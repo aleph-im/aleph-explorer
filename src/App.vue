@@ -2,10 +2,14 @@
   <div id="app">
     <div class="main-wrapper main-wrapper-1">
       <div class="main-zone">
+        <div class="navbar-bg"></div>
         <nav class="navbar navbar-expand-lg main-navbar">
+          <ul class="navbar-nav mr-auto mr-3">
+            <li v-if="window.width < 1024"><b-link @click="display_menu = !display_menu" href="#" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></b-link></li>
+          </ul>
+          <b-navbar-brand v-if="window.width < 1024" to="/">Aleph Explorer</b-navbar-brand>
           <form class="form-inline ml-auto">
-            <ul class="navbar-nav mr-3">
-              <li v-if="window.width < 1024"><b-link @click="display_menu = !display_menu" href="#" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></b-link></li>
+            <ul class="navbar-nav">
               <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li>
             </ul>
             <div class="search-element">
@@ -33,7 +37,7 @@
       <div class="main-sidebar" v-if="window.width >= 1024 | display_menu">
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
-            <b-link target="/">Aleph.im</b-link>
+            <b-link target="/">Aleph.im<br/>Explorer</b-link>
           </div>
           <ul class="sidebar-menu">
             <li class="menu-header">Dashboard</li>
@@ -117,6 +121,12 @@ nav.navbar {
     .sidebar-menu {
       min-height: calc(100vh - 60px - 6.1rem - 12px);
     }
+  }
+
+  .sidebar-brand {
+    height: auto;
+    line-height: 1.2em;
+    padding: 1.5em 0;
   }
 }
 
