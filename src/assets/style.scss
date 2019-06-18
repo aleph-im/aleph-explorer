@@ -1,0 +1,98 @@
+.main-content {
+  padding: 10px 30px 30px 30px;
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: row-reverse;
+
+  .main-zone {
+    flex-grow: 1;
+  }
+}
+
+
+nav.navbar {
+  position: inherit !important;
+  background: #6777ef;
+}
+
+.main-sidebar {
+  position: inherit !important;
+  min-width: 250px;
+  height: auto;
+
+  #sidebar-wrapper {
+    .sidebar-menu {
+      min-height: calc(100vh - 60px - 6.1rem - 12px);
+    }
+  }
+
+  .sidebar-brand {
+    height: auto;
+    line-height: 1.2em;
+    padding: 1.5em 0;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .main-wrapper {
+    flex-direction: column-reverse;
+    .main-sidebar {
+      width: 100%;
+    }
+  }
+}
+
+.main-sidebar .sidebar-menu li a.router-link-active {
+  color: #6777ef;
+  font-weight: 600;
+}
+
+.card table.compact {
+  td, th {
+    height: 3em !important;
+    font-size: 80%;
+    padding: 0 2px !important;
+
+    &:first-child {
+      padding-left: 25px !important;
+    }
+
+    &:last-child {
+      padding-right: 25px !important;
+    }
+  }
+
+  td {
+    &.hash,
+    &.address {
+      display: block;
+      width: 200px; /* However wide you want the cell to be before ellipsis */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+    }
+  }
+}
+
+.card .list-group.compact {
+  font-size: 80%;
+}
+
+a, span {
+  &.hash,
+  &.address {
+    display: inline-block;
+    vertical-align: bottom;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 20vw;
+    word-wrap: normal;
+  }
+
+  &.break-xs {
+    max-width: 10em;
+  }
+}

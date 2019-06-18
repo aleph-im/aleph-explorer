@@ -93,54 +93,5 @@ export default {
 /* optional imports */
 @import '~stisla-theme/dist/scss/components.scss';
 
-.main-content {
-  padding: 10px 30px 30px 30px;
-}
-
-.main-wrapper {
-  display: flex;
-  flex-direction: row-reverse;
-
-  .main-zone {
-    flex-grow: 1;
-  }
-}
-
-
-nav.navbar {
-  position: inherit !important;
-  background: #6777ef;
-}
-
-.main-sidebar {
-  position: inherit !important;
-  min-width: 250px;
-  height: auto;
-
-  #sidebar-wrapper {
-    .sidebar-menu {
-      min-height: calc(100vh - 60px - 6.1rem - 12px);
-    }
-  }
-
-  .sidebar-brand {
-    height: auto;
-    line-height: 1.2em;
-    padding: 1.5em 0;
-  }
-}
-
-@media only screen and (max-width: 1024px) {
-  .main-wrapper {
-    flex-direction: column-reverse;
-    .main-sidebar {
-      width: 100%;
-    }
-  }
-}
-
-.main-sidebar .sidebar-menu li a.router-link-active {
-  color: #6777ef;
-  font-weight: 600;
-}
+@import './assets/style.scss';
 </style>

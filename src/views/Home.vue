@@ -10,9 +10,46 @@
                 <b-link class="btn btn-primary" to="/messages">View all <i class="fas fa-chevron-right"></i></b-link>
               </div>
             </b-card-header>
+            <b-list-group flush class="compact">
+              <b-list-group-item v-for="message of last_messages" :key="message.item_hash">
+                <div class="d-flex w-100 font-small">
+                  <figure v-if="message.type==='POST'"
+                          class="avatar avatar-sm mr-2 bg-primary text-white"
+                          data-initial="Post"></figure>
+                  <figure v-if="message.type==='AGGREGATE'"
+                          class="avatar avatar-sm mr-2 bg-info text-white"
+                          data-initial="Aggr"></figure>
+                  <div>
+                    <b-link class="hash break-xs">{{message.item_hash}}</b-link><br />
+                    <span v-b-tooltip.hover :title="dateformat(message.time)">
+                      {{reldateformat(message.time)}}
+                    </span>
+                  </div>
+                  <div>
+                    By <b-link class="address break-xs">{{message.sender}}</b-link><br />
+                    <span v-if="message.content.address !== message.sender">
+                      For <b-link class="address break-xs">{{message.content.address}}</b-link>
+                    </span>
+                  </div>
+                  <div class="ml-auto">
+                    <b-badge v-b-tooltip.hover :title="confirm_text(message)"
+                    variant="light">{{message.confirmations.length}}</b-badge>
+                  </div>
+                </div>
+              </b-list-group-item>
+              <b-list-group-item>Dapibus ac facilisis in</b-list-group-item>
+              <b-list-group-item>Vestibulum at eros</b-list-group-item>
+            </b-list-group>
             <b-card-body class="p-0">
-              <b-table responsive striped hover table-class="compact mb-0"
-              :items="last_messages" :fields="messages_fields"></b-table>
+              <b-table responsive striped hover table-class="compact mb-0 table-nowrap"
+              :items="last_messages" :fields="messages_fields" :busy.sync="!last_messages.length">
+                <template slot="item_hash" slot-scope="data">
+                  <b-link>{{data.item.item_hash}}</b-link>
+                </template>
+                <template slot="time" slot-scope="data">
+                  {{dateformat(data.item.time)}}
+                </template>
+            </b-table>
             </b-card-body>
           </b-card>
         </b-col>
@@ -26,7 +63,11 @@
             </b-card-header>
             <b-card-body class="p-0">
               <b-table responsive striped hover table-class="compact mb-0"
-                       :items="last_posts" :fields="posts_fields"></b-table>
+                       :items="last_posts" :fields="posts_fields" :busy.sync="!last_posts.length">
+                <template slot="time" slot-scope="data">
+                  {{dateformat(data.item.time)}}
+                </template>
+              </b-table>
             </b-card-body>
           </b-card>
         </b-col>
@@ -55,20 +96,22 @@
 
 <script>
 import { mapState } from 'vuex'
+import moment from 'moment'
 import axios from 'axios'
 
 export default {
   name: 'home',
   data() {
     return {
+      last_messages: [],
       last_posts: [],
       messages_fields: [
-        { key: 'item_hash', label: 'Item Hash'},
+        { key: 'item_hash', label: 'Item Hash', class: 'hash'},
         { key: 'type', label: 'Type' },
         { key: 'time', label: 'Time' }
       ],
       posts_fields: [
-        { key: 'item_hash', label: 'Item Hash'},
+        { key: 'item_hash', label: 'Item Hash', class: 'hash'},
         { key: 'type', label: 'Post Type' },
         { key: 'time', label: 'Time' }
       ],
@@ -96,6 +139,16 @@ export default {
   components: {
   },
   methods: {
+    dateformat (dt) {
+      return moment.unix(dt).format('lll')
+    },
+    reldateformat (dt) {
+      return moment.unix(dt).fromNow()
+    },
+    confirm_text (message) {
+      let chains = [...new Set(message.confirmations.map(c => c.chain))];
+      return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`;
+    },
     async update() {
       await this.update_messages()
       await this.update_posts()

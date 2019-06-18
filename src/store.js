@@ -5,8 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    //api_server: 'https://apitest.aleph.im',
-    api_server: 'http://localhost:8080',
+    api_server: 'https://apitest.aleph.im',
+    //api_server: 'http://localhost:8080',
     network_id: 261,
     ipfs_gateway: 'https://ipfs.io/ipfs/',
     account: null,
