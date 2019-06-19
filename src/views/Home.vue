@@ -66,6 +66,7 @@ export default {
     return {
       last_messages: [],
       last_posts: [],
+      polling: null,
       messages_fields: [
         { key: 'item_hash', label: 'Item Hash', class: 'hash'},
         { key: 'type', label: 'Type' },
@@ -79,18 +80,6 @@ export default {
     }
   },
   computed: {
-    displayed_last_posts() {
-      return this.last_posts.map(post => ({
-        'hash': post.item_hash,
-        'type': post.type,
-        'sender': post.sender,
-        'address': post.address,
-        'ref': post.ref,
-        'time': post.time
-      }))
-    },
-    displayed_last_messages() {
-    },
     ...mapState({
       account: 'account',
       api_server: 'api_server',
@@ -142,7 +131,10 @@ export default {
     // We may not have a correct account list yet... So wait a bit.
     this.$nextTick(this.update.bind(this))
     //setTimeout(this.update.bind(this), 500)
-    setInterval(this.update.bind(this), 2000)
+    this.polling = setInterval(this.update.bind(this), 2000)
+  },
+  beforeDestroy () {
+  	clearInterval(this.polling)
   }
 }
 </script>
