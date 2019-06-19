@@ -21,9 +21,15 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
     },
     {
-      path: '/message/:hash',
+      path: '/address/:chain/:address/message/:type/:hash',
       name: 'message',
       component: () => import(/* webpackChunkName: "message" */ './views/Message.vue'),
+      props: true
+    },
+    {
+      path: '/address/:chain/:address',
+      name: 'address-detail',
+      component: () => import(/* webpackChunkName: "address_detail" */ './views/AddressDetail.vue'),
       props: true
     },
     {

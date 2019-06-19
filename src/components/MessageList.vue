@@ -12,7 +12,12 @@
                     data-initial="Aggr"></figure>
             <div>
               <b-link class="hash break-xs"
-                      :to="{name: 'message', params: {hash: message.item_hash}}">
+                      :to="{name: 'message', params: {
+                        hash: message.item_hash,
+                        chain: message.chain,
+                        address: message.sender,
+                        type: message.type
+                        }}">
                 {{message.item_hash}}
               </b-link><br />
               <span v-b-tooltip.hover :title="dateformat(message.time)">
@@ -21,7 +26,9 @@
             </div>
             <div>
               By <b-link class="address break-xs"
-                         :to="{name: 'address-detail', params: {address: message.sender}}">
+                         :to="{name: 'address-detail', params: {
+                           address: message.sender, chain: message.chain
+                           }}">
                 {{message.sender}}</b-link><br />
               <span v-if="message.content.address !== message.sender">
                 For <b-link class="address break-xs"
