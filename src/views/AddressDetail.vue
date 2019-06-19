@@ -5,10 +5,9 @@
     </div>
     <div class="section-body">
       <h2 class="section-title">
-        <AccountAvatar :address="address" avatarclass="avatar-sm" />
-        <AccountName :address="address" />
+        {{address}}
       </h2>
-      <p class="section-lead">Address of the {{chain}} network.</p>
+      <p class="section-lead" v-if="chain">Address of the {{chain}} network.</p>
     </div>
     <b-row>
       <b-col cols="12" md="6">
@@ -17,6 +16,12 @@
             <h4>Messages</h4>
           </b-card-header>
           <MessageList :messages="messages" class="compact" />
+          <b-pagination
+            v-model="current_msg_page"
+            :total-rows="total_msg"
+            :per-page="msg_per_page"
+            class="ml-auto mr-3" size="sm"
+          ></b-pagination>
           <!--
           <b-card-body class="p-0">
             <MessageTable :messages="last_messages" striped hover table-class="compact mb-0 table-nowrap" />
@@ -24,6 +29,29 @@
         </b-card>
       </b-col>
       <b-col cols="12" md="6">
+        <div class="card profile-widget">
+          <div class="profile-widget-header">
+            <AccountAvatar :address="address" avatarclass="profile-widget-picture avatar-xxl" />
+            <div class="profile-widget-items">
+              <div class="profile-widget-item">
+                <div class="profile-widget-item-label">Posts</div>
+                <div class="profile-widget-item-value">187</div>
+              </div>
+              <div class="profile-widget-item">
+                <div class="profile-widget-item-label">Messages</div>
+                <div class="profile-widget-item-value">6,8K</div>
+              </div>
+              <div class="profile-widget-item">
+                <div class="profile-widget-item-label">Following</div>
+                <div class="profile-widget-item-value">2,1K</div>
+              </div>
+            </div>
+          </div>
+          <div class="profile-widget-description pb-0">
+            <div class="profile-widget-name"><AccountName :address="address" :profiles="profiles" /></div>
+            <p v-if="profile && profile.bio">{{profile.bio}}</p>
+          </div>
+        </div>
       </b-col>
     </b-row>
   </div>
@@ -43,7 +71,7 @@ export default {
     return {
       profile: {},
       messages: [],
-      msg_per_page: 20,
+      msg_per_page: 10,
       total_msg: 0,
       current_msg_page: 1,
       posts: [],
@@ -54,7 +82,8 @@ export default {
   },
   computed: mapState({
     account: state => state.account,
-    api_server: state => state.api_server
+    api_server: state => state.api_server,
+    profiles: state => state.profiles
   }),
   components: {
     MessageList, AccountAvatar, AccountName
@@ -66,6 +95,7 @@ export default {
   methods: {
     async refresh() {
       await this.getProfile()
+      await this.getMessages()
       await this.getPosts()
     },
     async getProfile() {
@@ -96,9 +126,8 @@ export default {
     },
     async getMessages() {
       // own posts`
-      let response = await axios.get(`${this.api_server}/api/v0/posts.json`, {
+      let response = await axios.get(`${this.api_server}/api/v0/messages.json`, {
         params: {
-          'types': 'blog_pers,comment,social',
           'addresses': this.address,
           'pagination': this.msg_per_page,
           'page': this.current_msg_page
@@ -117,8 +146,8 @@ export default {
       await this.getPosts()
       await this.getMessages()
     },
-    async current_page() {
-      await this.getPosts()
+    async current_msg_page() {
+      await this.getMessages()
     }
   },
   async created() {
