@@ -11,15 +11,22 @@
                     class="avatar avatar-sm mr-2 bg-info text-white"
                     data-initial="Aggr"></figure>
             <div>
-              <b-link class="hash break-xs">{{message.item_hash}}</b-link><br />
+              <b-link class="hash break-xs"
+                      :to="{name: 'message', params: {hash: message.item_hash}}">
+                {{message.item_hash}}
+              </b-link><br />
               <span v-b-tooltip.hover :title="dateformat(message.time)">
                 {{reldateformat(message.time)}}
               </span>
             </div>
             <div>
-              By <b-link class="address break-xs">{{message.sender}}</b-link><br />
+              By <b-link class="address break-xs"
+                         :to="{name: 'address-detail', params: {address: message.sender}}">
+                {{message.sender}}</b-link><br />
               <span v-if="message.content.address !== message.sender">
-                For <b-link class="address break-xs">{{message.content.address}}</b-link>
+                For <b-link class="address break-xs"
+                           :to="{name: 'address-detail', params: {address: message.content.address}}">
+                    {{message.content.address}}</b-link>
               </span>
             </div>
             <div class="ml-auto" v-if="message.confirmations">
