@@ -34,24 +34,26 @@
           </div>
         </footer>
       </div>
-      <div class="main-sidebar" v-if="window.width >= 1024 | display_menu">
-        <aside id="sidebar-wrapper">
-          <div class="sidebar-brand">
-            <b-link target="/">Aleph.im<br/>Explorer</b-link>
-          </div>
-          <ul class="sidebar-menu">
-            <li class="menu-header">Dashboard</li>
-            <b-nav-item to="/">
-              <i class="fas fa-chart-line"></i><span>General Dashboard</span>
-            </b-nav-item>
-          </ul>
-          <div class="p-3 mt-4 mb-4 hide-sidebar-mini">
-            <a href="documentation.html" class="btn btn-primary btn-lg btn-icon-split btn-block">
-              <i class="far fa-question-circle"></i> <div>Documentation</div>
-            </a>
-          </div>
-        </aside>
-      </div>
+      <transition name="fade">
+        <div class="main-sidebar" v-if="window.width >= 1024 | display_menu">
+          <aside id="sidebar-wrapper">
+            <div class="sidebar-brand">
+              <b-link target="/">Aleph.im<br/>Explorer</b-link>
+            </div>
+            <ul class="sidebar-menu">
+              <li class="menu-header">Dashboard</li>
+              <b-nav-item to="/">
+                <i class="fas fa-chart-line"></i><span>General Dashboard</span>
+              </b-nav-item>
+            </ul>
+            <div class="p-3 mt-4 mb-4 hide-sidebar-mini">
+              <b-link to="/about" class="btn btn-primary btn-lg btn-icon-split btn-block">
+                <i class="far fa-question-circle"></i> <div>About</div>
+              </b-link>
+            </div>
+          </aside>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -94,4 +96,11 @@ export default {
 @import '~stisla-theme/dist/scss/components.scss';
 
 @import './assets/style.scss';
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 </style>
