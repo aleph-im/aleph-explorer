@@ -17,7 +17,8 @@ export default {
   components: {
   },
   props: {
-    address: String
+    address: String,
+    chain: String
   }
 }
 </script>

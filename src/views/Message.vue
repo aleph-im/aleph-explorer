@@ -17,7 +17,10 @@ export default {
   components: {
   },
   props: {
-    hash: String
+    hash: String,
+    chain: String,
+    address: String,
+    type: String
   }
 }
 </script>
