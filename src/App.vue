@@ -62,7 +62,6 @@
 export default {
   name: 'app',
   data() {
-    console.log(this.$mq)
     return {
       window: {
         width: 0,
