@@ -182,3 +182,10 @@ export default {
   }
 }
 </script>
+
+<style lang="css">
+.vjs-tree {
+  font-size: 10px !important;
+  line-height: 1.5em;
+}
+</style>
