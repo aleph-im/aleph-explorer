@@ -52,26 +52,25 @@
             <p v-if="aggregates.profile && aggregates.profile.bio">{{aggregates.profile.bio}}</p>
           </div>
         </div>
-
-        <b-card no-body v-if="aggregates">
-          <b-card-header>
-            <h4>Aggregates detail</h4>
-          </b-card-header>
-          <b-tabs pills card vertical>
-            <b-tab v-for="[key, value] of Object.entries(aggregates)"
-              :title="key"
-              :key="key">
-              <b-card-text>
-                <vue-json-pretty
-                  :data="value">
-                </vue-json-pretty>
-
-              </b-card-text>
-            </b-tab>
-          </b-tabs>
-        </b-card>
       </b-col>
     </b-row>
+
+    <b-card no-body v-if="aggregates">
+      <b-card-header>
+        <h4>Aggregates detail</h4>
+      </b-card-header>
+      <b-tabs pills card vertical>
+        <b-tab v-for="[key, value] of Object.entries(aggregates)"
+          :title="key"
+          :key="key">
+          <b-card-text>
+            <vue-json-pretty
+              :data="value" highlightMouseoverNode>
+            </vue-json-pretty>
+          </b-card-text>
+        </b-tab>
+      </b-tabs>
+    </b-card>
   </div>
 </template>
 
