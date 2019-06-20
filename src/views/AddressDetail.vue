@@ -49,9 +49,27 @@
           </div>
           <div class="profile-widget-description pb-0">
             <div class="profile-widget-name"><AccountName :address="address" :profiles="profiles" /></div>
-            <p v-if="profile && profile.bio">{{profile.bio}}</p>
+            <p v-if="aggregates.profile && aggregates.profile.bio">{{aggregates.profile.bio}}</p>
           </div>
         </div>
+
+        <b-card no-body v-if="aggregates">
+          <b-card-header>
+            <h4>Aggregates detail</h4>
+          </b-card-header>
+          <b-tabs pills card vertical>
+            <b-tab v-for="[key, value] of Object.entries(aggregates)"
+              :title="key"
+              :key="key">
+              <b-card-text>
+                <vue-json-pretty
+                  :data="value">
+                </vue-json-pretty>
+
+              </b-card-text>
+            </b-tab>
+          </b-tabs>
+        </b-card>
       </b-col>
     </b-row>
   </div>
@@ -62,14 +80,15 @@ import { mapState } from 'vuex'
 import AccountAvatar from '@/components/AccountAvatar.vue'
 import AccountName from '@/components/AccountName.vue'
 import MessageList from '@/components/MessageList.vue'
-import {fetch_profile} from 'aleph-js/src/api/aggregates'
+import {fetch} from 'aleph-js/src/api/aggregates'
 import axios from 'axios'
+import VueJsonPretty from 'vue-json-pretty'
 
 export default {
   name: 'address-detail',
   data() {
     return {
-      profile: {},
+      aggregates: {},
       stats: {},
       messages: [],
       msg_per_page: 10,
@@ -87,7 +106,7 @@ export default {
     profiles: state => state.profiles
   }),
   components: {
-    MessageList, AccountAvatar, AccountName
+    MessageList, AccountAvatar, AccountName, VueJsonPretty
   },
   props: {
     address: String,
@@ -96,18 +115,18 @@ export default {
   methods: {
     async refresh() {
       await this.getStats()
-      await this.getProfile()
+      await this.getAggregates()
       await this.getPosts()
       await this.getMessages()
     },
-    async getProfile() {
-      this.profile = await fetch_profile(this.address, {api_server: this.api_server})
-      if (this.profile === null)
-        this.profile = {}
-      else
+    async getAggregates() {
+      this.aggregates = await fetch(this.address, {api_server: this.api_server})
+      if (this.aggregates === null)
+        this.aggregates = {}
+      else if (this.aggregates.profile !== undefined)
         this.$store.commit('store_profile', {
           address: this.address,
-          profile: this.profile
+          profile: this.aggregates['profile']
         })
     },
     async getPosts() {

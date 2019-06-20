@@ -10,7 +10,7 @@
                 <b-link class="btn btn-primary" to="/messages">View all <i class="fas fa-chevron-right"></i></b-link>
               </div>
             </b-card-header>
-            <MessageList :messages="last_messages" class="compact" />
+            <MessageList :messages="last_messages" class="compact" animate />
             <!--
             <b-card-body class="p-0">
               <MessageTable :messages="last_messages" striped hover table-class="compact mb-0 table-nowrap" />
