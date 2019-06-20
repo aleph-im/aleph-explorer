@@ -34,16 +34,16 @@
             <AccountAvatar :address="address" avatarclass="profile-widget-picture avatar-xxl" />
             <div class="profile-widget-items">
               <div class="profile-widget-item">
-                <div class="profile-widget-item-label">Posts</div>
-                <div class="profile-widget-item-value">187</div>
-              </div>
-              <div class="profile-widget-item">
                 <div class="profile-widget-item-label">Messages</div>
-                <div class="profile-widget-item-value">6,8K</div>
+                <div class="profile-widget-item-value">{{stats ? stats.messages : 0}}</div>
               </div>
               <div class="profile-widget-item">
-                <div class="profile-widget-item-label">Following</div>
-                <div class="profile-widget-item-value">2,1K</div>
+                <div class="profile-widget-item-label">Posts</div>
+                <div class="profile-widget-item-value">{{stats ? stats.posts : 0}}</div>
+              </div>
+              <div class="profile-widget-item">
+                <div class="profile-widget-item-label">Aggregates</div>
+                <div class="profile-widget-item-value">{{stats ? stats.aggregates : 0}}</div>
               </div>
             </div>
           </div>
@@ -70,6 +70,7 @@ export default {
   data() {
     return {
       profile: {},
+      stats: {},
       messages: [],
       msg_per_page: 10,
       total_msg: 0,
@@ -94,9 +95,10 @@ export default {
   },
   methods: {
     async refresh() {
+      await this.getStats()
       await this.getProfile()
-      await this.getMessages()
       await this.getPosts()
+      await this.getMessages()
     },
     async getProfile() {
       this.profile = await fetch_profile(this.address, {api_server: this.api_server})
@@ -138,13 +140,20 @@ export default {
       this.messages = messages // display all for now
       this.total_msg = response.data.pagination_total
       this.current_msg_page = response.data.pagination_page
+    },
+    async getStats() {
+      let response = await axios.get(`${this.api_server}/api/v0/addresses/stats.json`, {
+        params: {
+          addresses: [this.address]
+        }
+      })
+      let stats = response.data.data[this.address]
+      if (stats !== undefined) { this.$set(this, 'stats', stats) } else { this.$set(this, 'stats', {}) }
     }
   },
   watch: {
     async $route(to, from) {
-      await this.getProfile()
-      await this.getPosts()
-      await this.getMessages()
+      await this.refresh()
     },
     async current_msg_page() {
       await this.getMessages()
