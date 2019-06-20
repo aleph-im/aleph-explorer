@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-list-group flush class="compact">
+    <b-list-group flush :class="this.class + ' animate'">
       <transition-group name="dynamic-list" tag="div">
         <b-list-group-item v-for="message of messages" :key="message.item_hash">
           <div class="d-flex w-100 font-small">
@@ -52,7 +52,9 @@ import moment from 'moment';
 export default {
   name: 'MessageList',
   props: {
-    messages: Array
+    messages: Array,
+    animate: Boolean,
+    class: String
   },
   methods:{
     dateformat (dt) {
@@ -72,17 +74,18 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .list-group-item {
-  transition: all 1s;
+  transition: all .2s;
 }
 .dynamic-list-enter, .dynamic-list-leave-to
 /* .list-complete-leave-active below version 2.1.8 */ {
   opacity: 0;
-  transform: translateX(30px);
+  transform: translateY(-30px);
 }
 .dynamic-list-leave-to {
-  transform: translateX(-30px);
+  transform: translateY(30px);
 }
 .dynamic-list-leave-active {
   position: absolute;
+  width: 100%;
 }
 </style>
