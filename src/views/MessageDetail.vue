@@ -79,6 +79,25 @@
                 <span>Content time</span>
                 <span>{{dateformat(message.content.time)}}</span>
               </b-list-group-item>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                <span>Confirmations</span>
+                <div v-if="message.confirmations">
+                  <span v-for="conf in message.confirmations">
+                    {{conf.chain}} (block
+                      <a v-if="conf.chain=='NULS'" target="_blank" rel="noopener noreferrer"
+                         :href="'https://testnet.nuls.world/transactions/'+getHash(conf.hash)">
+                         {{conf.height}}</a>
+                      <a v-else-if="conf.chain=='BNB'" target="_blank" rel="noopener noreferrer"
+                         :href="'https://explorer.binance.org/tx/'+getHash(conf.hash)">
+                         {{conf.height}}</a>
+                      <a v-else-if="conf.chain=='ETH'" target="_blank" rel="noopener noreferrer"
+                         :href="'https://rinkeby.etherscan.io/tx/0x'+getHash(conf.hash)">
+                         {{conf.height}}</a>
+                      <a v-else>{{conf.height}}</a>)<br />
+                  </span>
+                </div>
+                <span v-else>None</span>
+              </b-list-group-item>
             </b-list-group>
           </b-card>
         </b-col>
@@ -93,6 +112,11 @@ import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
 import moment from 'moment';
 import AddressLink from '@/components/AddressLink'
+
+function base64toHEX(base64) {
+  const buffer = Buffer.from(base64, 'base64');
+  return buffer.toString('hex');
+}
 
 export default {
   name: 'message-detail',
@@ -121,6 +145,12 @@ export default {
     },
     reldateformat (dt) {
       return moment.unix(dt).fromNow()
+    },
+    getHash(hash) {
+      if (hash.$binary !== undefined)
+        return base64toHEX(hash.$binary)
+      else
+        return hash
     },
     async update() {
       await this.getMessages()
