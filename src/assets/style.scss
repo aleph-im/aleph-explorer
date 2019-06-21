@@ -62,6 +62,14 @@ nav.navbar {
     &:last-child {
       padding-right: 25px !important;
     }
+
+    &::after {
+      right: auto !important;
+      bottom: auto !important;
+      position: inherit !important;
+      display: inline-block !important;
+      margin-left: 1em;
+    }
   }
 
   td {

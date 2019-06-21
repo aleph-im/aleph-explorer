@@ -46,6 +46,13 @@
               <b-nav-item to="/">
                 <i class="fas fa-chart-line"></i><span>General Dashboard</span>
               </b-nav-item>
+              <li class="menu-header">Insights</li>
+              <b-nav-item to="/messages">
+                <i class="fas fa-inbox"></i><span>Messages</span>
+              </b-nav-item>
+              <b-nav-item to="/addresses">
+                <i class="fas fa-address-book"></i><span>Addresses</span>
+              </b-nav-item>
             </ul>
             <div class="p-3 mt-4 mb-4 hide-sidebar-mini">
               <b-link to="/about" class="btn btn-primary btn-lg btn-icon-split btn-block">
@@ -60,6 +67,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import { mapState } from 'vuex'
 export default {
   name: 'app',
   data() {
@@ -71,9 +80,15 @@ export default {
       'display_menu': false
     }
   },
+  computed: mapState({
+    account: state => state.account,
+    api_server: state => state.api_server,
+    profiles: state => state.profiles
+  }),
   created() {
     window.addEventListener('resize', this.handleResize)
     this.handleResize();
+    this.loadAddresses();
   },
   destroyed() {
     window.removeEventListener('resize', this.handleResize)
@@ -82,6 +97,12 @@ export default {
     handleResize() {
       this.window.width = window.innerWidth;
       this.window.height = window.innerHeight;
+    },
+    async loadAddresses() {
+      // VERY BAD, we load everything for now!
+      // TODO: gotta do it on demand.
+      let response = await axios.get(`${this.api_server}/api/v0/addresses/stats.json`)
+      this.$store.commit('set_addresses_stats', response.data.data)
     }
   }
 }

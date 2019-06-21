@@ -11,23 +11,25 @@
               </div>
             </b-card-header>
             <MessageList :messages="last_messages" class="compact" animate />
-            <!--
-            <b-card-body class="p-0">
-              <MessageTable :messages="last_messages" striped hover table-class="compact mb-0 table-nowrap" />
-            </b-card-body> -->
           </b-card>
         </b-col>
         <b-col cols="12" md="6">
           <b-card no-body>
             <b-card-header>
-              <h4>Last posts only</h4>
+              <h4>Most active addresses</h4>
               <div class="card-header-action">
-                <b-link class="btn btn-primary" to="/posts">View all <i class="fas fa-chevron-right"></i></b-link>
+                <b-link class="btn btn-primary" to="/addresses">View all <i class="fas fa-chevron-right"></i></b-link>
               </div>
             </b-card-header>
-            <b-card-body class="p-0">
-              <MessageTable :messages="last_posts" striped hover table-class="compact mb-0 table-nowrap" />
-            </b-card-body>
+            <b-table responsive table-class="compact"
+            :items="active_addresses" :fields="addresses_fields">
+                <template slot="address" slot-scope="data">
+                  <AddressLink :address="data.item.address" class="address break-xs" />
+                </template>
+                <template slot="time" slot-scope="data">
+                  {{dateformat(data.item.time)}}
+                </template>
+            </b-table>
           </b-card>
         </b-col>
       </b-row>
@@ -59,36 +61,44 @@ import moment from 'moment'
 import axios from 'axios'
 import MessageList from '@/components/MessageList.vue'
 import MessageTable from '@/components/MessageTable.vue'
+import AddressLink from '@/components/AddressLink'
 
 export default {
   name: 'home',
   data() {
     return {
       last_messages: [],
-      last_posts: [],
       polling: null,
       messages_fields: [
         { key: 'item_hash', label: 'Item Hash', class: 'hash'},
         { key: 'type', label: 'Type' },
         { key: 'time', label: 'Time' }
       ],
-      posts_fields: [
-        { key: 'item_hash', label: 'Item Hash', class: 'hash'},
-        { key: 'type', label: 'Post Type' },
-        { key: 'time', label: 'Time' }
+      addresses_fields: [
+        { key: 'address', label: 'Address'},
+        { key: 'messages', label: 'Messages', class: 'text-right'},
+        { key: 'posts', label: 'Posts', class: 'text-right'},
+        { key: 'aggregates', label: 'Aggregates', class: 'text-right'}
       ],
     }
   },
   computed: {
+    active_addresses() {
+      let items = Object.values(this.addresses_stats)
+      items = items.sort((a, b) => b.messages - a.messages).slice(0,25)
+      return items
+    },
     ...mapState({
       account: 'account',
       api_server: 'api_server',
-      last_broadcast: 'last_broadcast'
+      last_broadcast: 'last_broadcast',
+      addresses_stats: 'addresses_stats'
     })
   },
   components: {
     MessageList,
-    MessageTable
+    MessageTable,
+    AddressLink
   },
   methods: {
     dateformat (dt) {
@@ -103,28 +113,16 @@ export default {
     },
     async update() {
       await this.update_messages()
-      await this.update_posts()
     },
     async update_messages() {
       let response = await axios.get(`${this.api_server}/api/v0/messages.json`, {
         params: {
-          'pagination': 10,
+          'pagination': 15,
           'page': 1
         }
       })
 
       this.last_messages = response.data.messages // display all for now
-    },
-    async update_posts() {
-      let response = await axios.get(`${this.api_server}/api/v0/messages.json`, {
-        params: {
-          'msgType': 'POST',
-          'pagination': 10,
-          'page': 1
-        }
-      })
-
-      this.last_posts = response.data.messages // display all for now
     }
   },
   async mounted() {

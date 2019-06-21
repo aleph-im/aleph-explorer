@@ -11,7 +11,7 @@ export default new Vuex.Store({
     ipfs_gateway: 'https://ipfs.io/ipfs/',
     account: null,
     profiles: {},
-    alias_address: {},
+    addresses_stats: [],
     last_broadcast: null,
     categories: [ // categories are hard-coded for now...
       'Crypto',
@@ -22,6 +22,9 @@ export default new Vuex.Store({
     ]
   },
   mutations: {
+    set_addresses_stats(state, addresses_stats) {
+      state.addresses_stats = addresses_stats
+    },
     set_account(state, account) {
       state.account = account
     },
