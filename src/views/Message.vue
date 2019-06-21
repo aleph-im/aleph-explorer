@@ -12,7 +12,7 @@
       <p class="section-lead" v-if="messages.length > 1">Warning, there is {{messages.length}} messages corresponding! All are shown, one under the other.</p>
     </div>
     <div v-for="message in messages">
-      <b-row>
+      <b-row class="flex-column-reverse flex-lg-row">
         <b-col lg="8">
           <b-card no-body>
             <!-- <b-card-header>

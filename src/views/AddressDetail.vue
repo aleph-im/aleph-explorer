@@ -9,7 +9,7 @@
       </h2>
       <p class="section-lead" v-if="chain">Address of the {{chain}} network.</p>
     </div>
-    <b-row>
+    <b-row class="flex-column-reverse flex-md-row">
       <b-col cols="12" md="6">
         <b-card no-body class="card-primary">
           <b-card-header>
