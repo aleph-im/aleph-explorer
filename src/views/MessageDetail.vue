@@ -12,13 +12,9 @@
       <p class="section-lead" v-if="messages.length > 1">Warning, there is {{messages.length}} messages corresponding! All are shown, one under the other.</p>
     </div>
     <div v-for="message in messages">
-      <b-row class="flex-column-reverse flex-lg-row">
-        <b-col lg="8">
+      <b-row class="flex-column-reverse flex-xl-row">
+        <b-col cols="12" xl="8">
           <b-card no-body>
-            <!-- <b-card-header>
-              <h4>Message content</h4>
-            </b-card-header> -->
-
             <b-tabs pills card>
               <b-tab title="Message Content" v-if="message.content">
                 <b-card-body>
@@ -27,10 +23,31 @@
                   </vue-json-pretty>
                 </b-card-body>
               </b-tab>
+              <b-tab title="Signature" v-if="message.signature">
+                <b-card-body>
+                  <vue-json-pretty
+                    :data="message.signature" highlightMouseoverNode>
+                  </vue-json-pretty>
+                </b-card-body>
+              </b-tab>
+              <b-tab title="Confirmations" v-if="message.confirmations">
+                <b-card-body>
+                  <vue-json-pretty
+                    :data="message.confirmations" highlightMouseoverNode>
+                  </vue-json-pretty>
+                </b-card-body>
+              </b-tab>
+              <b-tab title="Raw stored">
+                <b-card-body>
+                  <vue-json-pretty
+                    :data="message" highlightMouseoverNode>
+                  </vue-json-pretty>
+                </b-card-body>
+              </b-tab>
             </b-tabs>
           </b-card>
         </b-col>
-        <b-col lg="4">
+        <b-col cols="12" xl="4">
           <b-card no-body>
             <b-card-header>
               <h4>Message details</h4>
@@ -39,6 +56,10 @@
               <b-list-group-item class="d-flex w-100 font-small justify-content-between">
                 <span>Message type</span>
                 <span>{{message.type}}</span>
+              </b-list-group-item>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                <span>Channel</span>
+                <span>{{message.channel}}</span>
               </b-list-group-item>
               <b-list-group-item class="d-flex w-100 font-small justify-content-between">
                 <span>Sender</span>
@@ -72,7 +93,7 @@ import moment from 'moment';
 import AddressLink from '@/components/AddressLink'
 
 export default {
-  name: 'message',
+  name: 'message-detail',
   components: {
     VueJsonPretty, AddressLink
   },
@@ -138,5 +159,6 @@ export default {
 .vjs-tree {
   font-size: 10px !important;
   line-height: 1.5em;
+  word-wrap: anywhere;
 }
 </style>
