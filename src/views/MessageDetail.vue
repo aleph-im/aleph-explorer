@@ -26,7 +26,7 @@
               <b-tab title="Signature" v-if="message.signature">
                 <b-card-body>
                   <vue-json-pretty
-                    :data="message.signature" highlightMouseoverNode>
+                    :data="{signature: message.signature}" highlightMouseoverNode>
                   </vue-json-pretty>
                 </b-card-body>
               </b-tab>
@@ -65,17 +65,19 @@
                 <span>Sender</span>
                 <span><address-link :address="message.sender" :chain="message.chain" /></span>
               </b-list-group-item>
-              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between"
+                                 v-if="(message.content) && (message.sender !== message.content.address)">
                 <span>On behalf of</span>
                 <span><address-link :address="message.content.address" /></span>
               </b-list-group-item>
               <b-list-group-item class="d-flex w-100 font-small justify-content-between">
                 <span>Message time</span>
-                <span>{{message.time}}</span>
+                <span>{{dateformat(message.time)}}</span>
               </b-list-group-item>
-              <b-list-group-item class="d-flex w-100 font-small justify-content-between" v-if="message.content.time">
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between"
+                                 v-if="message.content && message.content.time">
                 <span>Content time</span>
-                <span>{{message.content.time}}</span>
+                <span>{{dateformat(message.content.time)}}</span>
               </b-list-group-item>
             </b-list-group>
           </b-card>
