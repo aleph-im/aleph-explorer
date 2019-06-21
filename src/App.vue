@@ -26,12 +26,16 @@
             <router-view/>
           </section>
         </div>
-        <footer class="main-footer">
+        <footer class="main-footer px-5">
           <div class="footer-left">
-            Copyright © 2019<div class="bullet"></div> <a href="https://aleph.im">Aleph.im</a>
+            Copyright © 2019 <a href="https://aleph.im">Aleph.im</a>
           </div>
           <div class="footer-right">
             v0.1.0
+            <a href="https://github.com/aleph-im/aleph-explorer" class="card-link"
+                 target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-github"></i>
+              </a>
           </div>
         </footer>
       </div>

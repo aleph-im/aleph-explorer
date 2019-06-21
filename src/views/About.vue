@@ -1,12 +1,30 @@
 <template>
   <div>
-    <div class="section-header">
-      <h1>About</h1>
-    </div>
-    <div class="section-body">
-      <h2 class="section-title">Who are we?</h2>
-      <p class="section-lead">This page is just an example for you to create your own page.</p>
-    </div>
+    <b-card no-body>
+      <b-card-header>
+        <h4>What is
+          <a href="https://aleph.im"
+           target="_blank" rel="noopener noreferrer">Aleph.im</a>?</h4>
+      </b-card-header>
+      <b-card-body>
+        <b-card-text>
+          Aleph.im is:
+        </b-card-text>
+        <ul>
+          <li>A cross-blockchain layer-2 network</li>
+          <li>A decentralized secure cloud computing network</li>
+          <li>A decentralized IoT messenging and analytics platform</li>
+        </ul>
+      </b-card-body>
+      <b-card-footer class="bg-whitesmoke">
+        <a href="https://aleph.im" class="card-link"
+           target="_blank" rel="noopener noreferrer">
+           <i class="fas fa-home"></i> Website</a>
+        <a href="https://github.com/aleph-im/" class="card-link"
+           target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-github"></i> Github repositories</a>
+      </b-card-footer>
+    </b-card>
   </div>
 </template>
 
