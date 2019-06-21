@@ -13,7 +13,7 @@
         </b-card-header>
         <MessageList :messages="messages" class="compact" detailed />
 
-        <b-card-footer class="d-flex justify-content-between">
+        <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
           Total: {{total_msg}}
           <b-pagination
             v-model="page"

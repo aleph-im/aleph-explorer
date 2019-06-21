@@ -32,7 +32,7 @@
             </template>
         </b-table>
 
-        <b-card-footer class="d-flex justify-content-between">
+        <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
           Total: {{total}}
           <b-pagination
             v-model="page"
