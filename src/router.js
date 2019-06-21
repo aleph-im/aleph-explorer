@@ -27,13 +27,7 @@ export default new Router({
       props: true
     },
     {
-      path: '/address/:chain/:address',
-      name: 'address-detail',
-      component: () => import(/* webpackChunkName: "address_detail" */ './views/AddressDetail.vue'),
-      props: true
-    },
-    {
-      path: '/address/:address',
+      path: '/address/:chain?/:address',
       name: 'address-detail',
       component: () => import(/* webpackChunkName: "address_detail" */ './views/AddressDetail.vue'),
       props: true
