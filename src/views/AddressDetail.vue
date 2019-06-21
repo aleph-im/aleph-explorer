@@ -16,16 +16,16 @@
             <h4>Messages</h4>
           </b-card-header>
           <MessageList :messages="messages" class="compact" />
-          <b-pagination
-            v-model="current_msg_page"
-            :total-rows="total_msg"
-            :per-page="msg_per_page"
-            class="ml-auto mr-3" size="sm"
-          ></b-pagination>
-          <!--
-          <b-card-body class="p-0">
-            <MessageTable :messages="last_messages" striped hover table-class="compact mb-0 table-nowrap" />
-          </b-card-body> -->
+
+          <b-card-footer class="d-flex justify-content-between">
+            Total: {{total_msg}}
+            <b-pagination
+              v-model="current_msg_page"
+              :total-rows="total_msg"
+              :per-page="msg_per_page"
+              class="ml-auto mb-0" size="sm"
+            ></b-pagination>
+          </b-card-footer>
         </b-card>
       </b-col>
       <b-col cols="12" md="6">
@@ -142,7 +142,7 @@ export default {
 
       this.posts = posts // display all for now
       this.total_posts = response.data.pagination_total
-      this.current_post_page = response.data.pagination_page
+      // this.current_post_page = response.data.pagination_page
     },
     async getMessages() {
       // own posts`
@@ -157,7 +157,7 @@ export default {
 
       this.messages = messages // display all for now
       this.total_msg = response.data.pagination_total
-      this.current_msg_page = response.data.pagination_page
+      // this.current_msg_page = response.data.pagination_page
     },
     async getStats() {
       let response = await axios.get(`${this.api_server}/api/v0/addresses/stats.json`, {
