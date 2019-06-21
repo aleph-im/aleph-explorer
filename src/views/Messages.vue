@@ -1,20 +1,94 @@
 <template>
   <div>
-    <div class="section-header">
-      <h1>About</h1>
-    </div>
-    <div class="section-body">
-      <h2 class="section-title">Who are we?</h2>
-      <p class="section-lead">This page is just an example for you to create your own page.</p>
-    </div>
+      <b-card no-body class="card-primary">
+        <b-card-header class="d-flex justify-content-between">
+          <h4>Messages</h4>
+            <b-pagination
+              v-model="page"
+              :total-rows="total_msg"
+              :per-page="per_page"
+              limit="9"
+              class="mb-0" size="sm"
+            ></b-pagination>
+        </b-card-header>
+        <MessageList :messages="messages" class="compact" detailed />
+
+        <b-card-footer class="d-flex justify-content-between">
+          Total: {{total_msg}}
+          <b-pagination
+            v-model="page"
+            :total-rows="total_msg"
+            :per-page="per_page"
+            limit="9"
+            class="mb-0" size="sm"
+          ></b-pagination>
+        </b-card-footer>
+        <!--
+        <b-card-body class="p-0">
+          <MessageTable :messages="last_messages" striped hover table-class="compact mb-0 table-nowrap" />
+        </b-card-body> -->
+      </b-card>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import MessageList from '@/components/MessageList.vue'
+import {fetch} from 'aleph-js/src/api/aggregates'
+import axios from 'axios'
+import VueJsonPretty from 'vue-json-pretty'
 
 export default {
   name: 'about',
+  data() {
+    return {
+      messages: [],
+      per_page: 15,
+      total_msg: 0,
+      page: 1
+    }
+  },
+  computed: mapState({
+    account: state => state.account,
+    api_server: state => state.api_server,
+    profiles: state => state.profiles
+  }),
+  props: {
+    msg_type: {
+      type: String
+    }
+  },
   components: {
+    MessageList, VueJsonPretty
+  },
+  methods: {
+    async refresh() {
+      await this.getMessages()
+    },
+    async getMessages() {
+      // own posts`
+      let response = await axios.get(`${this.api_server}/api/v0/messages.json`, {
+        params: {
+          'pagination': this.per_page,
+          'page': this.page
+        }
+      })
+      let messages = response.data.messages
+
+      this.messages = messages // display all for now
+      this.total_msg = response.data.pagination_total
+    }
+  },
+  watch: {
+    async $route(to, from) {
+      await this.refresh()
+    },
+    async page() {
+      await this.refresh()
+    }
+  },
+  async created() {
+    await this.refresh()
   }
 }
 </script>
