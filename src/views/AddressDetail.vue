@@ -11,7 +11,7 @@
     </div>
     <b-row>
       <b-col cols="12" md="6">
-        <b-card no-body>
+        <b-card no-body class="card-primary">
           <b-card-header>
             <h4>Messages</h4>
           </b-card-header>
@@ -29,7 +29,7 @@
         </b-card>
       </b-col>
       <b-col cols="12" md="6">
-        <div class="card profile-widget">
+        <div class="card profile-widget card-success">
           <div class="profile-widget-header">
             <AccountAvatar :address="address" avatarclass="profile-widget-picture avatar-xxl" />
             <div class="profile-widget-items">
@@ -55,7 +55,7 @@
       </b-col>
     </b-row>
 
-    <b-card no-body v-if="aggregates">
+    <b-card no-body v-if="aggregates" class="card-info">
       <b-card-header>
         <h4>Aggregates detail</h4>
       </b-card-header>
@@ -63,11 +63,11 @@
         <b-tab v-for="[key, value] of Object.entries(aggregates)"
           :title="key"
           :key="key">
-          <b-card-text>
+          <b-card-body>
             <vue-json-pretty
               :data="value" highlightMouseoverNode>
             </vue-json-pretty>
-          </b-card-text>
+          </b-card-body>
         </b-tab>
       </b-tabs>
     </b-card>
