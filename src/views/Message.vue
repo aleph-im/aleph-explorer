@@ -5,22 +5,138 @@
     </div>
     <div class="section-body">
       <h2 class="section-title">{{hash}}</h2>
-      <p class="section-lead">This page is just an example for you to create your own page.</p>
+      <p class="section-lead" v-if="chain&&address&&type">
+        Looking for this {{type}} message on {{chain}}, sent by <address-link :address="address" :chain="chain" />
+        <span v-if="messages.length"> {{reldateformat(messages[0].time)}}</span>.
+      </p>
+      <p class="section-lead" v-if="messages.length > 1">Warning, there is {{messages.length}} messages corresponding! All are shown, one under the other.</p>
+    </div>
+    <div v-for="message in messages">
+      <b-row>
+        <b-col lg="8">
+          <b-card no-body>
+            <!-- <b-card-header>
+              <h4>Message content</h4>
+            </b-card-header> -->
+
+            <b-tabs pills card>
+              <b-tab title="Message Content" v-if="message.content">
+                <b-card-body>
+                  <vue-json-pretty
+                    :data="message.content" highlightMouseoverNode>
+                  </vue-json-pretty>
+                </b-card-body>
+              </b-tab>
+            </b-tabs>
+          </b-card>
+        </b-col>
+        <b-col lg="4">
+          <b-card no-body>
+            <b-card-header>
+              <h4>Message details</h4>
+            </b-card-header>
+            <b-list-group flush>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                <span>Message type</span>
+                <span>{{message.type}}</span>
+              </b-list-group-item>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                <span>Sender</span>
+                <span><address-link :address="message.sender" :chain="message.chain" /></span>
+              </b-list-group-item>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                <span>On behalf of</span>
+                <span><address-link :address="message.content.address" /></span>
+              </b-list-group-item>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                <span>Message time</span>
+                <span>{{message.time}}</span>
+              </b-list-group-item>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between" v-if="message.content.time">
+                <span>Content time</span>
+                <span>{{message.content.time}}</span>
+              </b-list-group-item>
+            </b-list-group>
+          </b-card>
+        </b-col>
+      </b-row>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import axios from 'axios'
+import VueJsonPretty from 'vue-json-pretty'
+import moment from 'moment';
+import AddressLink from '@/components/AddressLink'
 
 export default {
   name: 'message',
   components: {
+    VueJsonPretty, AddressLink
+  },
+  computed: mapState({
+    account: state => state.account,
+    api_server: state => state.api_server,
+    profiles: state => state.profiles
+  }),
+  data() {
+    return {
+      messages: []
+    }
   },
   props: {
     hash: String,
     chain: String,
     address: String,
     type: String
+  },
+  methods: {
+    dateformat (dt) {
+      return moment.unix(dt).format('lll')
+    },
+    reldateformat (dt) {
+      return moment.unix(dt).fromNow()
+    },
+    async update() {
+      await this.getMessages()
+      this.$forceUpdate()
+    },
+    async getMessages() {
+      let args = {
+        hashes: this.hash
+      }
+      if (this.chain)
+        args['chain'] = this.chain
+
+      if (this.address)
+        args['addresses'] = this.address
+
+      if (this.type)
+        args['msgType'] = this.type
+
+      let response = await axios.get(
+        `${this.api_server}/api/v0/messages.json`,
+        {params: args}
+      )
+      this.messages = response.data.messages
+    }
+  },
+  watch: {
+    async hash() {
+      await this.update()
+    }
+  },
+  async mounted() {
+    await this.update()
   }
 }
 </script>
+
+<style lang="css">
+.vjs-tree {
+  font-size: 10px !important;
+  line-height: 1.5em;
+}
+</style>
