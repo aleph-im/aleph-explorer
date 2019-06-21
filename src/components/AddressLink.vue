@@ -1,5 +1,5 @@
 <template>
-  <b-link :class="'address '+this.class"
+  <b-link class="address"
           :to="{name: 'address-detail', params: {
                address: this.address, chain: this.chain
                }}">
@@ -12,7 +12,6 @@ export default {
   props: {
     address: String,
     chain: String,
-    class: String
   }
 }
 </script>

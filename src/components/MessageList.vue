@@ -1,40 +1,38 @@
 <template>
-  <div>
-    <b-list-group flush :class="this.class + ' animate'">
-      <transition-group name="dynamic-list" tag="div">
-        <b-list-group-item v-for="message of messages" :key="message.item_hash">
-          <div class="d-flex w-100 font-small">
-            <figure v-if="message.type==='POST'"
-                    class="avatar avatar-sm mr-2 bg-primary text-white"
-                    data-initial="Post"></figure>
-            <figure v-if="message.type==='AGGREGATE'"
-                    class="avatar avatar-sm mr-2 bg-info text-white"
-                    data-initial="Aggr"></figure>
-            <div>
-              <message-link :hash="message.item_hash"
-                            :chain="message.chain"
-                            :address="message.sender"
-                            :type="message.type"
-               class="break-xs" /><br />
-              <span v-b-tooltip.hover :title="dateformat(message.time)">
-                {{reldateformat(message.time)}}
-              </span>
-            </div>
-            <div>
-              By <address-link :address="message.sender" :chain="message.chain" class="break-xs" /><br />
-              <span v-if="message.content.address !== message.sender">
-                For <address-link :address="message.content.address" class="break-xs" />
-              </span>
-            </div>
-            <div class="ml-auto" v-if="message.confirmations">
-              <b-badge v-b-tooltip.hover :title="confirm_text(message)"
-              variant="light">{{message.confirmations.length}}</b-badge>
-            </div>
+  <b-list-group flush class="animate">
+    <transition-group name="dynamic-list" tag="div">
+      <b-list-group-item v-for="message of messages" :key="message.item_hash">
+        <div class="d-flex w-100 font-small">
+          <figure v-if="message.type==='POST'"
+                  class="avatar avatar-sm mr-2 bg-primary text-white"
+                  data-initial="Post"></figure>
+          <figure v-if="message.type==='AGGREGATE'"
+                  class="avatar avatar-sm mr-2 bg-info text-white"
+                  data-initial="Aggr"></figure>
+          <div>
+            <message-link :hash="message.item_hash"
+                          :chain="message.chain"
+                          :address="message.sender"
+                          :type="message.type"
+             class="break-xs" /><br />
+            <span v-b-tooltip.hover :title="dateformat(message.time)">
+              {{reldateformat(message.time)}}
+            </span>
           </div>
-        </b-list-group-item>
-      </transition-group>
-    </b-list-group>
-  </div>
+          <div>
+            By <address-link :address="message.sender" :chain="message.chain" class="break-xs" /><br />
+            <span v-if="message.content.address !== message.sender">
+              For <address-link :address="message.content.address" class="break-xs" />
+            </span>
+          </div>
+          <div class="ml-auto" v-if="message.confirmations">
+            <b-badge v-b-tooltip.hover :title="confirm_text(message)"
+            variant="light">{{message.confirmations.length}}</b-badge>
+          </div>
+        </div>
+      </b-list-group-item>
+    </transition-group>
+  </b-list-group>
 </template>
 
 <script>
@@ -45,8 +43,7 @@ export default {
   name: 'MessageList',
   props: {
     messages: Array,
-    animate: Boolean,
-    class: String
+    animate: Boolean
   },
   components: {
     MessageLink, AddressLink
