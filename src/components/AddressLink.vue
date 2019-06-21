@@ -1,5 +1,5 @@
 <template>
-  <b-link :class="'address'+this.class"
+  <b-link :class="'address '+this.class"
           :to="{name: 'address-detail', params: {
                address: this.address, chain: this.chain
                }}">

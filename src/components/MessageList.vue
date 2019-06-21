@@ -11,29 +11,19 @@
                     class="avatar avatar-sm mr-2 bg-info text-white"
                     data-initial="Aggr"></figure>
             <div>
-              <b-link class="hash break-xs"
-                      :to="{name: 'message', params: {
-                        hash: message.item_hash,
-                        chain: message.chain,
-                        address: message.sender,
-                        type: message.type
-                        }}">
-                {{message.item_hash}}
-              </b-link><br />
+              <message-link :hash="message.item_hash"
+                            :chain="message.chain"
+                            :address="message.sender"
+                            :type="message.type"
+               class="break-xs" /><br />
               <span v-b-tooltip.hover :title="dateformat(message.time)">
                 {{reldateformat(message.time)}}
               </span>
             </div>
             <div>
-              By <b-link class="address break-xs"
-                         :to="{name: 'address-detail', params: {
-                           address: message.sender, chain: message.chain
-                           }}">
-                {{message.sender}}</b-link><br />
+              By <address-link :address="message.sender" :chain="message.chain" class="break-xs" /><br />
               <span v-if="message.content.address !== message.sender">
-                For <b-link class="address break-xs"
-                           :to="{name: 'address-detail', params: {address: message.content.address}}">
-                    {{message.content.address}}</b-link>
+                For <address-link :address="message.content.address" class="break-xs" />
               </span>
             </div>
             <div class="ml-auto" v-if="message.confirmations">
@@ -48,13 +38,18 @@
 </template>
 
 <script>
-import moment from 'moment';
+import moment from 'moment'
+import MessageLink from './MessageLink'
+import AddressLink from './AddressLink'
 export default {
   name: 'MessageList',
   props: {
     messages: Array,
     animate: Boolean,
     class: String
+  },
+  components: {
+    MessageLink, AddressLink
   },
   methods:{
     dateformat (dt) {
