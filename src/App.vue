@@ -7,8 +7,9 @@
           <ul class="navbar-nav mr-auto mr-3">
             <li v-if="window.width < 1024"><b-link @click="display_menu = !display_menu" href="#" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></b-link></li>
           </ul>
-          <b-navbar-brand v-if="window.width < 1024" to="/">Aleph Explorer</b-navbar-brand>
-          <form class="form-inline ml-auto">
+          <b-navbar-brand v-if="window.width < 1024" to="/">א test-net</b-navbar-brand>
+          <b-navbar-brand v-else to="/">א test-net Explorer</b-navbar-brand>
+          <!-- <form class="form-inline ml-auto">
             <ul class="navbar-nav">
               <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li>
             </ul>
@@ -16,7 +17,7 @@
               <input class="form-control" type="search" placeholder="Search" aria-label="Search">
               <button class="btn" type="submit"><i class="fas fa-search"></i></button>
             </div>
-          </form>
+          </form> -->
         </nav>
 
         <!-- Main Content -->
