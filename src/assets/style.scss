@@ -33,6 +33,21 @@ nav.navbar {
     line-height: 1.2em;
     padding: 1.5em 0;
   }
+
+  .close-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 20px;
+    i {
+      font-size: 24px;
+    }
+    cursor: pointer;
+    opacity: .5;
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 
 @media only screen and (max-width: 1024px) {
@@ -40,6 +55,7 @@ nav.navbar {
     flex-direction: column-reverse;
     .main-sidebar {
       width: 100%;
+      position: absolute !important;
     }
   }
 }

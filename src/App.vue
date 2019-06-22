@@ -42,6 +42,9 @@
       <transition name="fade">
         <div class="main-sidebar" v-if="window.width >= 1024 | display_menu">
           <aside id="sidebar-wrapper">
+            <div class="d-lg-none close-button" @click="display_menu = false">
+              <i class="fas fa-times"></i>
+            </div>
             <div class="sidebar-brand">
               <b-link target="/">Aleph.im<br/>Explorer</b-link>
             </div>
@@ -107,6 +110,11 @@ export default {
       // TODO: gotta do it on demand.
       let response = await axios.get(`${this.api_server}/api/v0/addresses/stats.json`)
       this.$store.commit('set_addresses_stats', response.data.data)
+    }
+  },
+  watch: {
+    '$route' (to, from) {
+      this.display_menu = false
     }
   }
 }

@@ -11,7 +11,7 @@ export default {
   name: 'address-link',
   props: {
     address: String,
-    chain: String,
+    chain: String
   }
 }
 </script>
