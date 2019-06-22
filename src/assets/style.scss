@@ -5,6 +5,7 @@
 .main-wrapper {
   display: flex;
   flex-direction: row-reverse;
+  min-height: 100vh;
 
   .main-zone {
     flex-grow: 1;
@@ -23,8 +24,12 @@ nav.navbar {
   height: auto;
 
   #sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
     .sidebar-menu {
-      min-height: calc(100vh - 60px - 6.1rem - 12px);
+      /*min-height: calc(100vh - 75.6px - 42.5px - 5rem);*/
+      flex-grow: 1;
     }
   }
 
@@ -56,6 +61,10 @@ nav.navbar {
     .main-sidebar {
       width: 100%;
       position: absolute !important;
+
+      #sidebar-wrapper {
+        min-height: 100vh;
+      }
     }
   }
 }
