@@ -28,9 +28,20 @@
               For <address-link :address="message.content.address" class="break-xs" />
             </span>
           </div>
-          <div class="ml-auto" v-if="message.confirmations">
+          <div class="ml-auto d-none d-xl-block">
+            <b-badge variant="light" v-b-tooltip.hover :title="preview_format(message)"
+            v-if="message.type==='POST'" class="text-truncate break-word">
+              {{message.content.type}}</b-badge>
+            <b-badge variant="light"  v-b-tooltip.hover :title="preview_format(message)"
+            v-if="message.type==='AGGREGATE'" class="text-truncate break-word">
+              {{message.content.key}}</b-badge>
+            <!-- <b-badge variant="light"
+            v-if="message.type==='STORE'" class="text-truncate break-word">
+              {{message.content.size/1000000}} MB</b-badge> -->
+          </div>
+          <div class="ml-auto">
             <b-badge v-b-tooltip.hover :title="confirm_text(message)"
-            variant="light">{{message.confirmations.length}}</b-badge>
+            variant="light" v-if="message.confirmations">{{message.confirmations.length}}</b-badge>
           </div>
         </div>
       </b-list-group-item>
@@ -61,6 +72,13 @@ export default {
     confirm_text (message) {
       let chains = [...new Set(message.confirmations.map(c => c.chain))];
       return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`;
+    },
+    preview_format (message) {
+      let text = JSON.stringify(message.content.content)
+      if (text.length > 80)
+          return text.substring(0,80)+'...'
+      else
+          return text
     }
   }
 }
