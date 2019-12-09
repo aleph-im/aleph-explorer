@@ -62,7 +62,7 @@
       <b-tabs pills card vertical>
         <b-tab v-for="[key, value] of Object.entries(aggregates)"
           :title="key"
-          :key="key">
+          :key="key+component_key">
           <b-card-body>
             <vue-json-pretty
               :data="value" highlightMouseoverNode>
@@ -96,7 +96,8 @@ export default {
       posts: [],
       posts_per_page: 20,
       total_posts: 0,
-      current_post_page: 1
+      current_post_page: 1,
+      component_key: 0
     }
   },
   computed: mapState({
@@ -118,6 +119,10 @@ export default {
       await this.getPosts()
       await this.getMessages()
     },
+    async partialRefresh() {
+      await this.getPosts()
+      await this.getMessages()
+    },
     async getAggregates() {
       this.aggregates = await fetch(this.address, {api_server: this.api_server})
       if (this.aggregates === null)
@@ -127,6 +132,7 @@ export default {
           address: this.address,
           profile: this.aggregates['profile']
         })
+      this.component_key = this.component_key + 1;
     },
     async getPosts() {
       // own posts`
@@ -179,6 +185,15 @@ export default {
   },
   async created() {
     await this.refresh()
+  },
+  async mounted() {
+    // We may not have a correct account list yet... So wait a bit.
+    // this.$nextTick(this.partialUpdate.bind(this))
+    //setTimeout(this.update.bind(this), 500)
+    this.polling = setInterval(this.partialRefresh.bind(this), 10000)
+  },
+  beforeDestroy () {
+  	clearInterval(this.polling)
   }
 }
 </script>
