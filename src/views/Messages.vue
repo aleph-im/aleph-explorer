@@ -1,15 +1,24 @@
 <template>
   <div>
+    <b-dropdown id="dropdown-1" variant="outline-light"
+                :text="selchannel?selchannel:'All channels'" class="position-absolute mt-n5 rounded ml-4 ml-lg-0">
+      <b-dropdown-item @click="select_channel(null)">All channels</b-dropdown-item>
+      <b-dropdown-divider></b-dropdown-divider>
+      <b-dropdown-item v-for="channel of channels" @click="select_channel(channel)" :key="channel">
+        {{channel}}
+      </b-dropdown-item>
+    </b-dropdown>
       <b-card no-body class="card-primary">
         <b-card-header class="d-flex justify-content-between">
           <h4>Messages</h4>
-            <b-pagination
-              v-model="page"
-              :total-rows="total_msg"
-              :per-page="per_page"
-              limit="9"
-              class="mb-0" size="sm"
-            ></b-pagination>
+
+          <b-pagination
+            v-model="page"
+            :total-rows="total_msg"
+            :per-page="per_page"
+            limit="4"
+            class="mb-0" size="sm"
+          ></b-pagination>
         </b-card-header>
         <MessageList :messages="messages" class="compact" detailed />
 
@@ -43,6 +52,8 @@ export default {
   data() {
     return {
       messages: [],
+      channels: [],
+      selchannel: null,
       per_page: 15,
       total_msg: 0,
       page: 1
@@ -64,19 +75,30 @@ export default {
   methods: {
     async refresh() {
       await this.getMessages()
+      await this.getChannels()
     },
     async getMessages() {
-      // own posts`
       let response = await axios.get(`${this.api_server}/api/v0/messages.json`, {
         params: {
           'pagination': this.per_page,
-          'page': this.page
+          'page': this.page,
+          'channels': this.selchannel ? this.selchannel : undefined
         }
       })
       let messages = response.data.messages
 
       this.messages = messages // display all for now
       this.total_msg = response.data.pagination_total
+    },
+    async getChannels() {
+      let response = await axios.get(`${this.api_server}/api/v0/channels/list.json`)
+      let channels = response.data.channels
+
+      this.channels = channels // display all for now
+    },
+    select_channel(channel) {
+      this.selchannel = channel
+      this.getMessages()
     }
   },
   watch: {

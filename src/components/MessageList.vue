@@ -9,6 +9,9 @@
           <figure v-if="message.type==='AGGREGATE'"
                   class="avatar avatar-sm mr-2 bg-info text-white"
                   data-initial="Aggr"></figure>
+          <figure v-if="message.type==='STORE'"
+                  class="avatar avatar-sm mr-2 bg-dark text-white"
+                  data-initial="Store"></figure>
           <div>
             <message-link :hash="message.item_hash"
                           :chain="message.chain"
