@@ -87,6 +87,9 @@
                       <a v-if="conf.chain=='NULS'" target="_blank" rel="noopener noreferrer"
                          :href="'https://testnet.nuls.world/transactions/'+getHash(conf.hash)">
                          {{conf.height}}</a>
+                      <a v-if="conf.chain=='NULS2'" target="_blank" rel="noopener noreferrer"
+                         :href="'https://nuls.world/transactions/'+getHash(conf.hash)">
+                         {{conf.height}}</a>
                       <a v-else-if="conf.chain=='BNB'" target="_blank" rel="noopener noreferrer"
                          :href="'https://explorer.binance.org/tx/'+getHash(conf.hash)">
                          {{conf.height}}</a>
