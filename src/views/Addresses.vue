@@ -24,11 +24,8 @@
         :sort-desc.sync="sortDesc"
         :sort-direction="sortDirection"
         @filtered="onFiltered">
-            <template slot="address" slot-scope="data">
-              <AddressLink :address="data.item.address" class="address" />
-            </template>
-            <template slot="time" slot-scope="data">
-              {{dateformat(data.item.time)}}
+            <template v-slot:cell(address)="data">
+              <AddressLink :address="data.value" class="address" />
             </template>
         </b-table>
 
@@ -56,7 +53,7 @@ import AddressLink from '@/components/AddressLink'
 
 export default {
   name: 'about',
-  data() {
+  data () {
     return {
       per_page: 20,
       total: 0,
@@ -66,15 +63,15 @@ export default {
       sortDesc: true,
       sortDirection: 'desc',
       addresses_fields: [
-        { key: 'address', label: 'Address', sortable: true},
-        { key: 'posts', label: 'Posts count', class: 'text-right', sortable: true},
-        { key: 'aggregates', label: 'Aggregates count', class: 'text-right', sortable: true},
-        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: true}
+        { key: 'address', label: 'Address', sortable: true },
+        { key: 'posts', label: 'Posts count', class: 'text-right', sortable: true },
+        { key: 'aggregates', label: 'Aggregates count', class: 'text-right', sortable: true },
+        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: true }
       ]
     }
   },
   computed: {
-    items() {
+    items () {
       return Object.values(this.addresses_stats)
     },
     ...mapState({
@@ -93,13 +90,13 @@ export default {
     AddressLink
   },
   methods: {
-    onFiltered(filteredItems) {
+    onFiltered (filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.total = filteredItems.length
       this.page = 1
     }
   },
-  mounted() {
+  mounted () {
     // Set the initial number of items
     this.total = this.items.length
   }
