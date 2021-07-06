@@ -101,6 +101,11 @@
                 </div>
                 <span v-else>None</span>
               </b-list-group-item>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between"
+                                 v-if="message.type === 'PROGRAM'">
+                <span>Execute on</span>
+                <span><a :href="'https://aleph.sh/vm/' + message.item_hash">aleph.sh</a></span>
+              </b-list-group-item>
             </b-list-group>
           </b-card>
         </b-col>
