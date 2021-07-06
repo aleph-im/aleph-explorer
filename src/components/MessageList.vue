@@ -12,6 +12,9 @@
           <figure v-if="message.type==='STORE'"
                   class="avatar avatar-sm mr-2 bg-dark text-white"
                   data-initial="Store"></figure>
+          <figure v-if="message.type==='PROGRAM'"
+                  class="avatar avatar-sm mr-2 warning text-white"
+                  data-initial="VM"></figure>
           <div>
             <message-link :hash="message.item_hash"
                           :chain="message.chain"
