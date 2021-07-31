@@ -33,10 +33,10 @@
           </div>
           <div class="ml-auto d-none d-xl-block">
             <b-badge variant="light" v-b-tooltip.hover :title="preview_format(message)"
-            v-if="message.type==='POST'" class="text-truncate break-word">
+            v-if="message.type==='POST'" class="text-truncate break-word" style="max-width: 15em">
               {{message.content.type}}</b-badge>
             <b-badge variant="light"  v-b-tooltip.hover :title="preview_format(message)"
-            v-if="message.type==='AGGREGATE'" class="text-truncate break-word">
+            v-if="message.type==='AGGREGATE'" class="text-truncate break-word" style="max-width: 15em">
               {{message.content.key}}</b-badge>
             <!-- <b-badge variant="light"
             v-if="message.type==='STORE'" class="text-truncate break-word">
@@ -65,7 +65,7 @@ export default {
   components: {
     MessageLink, AddressLink
   },
-  methods:{
+  methods: {
     dateformat (dt) {
       return moment.unix(dt).format('lll')
     },
@@ -73,15 +73,12 @@ export default {
       return moment.unix(dt).fromNow()
     },
     confirm_text (message) {
-      let chains = [...new Set(message.confirmations.map(c => c.chain))];
-      return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`;
+      let chains = [...new Set(message.confirmations.map(c => c.chain))]
+      return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`
     },
     preview_format (message) {
       let text = JSON.stringify(message.content.content)
-      if (text.length > 80)
-          return text.substring(0,80)+'...'
-      else
-          return text
+      if (text.length > 80) { return text.substring(0, 80) + '...' } else { return text }
     }
   }
 }
