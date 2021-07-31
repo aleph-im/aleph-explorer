@@ -94,7 +94,7 @@
                          :href="'https://explorer.binance.org/tx/'+getHash(conf.hash)">
                          {{conf.height}}</a>
                       <a v-else-if="conf.chain=='ETH'" target="_blank" rel="noopener noreferrer"
-                         :href="'https://rinkeby.etherscan.io/tx/0x'+getHash(conf.hash)">
+                         :href="'https://etherscan.io/tx/'+getHash(conf.hash)">
                          {{conf.height}}</a>
                       <a v-else>{{conf.height}}</a>)<br />
                   </span>
@@ -118,12 +118,12 @@
 import { mapState } from 'vuex'
 import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
-import moment from 'moment';
+import moment from 'moment'
 import AddressLink from '@/components/AddressLink'
 
-function base64toHEX(base64) {
-  const buffer = Buffer.from(base64, 'base64');
-  return buffer.toString('hex');
+function base64toHEX (base64) {
+  const buffer = Buffer.from(base64, 'base64')
+  return buffer.toString('hex')
 }
 
 export default {
@@ -136,7 +136,7 @@ export default {
     api_server: state => state.api_server,
     profiles: state => state.profiles
   }),
-  data() {
+  data () {
     return {
       messages: []
     }
@@ -154,42 +154,36 @@ export default {
     reldateformat (dt) {
       return moment.unix(dt).fromNow()
     },
-    getHash(hash) {
-      if (hash.$binary !== undefined)
-        return base64toHEX(hash.$binary)
-      else
-        return hash
+    getHash (hash) {
+      if (hash.$binary !== undefined) { return base64toHEX(hash.$binary) } else { return hash }
     },
-    async update() {
+    async update () {
       await this.getMessages()
       this.$forceUpdate()
     },
-    async getMessages() {
+    async getMessages () {
       let args = {
         hashes: this.hash
       }
-      if (this.chain)
-        args['chain'] = this.chain
+      if (this.chain) { args['chain'] = this.chain }
 
-      if (this.address)
-        args['addresses'] = this.address
+      if (this.address) { args['addresses'] = this.address }
 
-      if (this.type)
-        args['msgType'] = this.type
+      if (this.type) { args['msgType'] = this.type }
 
       let response = await axios.get(
         `${this.api_server}/api/v0/messages.json`,
-        {params: args}
+        { params: args }
       )
       this.messages = response.data.messages
     }
   },
   watch: {
-    async hash() {
+    async hash () {
       await this.update()
     }
   },
-  async mounted() {
+  async mounted () {
     await this.update()
   }
 }
