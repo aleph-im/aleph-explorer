@@ -33,10 +33,10 @@
           </div>
           <div class="ml-auto d-none d-xl-block">
             <b-badge variant="light" v-b-tooltip.hover :title="preview_format(message)"
-            v-if="message.type==='POST'" class="text-truncate break-word">
+            v-if="message.type==='POST'" class="text-truncate break-word" style="max-width: 15em">
               {{message.content.type}}</b-badge>
             <b-badge variant="light"  v-b-tooltip.hover :title="preview_format(message)"
-            v-if="message.type==='AGGREGATE'" class="text-truncate break-word">
+            v-if="message.type==='AGGREGATE'" class="text-truncate break-word" style="max-width: 15em">
               {{message.content.key}}</b-badge>
             <!-- <b-badge variant="light"
             v-if="message.type==='STORE'" class="text-truncate break-word">

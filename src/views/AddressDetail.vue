@@ -79,7 +79,7 @@ import { mapState } from 'vuex'
 import AccountAvatar from '@/components/AccountAvatar.vue'
 import AccountName from '@/components/AccountName.vue'
 import MessageList from '@/components/MessageList.vue'
-import {fetch} from 'aleph-js/src/api/aggregates'
+import {aggregates} from 'aleph-js'
 import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
 
@@ -124,7 +124,7 @@ export default {
       await this.getMessages()
     },
     async getAggregates() {
-      this.aggregates = await fetch(this.address, {api_server: this.api_server})
+      this.aggregates = await aggretates.fetch(this.address, {api_server: this.api_server})
       if (this.aggregates === null)
         this.aggregates = {}
       else if (this.aggregates.profile !== undefined)

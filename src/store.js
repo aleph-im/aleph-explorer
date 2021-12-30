@@ -22,16 +22,16 @@ export default new Vuex.Store({
     ]
   },
   mutations: {
-    set_addresses_stats(state, addresses_stats) {
+    set_addresses_stats (state, addresses_stats) {
       state.addresses_stats = addresses_stats
     },
-    set_account(state, account) {
+    set_account (state, account) {
       state.account = account
     },
-    store_profile(state, payload) {
+    store_profile (state, payload) {
       state.profiles[payload.address] = payload.profile
     },
-    set_network(state, payload) {
+    set_network (state, payload) {
       state.network_id = payload.network_id
       state.api_server = payload.api_server
       state.profiles = {}

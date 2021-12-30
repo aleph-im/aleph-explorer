@@ -43,7 +43,6 @@
 <script>
 import { mapState } from 'vuex'
 import MessageList from '@/components/MessageList.vue'
-import {fetch} from 'aleph-js/src/api/aggregates'
 import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
 
