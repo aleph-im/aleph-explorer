@@ -165,7 +165,6 @@ export default {
       let args = {
         hashes: this.hash
       }
-      if (this.chain) { args['chain'] = this.chain }
 
       if (this.address) { args['addresses'] = this.address }
 
