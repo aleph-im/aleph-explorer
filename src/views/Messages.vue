@@ -1,11 +1,8 @@
 <template>
   <div>
-    <b-form-input list="channel-datalist" 
-                  @input="select_channel"
-                  :state="channelExists()" />
-    <datalist id="channel-datalist">
-      <option v-for="channel of channels" :key="channel">{{ channel }}</option>
-    </datalist>
+    <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0" style="min-width: 200px;">
+      <v-select :options="channels" @input="select_channel" placeholder="Filter channels" />
+    </div>
 
     <b-card no-body class="card-primary">
       <b-card-header class="d-flex justify-content-between">
@@ -41,7 +38,7 @@ import { mapState } from 'vuex'
 import MessageList from '@/components/MessageList.vue'
 import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
-import debounce from 'lodash/debounce'
+import 'vue-select/dist/vue-select.css';
 
 export default {
   name: 'about',
@@ -94,13 +91,8 @@ export default {
     },
     select_channel (channel) {
       this.selchannel = channel
-
-      if(!this.selchannel || this.channelExists())
-        debounce(this.getMessages(), 300)
+      this.getMessages()
     },
-    channelExists () {
-      return this.channels.find(f => this.selchannel === f) !== undefined
-    }
   },
   watch: {
     async $route (to, from) {
@@ -115,3 +107,9 @@ export default {
   }
 }
 </script>
+
+<style>
+:root{
+  --vs-font-size: unset;
+}
+</style>
