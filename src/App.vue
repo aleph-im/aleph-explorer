@@ -28,7 +28,7 @@
         </div>
         <footer class="main-footer px-5">
           <div class="footer-left">
-            Copyright © 2018-2020 <a href="https://aleph.im">Aleph.im</a>
+            Copyright © 2018-present <a href="https://aleph.im">Aleph.im</a>
           </div>
           <div class="footer-right">
             v0.1.1
