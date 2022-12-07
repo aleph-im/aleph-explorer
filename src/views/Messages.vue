@@ -110,6 +110,10 @@ export default {
 
 <style>
 :root{
+  /*
+    Overriding the default text size from the vue-select component
+    more info: https://vue-select.org/guide/css.html#css-variables
+  */
   --vs-font-size: unset;
 }
 </style>
