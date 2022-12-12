@@ -5,7 +5,7 @@ import store from './store'
 import BootstrapVue from 'bootstrap-vue'
 import vSelect from 'vue-select'
 
-Vue.component("v-select", vSelect)
+Vue.component('v-select', vSelect)
 Vue.use(BootstrapVue)
 
 Vue.config.productionTip = false
