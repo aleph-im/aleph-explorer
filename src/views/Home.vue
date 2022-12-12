@@ -108,7 +108,7 @@ export default {
     }
   },
   async mounted() {
-    const socket = new WebSocket(`wss://api2.aleph.im/api/ws0/messages?history=${QUEUE_SIZE}`)
+    const socket = new WebSocket(`wss://${this.api_server}/api/ws0/messages?history=${QUEUE_SIZE}`)
     socket.addEventListener('message', this.pushToMessageQueue)
     this.message_socket = socket
   },
