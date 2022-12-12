@@ -124,7 +124,7 @@ export default {
       await this.getMessages()
     },
     async getAggregates() {
-      this.aggregates = await aggretates.fetch(this.address, {api_server: this.api_server})
+      this.aggregates = await aggregates.fetch(this.address, {api_server: this.api_server})
       if (this.aggregates === null)
         this.aggregates = {}
       else if (this.aggregates.profile !== undefined)
