@@ -40,17 +40,18 @@
 <script>
 import { mapState } from 'vuex'
 import moment from 'moment'
-import axios from 'axios'
 import MessageList from '@/components/MessageList.vue'
 import MessageTable from '@/components/MessageTable.vue'
 import AddressLink from '@/components/AddressLink'
+
+const QUEUE_SIZE = 15
 
 export default {
   name: 'home',
   data() {
     return {
       last_messages: [],
-      polling: null,
+      message_socket: null,
       messages_fields: [
         { key: 'item_hash', label: 'Item Hash', class: 'hash'},
         { key: 'type', label: 'Type' },
@@ -93,28 +94,26 @@ export default {
       let chains = [...new Set(message.confirmations.map(c => c.chain))];
       return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`;
     },
-    async update() {
-      await this.update_messages()
-    },
-    async update_messages() {
-      let response = await axios.get(`${this.api_server}/api/v0/messages.json`, {
-        params: {
-          'pagination': 15,
-          'page': 1
+    pushToMessageQueue ({data}) {
+      if(data){
+        try {
+          const message = JSON.parse(data)
+          this.last_messages.unshift(message)
+          if (this.last_messages.length > QUEUE_SIZE)
+            this.last_messages.pop()
+        } catch (err) {
+          console.log(err)
         }
-      })
-
-      this.last_messages = response.data.messages // display all for now
+      }
     }
   },
   async mounted() {
-    // We may not have a correct account list yet... So wait a bit.
-    this.$nextTick(this.update.bind(this))
-    //setTimeout(this.update.bind(this), 500)
-    this.polling = setInterval(this.update.bind(this), 2000)
+    const socket = new WebSocket(`wss://api2.aleph.im/api/ws0/messages?history=${QUEUE_SIZE}`)
+    socket.addEventListener('message', this.pushToMessageQueue)
+    this.message_socket = socket
   },
   beforeDestroy () {
-  	clearInterval(this.polling)
+    this.message_socket.close()
   }
 }
 </script>
