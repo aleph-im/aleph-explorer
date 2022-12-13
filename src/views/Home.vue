@@ -94,22 +94,35 @@ export default {
       let chains = [...new Set(message.confirmations.map(c => c.chain))];
       return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`;
     },
-    pushToMessageQueue ({data}) {
-      if(data){
-        try {
-          const message = JSON.parse(data)
-          this.last_messages.unshift(message)
-          if (this.last_messages.length > QUEUE_SIZE)
-            this.last_messages.pop()
-        } catch (err) {
-          console.log(err)
-        }
-      }
+    pushToMessageQueue (data) {
+      const message = data
+      this.last_messages.unshift(message)
+      this.last_messages.pop()
     }
   },
   async mounted() {
     const socket = new WebSocket(`wss://${this.api_server}/api/ws0/messages?history=${QUEUE_SIZE}`)
-    socket.addEventListener('message', this.pushToMessageQueue)
+
+    let messageCount = 0
+    const prefillQueue = []
+    socket.addEventListener('message', (e) => {
+      let data
+      try {
+        data = JSON.parse(e.data)
+        if(!data)
+          return
+      } catch (error) {
+        console.log('Could not parse socket response')
+      }
+
+      if(messageCount > QUEUE_SIZE)
+        return this.pushToMessageQueue(data)
+
+      prefillQueue.unshift(data)
+      messageCount++
+      if(messageCount === QUEUE_SIZE)
+        this.last_messages = [...prefillQueue]
+    })
     this.message_socket = socket
   },
   beforeDestroy () {
