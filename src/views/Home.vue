@@ -102,9 +102,8 @@ export default {
   },
   async mounted() {
     const socket = new WebSocket(`wss://${this.api_server}/api/ws0/messages?history=${QUEUE_SIZE}`)
-
-    let messageCount = 0
     const prefillQueue = []
+
     socket.addEventListener('message', (e) => {
       let data
       try {
@@ -115,12 +114,11 @@ export default {
         console.log('Could not parse socket response')
       }
 
-      if(messageCount > QUEUE_SIZE)
+      if(prefillQueue.length > QUEUE_SIZE)
         return this.pushToMessageQueue(data)
 
       prefillQueue.unshift(data)
-      messageCount++
-      if(messageCount === QUEUE_SIZE)
+      if(prefillQueue.length === QUEUE_SIZE)
         this.last_messages = [...prefillQueue]
     })
     this.message_socket = socket
