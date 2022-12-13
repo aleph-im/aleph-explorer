@@ -114,7 +114,7 @@ export default {
         console.log('Could not parse socket response')
       }
 
-      if(prefillQueue.length > QUEUE_SIZE)
+      if (this.last_messages.length === QUEUE_SIZE)
         return this.pushToMessageQueue(data)
 
       prefillQueue.unshift(data)
