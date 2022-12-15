@@ -171,7 +171,7 @@ export default {
       if (this.type) { args['msgType'] = this.type }
 
       let response = await axios.get(
-        `${this.api_server}/api/v0/messages.json`,
+        `https://${this.api_server}/api/v0/messages.json`,
         { params: args }
       )
       this.messages = response.data.messages
