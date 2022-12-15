@@ -31,7 +31,14 @@
             Copyright © 2018-present <a href="https://aleph.im">Aleph.im</a>
           </div>
           <div class="footer-right">
-            v0.1.1
+            <template v-if="app_version">
+              <template v-if="last_release_is_a_tag()">
+                <a :href="('https://github.com/aleph-im/aleph-explorer/tree/' + app_version)">{{ app_version }}</a>
+              </template>
+              <template v-else>
+                {{ app_version }}
+              </template>
+            </template>
             <a href="https://github.com/aleph-im/aleph-explorer" class="card-link"
                  target="_blank" rel="noopener noreferrer">
                 <i class="fab fa-github"></i>
@@ -78,13 +85,14 @@ import axios from 'axios'
 import { mapState } from 'vuex'
 export default {
   name: 'app',
-  data() {
+  data () {
     return {
       window: {
         width: 0,
         height: 0
       },
-      'display_menu': false
+      'display_menu': false,
+      app_version: GIT_DESCRIBE_TAGS
     }
   },
   computed: mapState({
@@ -92,24 +100,34 @@ export default {
     api_server: state => state.api_server,
     profiles: state => state.profiles
   }),
-  created() {
+  created () {
     window.addEventListener('resize', this.handleResize)
-    this.handleResize();
-    this.loadAddresses();
+    this.handleResize()
+    this.loadAddresses()
+
+    if (!GIT_DESCRIBE_TAGS) {
+      console.warn(`
+No build version detected.
+This bundle was probably not built from a git repository,
+or your build process might be broken! `)
+    }
   },
-  destroyed() {
+  destroyed () {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
-    handleResize() {
-      this.window.width = window.innerWidth;
-      this.window.height = window.innerHeight;
+    handleResize () {
+      this.window.width = window.innerWidth
+      this.window.height = window.innerHeight
     },
-    async loadAddresses() {
+    async loadAddresses () {
       // VERY BAD, we load everything for now!
       // TODO: gotta do it on demand.
       let response = await axios.get(`https://${this.api_server}/api/v0/addresses/stats.json`)
       this.$store.commit('set_addresses_stats', response.data.data)
+    },
+    last_release_is_a_tag () {
+      return /\d+-.[0-9A-F]{7}$/i.test(this.app_version)
     }
   },
   watch: {

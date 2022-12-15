@@ -125,6 +125,7 @@ export default {
     },
     async getAggregates() {
       this.aggregates = await aggregates.fetch(this.address, {api_server: 'https://' + this.api_server})
+      
       if (this.aggregates === null)
         this.aggregates = {}
       else if (this.aggregates.profile !== undefined)

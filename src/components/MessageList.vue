@@ -3,24 +3,13 @@
     <transition-group name="dynamic-list" tag="div">
       <b-list-group-item v-for="message of messages" :key="message.item_hash">
         <div class="d-flex w-100 font-small">
-          <figure v-if="message.type==='POST'"
-                  class="avatar avatar-sm mr-2 bg-primary text-white"
-                  data-initial="Post"></figure>
-          <figure v-if="message.type==='AGGREGATE'"
-                  class="avatar avatar-sm mr-2 bg-info text-white"
-                  data-initial="Aggr"></figure>
-          <figure v-if="message.type==='STORE'"
-                  class="avatar avatar-sm mr-2 bg-dark text-white"
-                  data-initial="Store"></figure>
-          <figure v-if="message.type==='PROGRAM'"
-                  class="avatar avatar-sm mr-2 warning text-white"
-                  data-initial="VM"></figure>
+          <MessageIcon :messageType="message.type" />
           <div>
             <message-link :hash="message.item_hash"
                           :chain="message.chain"
                           :address="message.sender"
                           :type="message.type"
-             class="break-xs" /><br />
+                          className="break-xs" /><br />
             <span v-b-tooltip.hover :title="dateformat(message.time)">
               {{reldateformat(message.time)}}
             </span>
@@ -56,6 +45,8 @@
 import moment from 'moment'
 import MessageLink from './MessageLink'
 import AddressLink from './AddressLink'
+import MessageIcon from './MessageIcon.vue'
+
 export default {
   name: 'MessageList',
   props: {
@@ -63,8 +54,10 @@ export default {
     animate: Boolean
   },
   components: {
-    MessageLink, AddressLink
-  },
+    MessageLink,
+    AddressLink,
+    MessageIcon
+},
   methods: {
     dateformat (dt) {
       return moment.unix(dt).format('lll')
