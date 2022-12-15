@@ -1,5 +1,5 @@
 <template>
-  <figure :class="'avatar avatar-sm mr-2 text-white ' + this.iconStyle.background" 
+  <figure :class="'avatar avatar-sm mr-2 text-white ' + this.iconStyle.background"
           :data-initial="this.iconStyle.text" />
 </template>
 
@@ -37,11 +37,12 @@ export default {
     messageType: String
   },
   computed: {
-    iconStyle(){
-      if(iconStyles.hasOwnProperty(this.messageType))
+    iconStyle () {
+      if(iconStyles.hasOwnProperty(this.messageType)){
         return iconStyles[this.messageType]
+      }
 
-      return iconStyles[__unknown]
+      return iconStyles.__unknown
     }
   }
 }
