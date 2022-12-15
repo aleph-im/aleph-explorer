@@ -20,7 +20,7 @@
                           :chain="message.chain"
                           :address="message.sender"
                           :type="message.type"
-             class="break-xs" /><br />
+                          className="break-xs" /><br />
             <span v-b-tooltip.hover :title="dateformat(message.time)">
               {{reldateformat(message.time)}}
             </span>
