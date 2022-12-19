@@ -1,0 +1,31 @@
+
+name: Build app
+
+on:
+  pull_request:
+    branches: ["*"]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-22.10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get git context
+        run: git fetch --prune --unshallow
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build
+        run: yarn build
