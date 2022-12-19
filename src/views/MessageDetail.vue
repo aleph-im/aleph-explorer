@@ -117,9 +117,10 @@
 <script>
 import { mapState } from 'vuex'
 import axios from 'axios'
-import VueJsonPretty from 'vue-json-pretty'
 import moment from 'moment'
 import AddressLink from '@/components/AddressLink'
+import VueJsonPretty from 'vue-json-pretty'
+import 'vue-json-pretty/lib/styles.css'
 
 function base64toHEX (base64) {
   const buffer = Buffer.from(base64, 'base64')
