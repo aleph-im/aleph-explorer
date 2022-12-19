@@ -22,6 +22,11 @@ export default new Vuex.Store({
   },
   mutations: {
     set_addresses_stats (state, addresses_stats) {
+      try {
+        delete addresses_stats[null]
+      } catch (error) {
+        console.log('Cannot delete null key')
+      }
       state.addresses_stats = addresses_stats
     },
     set_account (state, account) {
