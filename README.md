@@ -1,21 +1,17 @@
-# aleph-explorer
+# Aleph Explorer
 
-## Project setup
-```
-npm install
-```
+This repository contains the code of [explorer.aleph.im](https://explorer.aleph.im).
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+The explorer allows you to easily watch the state of the Aleph Network, by fetching incoming and past messages in realtime.
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## Run the code locally
 
-### Lints and fixes files
-```
-npm run lint
-```
+1. Clone the repository
+2. Install the dependencies using
+    ```
+    yarn
+    ```
+3. Run the project (using hot-reload)
+    ```
+    yarn serve
+    ```
