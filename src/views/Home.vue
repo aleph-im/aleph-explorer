@@ -95,14 +95,13 @@ export default {
       return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`;
     },
     pushToMessageQueue (data) {
-      const message = data
-      this.last_messages.unshift(message)
+      this.last_messages.unshift(data)
       this.last_messages.pop()
     },
     openWS () {
       const socket = new WebSocket(`${this.api_server.ws_protocol}//${this.api_server.host}/api/ws0/messages?history=${QUEUE_SIZE}`)
 
-      // Batch the firsts message in a dedicated queue
+      // Batch the firsts messages in a dedicated queue
       // so the "MessageList" component only updates once it is filled
       const prefillQueue = []
       this.last_messages = []
