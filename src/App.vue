@@ -123,7 +123,7 @@ or your build process might be broken! `)
     async loadAddresses () {
       // VERY BAD, we load everything for now!
       // TODO: gotta do it on demand.
-      let response = await axios.get(`https://${this.api_server}/api/v0/addresses/stats.json`)
+      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/addresses/stats.json`)
       this.$store.commit('set_addresses_stats', response.data.data)
     },
     last_release_is_a_tag () {
@@ -133,6 +133,9 @@ or your build process might be broken! `)
   watch: {
     '$route' (to, from) {
       this.display_menu = false
+    },
+    async 'api_server.host'(){
+      await this.loadAddresses()
     }
   }
 }

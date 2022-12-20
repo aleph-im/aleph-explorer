@@ -98,30 +98,45 @@ export default {
       const message = data
       this.last_messages.unshift(message)
       this.last_messages.pop()
+    },
+    openWS () {
+      const socket = new WebSocket(`${this.api_server.ws_protocol}//${this.api_server.host}/api/ws0/messages?history=${QUEUE_SIZE}`)
+
+      // Batch the firsts message in a dedicated queue
+      // so the "MessageList" component only updates once it is filled
+      const prefillQueue = []
+      this.last_messages = []
+
+      socket.addEventListener('message', (e) => {
+        let data
+        try {
+          data = JSON.parse(e.data)
+          if (!data)
+            return
+        } catch (error) {
+          console.log('Could not parse socket response')
+        }
+
+        if (this.last_messages.length === QUEUE_SIZE)
+          return this.pushToMessageQueue(data)
+
+        prefillQueue.unshift(data)
+        if (prefillQueue.length === QUEUE_SIZE)
+          this.last_messages = [...prefillQueue]
+      })
+      this.message_socket = socket
     }
   },
-  async mounted() {
-    const socket = new WebSocket(`wss://${this.api_server}/api/ws0/messages?history=${QUEUE_SIZE}`)
-    const prefillQueue = []
-
-    socket.addEventListener('message', (e) => {
-      let data
-      try {
-        data = JSON.parse(e.data)
-        if(!data)
-          return
-      } catch (error) {
-        console.log('Could not parse socket response')
-      }
-
-      if (this.last_messages.length === QUEUE_SIZE)
-        return this.pushToMessageQueue(data)
-
-      prefillQueue.unshift(data)
-      if(prefillQueue.length === QUEUE_SIZE)
-        this.last_messages = [...prefillQueue]
-    })
-    this.message_socket = socket
+  mounted() {
+    this.openWS()
+  },
+  watch:{
+    'api_server.host'(){
+      if(this.message_socket)
+        this.message_socket.close()
+      
+      this.openWS()
+    }
   },
   beforeDestroy () {
     this.message_socket.close()
