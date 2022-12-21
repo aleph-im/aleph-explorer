@@ -19,6 +19,7 @@
           :per-page="per_page"
           limit="4"
           class="mb-0" size="sm"
+          v-if="!isLoading"
         ></b-pagination>
       </b-card-header>
 
@@ -31,7 +32,9 @@
           :total-rows="total_msg"
           :per-page="per_page"
           limit="9"
-          class="mb-0" size="sm"
+          class="mb-0" 
+          size="sm"
+          v-if="!isLoading"
         ></b-pagination>
       </b-card-footer>
     </b-card>
@@ -44,8 +47,6 @@ import MessageList from '@/components/MessageList.vue'
 import axios from 'axios'
 import 'vue-select/dist/vue-select.css'
 
-const messageTypes = ['AGGREGATE', 'FORGET', 'POST', 'PROGRAM', 'STORE']
-
 export default {
   name: 'messages',
   data () {
@@ -55,7 +56,8 @@ export default {
       selected_channel: null,
       per_page: 15,
       total_msg: 0,
-      page: 1
+      page: 1,
+      isLoading: true
     }
   },
   computed: mapState({
@@ -102,13 +104,14 @@ export default {
 
       return this.$router.push({
         name: 'messages',
-        query: channel && { channels: channel.join(',') }
+        query: channel && { channels: channel.join(','), page: 1 }
       })
     },
     async loadQP (qp) {
       if (qp) {
         try {
           this.selected_channel = qp.channels && qp.channels.split(',')
+          this.page = parseInt(qp.page) || 1
         }
         catch (err) {
           console.log('Could not load query parameter')
@@ -120,17 +123,29 @@ export default {
     }
   },
   watch: {
-    async $route (to, from) {
+    async $route (to) {
       const { query } = to 
       await this.loadQP(query)
     },
-    async page () {
-      await this.getMessages()
-    }
   },
   async created () {
     await this.getChannels()
     await this.loadQP(this.$route.query)
+
+    this.$watch('page', page => {
+      this.$router.push({
+        name: 'messages',
+        query: {
+          ...this.$route.query,
+          page
+        }
+      })
+    })
+
+    // Fixes a bug in the pagination component 
+    // Where it would not display the correct number at page load
+    // src: https://github.com/bootstrap-vue/bootstrap-vue/issues/6960#issuecomment-1103795173
+    this.isLoading = false
   }
 }
 </script>
