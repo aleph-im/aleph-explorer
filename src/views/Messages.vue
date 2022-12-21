@@ -1,8 +1,11 @@
 <template>
   <div>
-
     <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0" style="min-width: 200px;">
-      <v-select :options="channels" @input="select_channel" placeholder="Filter channels" :value="selchannel" />
+      <v-select :options="channels" 
+                @input="select_channel" 
+                placeholder="Filter channels" 
+                :value="selected_channel"
+                multiple />
     </div>
 
 
@@ -38,9 +41,7 @@
 <script>
 import { mapState } from 'vuex'
 import MessageList from '@/components/MessageList.vue'
-import MessageIcon from '@/components/MessageIcon.vue'
 import axios from 'axios'
-import VueJsonPretty from 'vue-json-pretty'
 import 'vue-select/dist/vue-select.css'
 
 const messageTypes = ['AGGREGATE', 'FORGET', 'POST', 'PROGRAM', 'STORE']
@@ -51,7 +52,7 @@ export default {
     return {
       messages: [],
       channels: [],
-      selchannel: null,
+      selected_channel: null,
       per_page: 15,
       total_msg: 0,
       page: 1
@@ -80,7 +81,7 @@ export default {
         params: {
           'pagination': this.per_page,
           'page': this.page,
-          'channels': this.selchannel ? this.selchannel : undefined
+          'channels': this.selected_channel ? this.selected_channel.join(',') : undefined
         }
       })
       let messages = response.data.messages
@@ -95,33 +96,41 @@ export default {
       this.channels = channels // display all for now
     },
     select_channel (channel) {
-      this.$router.push({
+      if(channel.length === 0){
+        channel = null
+      }
+
+      return this.$router.push({
         name: 'messages',
-        query: channel && { channel }
+        query: channel && { channels: channel.join(',') }
       })
     },
-  },
-  watch: {
-    async $route (to, from) {
-      const { query } = to 
-      if(query){
-        try{
-          this.selchannel = query.channel
+    async loadQP (qp) {
+      if (qp) {
+        try {
+          this.selected_channel = qp.channels && qp.channels.split(',')
         }
-        catch(err){
+        catch (err) {
           console.log('Could not load query parameter')
           console.log(err)
         }
       }
 
       await this.getMessages()
+    }
+  },
+  watch: {
+    async $route (to, from) {
+      const { query } = to 
+      await this.loadQP(query)
     },
     async page () {
       await this.getMessages()
     }
   },
   async created () {
-    await this.refresh()
+    await this.getChannels()
+    await this.loadQP(this.$route.query)
   }
 }
 </script>
@@ -133,5 +142,12 @@ export default {
     more info: https://vue-select.org/guide/css.html#css-variables
   */
   --vs-font-size: unset;
+  --vs-selected-bg: #6777ef;
+  --vs-selected-color: white;
+  --vs-selected-border-color: #6777ef;
+}
+
+.vs__selected{
+  --vs-controls-color: #FFF;
 }
 </style>
