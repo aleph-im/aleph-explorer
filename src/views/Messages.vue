@@ -1,8 +1,10 @@
 <template>
   <div>
+
     <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0" style="min-width: 200px;">
-      <v-select :options="channels" @input="select_channel" placeholder="Filter channels" />
+      <v-select :options="channels" @input="select_channel" placeholder="Filter channels" :value="selchannel" />
     </div>
+
 
     <b-card no-body class="card-primary">
       <b-card-header class="d-flex justify-content-between">
@@ -36,12 +38,15 @@
 <script>
 import { mapState } from 'vuex'
 import MessageList from '@/components/MessageList.vue'
+import MessageIcon from '@/components/MessageIcon.vue'
 import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
-import 'vue-select/dist/vue-select.css';
+import 'vue-select/dist/vue-select.css'
+
+const messageTypes = ['AGGREGATE', 'FORGET', 'POST', 'PROGRAM', 'STORE']
 
 export default {
-  name: 'about',
+  name: 'messages',
   data () {
     return {
       messages: [],
@@ -63,7 +68,7 @@ export default {
     }
   },
   components: {
-    MessageList, VueJsonPretty
+    MessageList
   },
   methods: {
     async refresh () {
@@ -90,16 +95,29 @@ export default {
       this.channels = channels // display all for now
     },
     select_channel (channel) {
-      this.selchannel = channel
-      this.getMessages()
+      this.$router.push({
+        name: 'messages',
+        query: channel && { channel }
+      })
     },
   },
   watch: {
     async $route (to, from) {
-      await this.refresh()
+      const { query } = to 
+      if(query){
+        try{
+          this.selchannel = query.channel
+        }
+        catch(err){
+          console.log('Could not load query parameter')
+          console.log(err)
+        }
+      }
+
+      await this.getMessages()
     },
     async page () {
-      await this.refresh()
+      await this.getMessages()
     }
   },
   async created () {
