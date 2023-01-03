@@ -1,8 +1,13 @@
 <template>
   <div>
     <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0" style="min-width: 200px;">
-      <v-select :options="channels" @input="select_channel" placeholder="Filter channels" />
+      <v-select :options="channels" 
+                @input="select_channel" 
+                placeholder="Filter channels" 
+                :value="selected_channel"
+                multiple />
     </div>
+
 
     <b-card no-body class="card-primary">
       <b-card-header class="d-flex justify-content-between">
@@ -14,6 +19,7 @@
           :per-page="per_page"
           limit="4"
           class="mb-0" size="sm"
+          v-if="!isLoading"
         ></b-pagination>
       </b-card-header>
 
@@ -26,7 +32,9 @@
           :total-rows="total_msg"
           :per-page="per_page"
           limit="9"
-          class="mb-0" size="sm"
+          class="mb-0" 
+          size="sm"
+          v-if="!isLoading"
         ></b-pagination>
       </b-card-footer>
     </b-card>
@@ -37,18 +45,19 @@
 import { mapState } from 'vuex'
 import MessageList from '@/components/MessageList.vue'
 import axios from 'axios'
-import 'vue-select/dist/vue-select.css';
+import 'vue-select/dist/vue-select.css'
 
 export default {
-  name: 'about',
+  name: 'messages',
   data () {
     return {
       messages: [],
       channels: [],
-      selchannel: null,
+      selected_channel: null,
       per_page: 15,
       total_msg: 0,
-      page: 1
+      page: 1,
+      isLoading: true
     }
   },
   computed: mapState({
@@ -74,7 +83,7 @@ export default {
         params: {
           'pagination': this.per_page,
           'page': this.page,
-          'channels': this.selchannel ? this.selchannel : undefined
+          'channels': this.selected_channel ? this.selected_channel.join(',') : undefined
         }
       })
       let messages = response.data.messages
@@ -89,23 +98,57 @@ export default {
       this.channels = channels // display all for now
     },
     select_channel (channel) {
-      this.selchannel = channel
-      this.getMessages()
+      if(channel.length === 0){
+        channel = null
+      }
+
+      return this.$router.push({
+        name: 'messages',
+        query: channel && { channels: channel.join(','), page: 1 }
+      })
     },
+    async loadQP (qp) {
+      if (qp) {
+        try {
+          this.selected_channel = qp.channels && qp.channels.split(',')
+          this.page = parseInt(qp.page) || 1
+        }
+        catch (err) {
+          console.log('Could not load query parameter')
+          console.log(err)
+        }
+      }
+
+      await this.getMessages()
+    }
   },
   watch: {
-    async $route (to, from) {
-      await this.refresh()
-    },
-    async page () {
-      await this.refresh()
+    async $route (to) {
+      const { query } = to 
+      await this.loadQP(query)
     },
     async 'api_server.host'() {
       await this.refresh()
     }
   },
   async created () {
-    await this.refresh()
+    await this.getChannels()
+    await this.loadQP(this.$route.query)
+
+    this.$watch('page', page => {
+      this.$router.push({
+        name: 'messages',
+        query: {
+          ...this.$route.query,
+          page
+        }
+      })
+    })
+
+    // Fixes a bug in the pagination component 
+    // Where it would not display the correct number at page load
+    // src: https://github.com/bootstrap-vue/bootstrap-vue/issues/6960#issuecomment-1103795173
+    this.isLoading = false
   }
 }
 </script>
@@ -117,5 +160,12 @@ export default {
     more info: https://vue-select.org/guide/css.html#css-variables
   */
   --vs-font-size: unset;
+  --vs-selected-bg: #6777ef;
+  --vs-selected-color: white;
+  --vs-selected-border-color: #6777ef;
+}
+
+.vs__selected{
+  --vs-controls-color: #FFF;
 }
 </style>

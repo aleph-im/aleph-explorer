@@ -33,7 +33,7 @@ export default new Router({
       props: true
     },
     {
-      path: '/messages/:type?',
+      path: '/messages/',
       name: 'messages',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
