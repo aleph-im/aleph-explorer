@@ -117,9 +117,10 @@
 <script>
 import { mapState } from 'vuex'
 import axios from 'axios'
-import VueJsonPretty from 'vue-json-pretty'
 import moment from 'moment'
 import AddressLink from '@/components/AddressLink'
+import VueJsonPretty from 'vue-json-pretty'
+import 'vue-json-pretty/lib/styles.css'
 
 function base64toHEX (base64) {
   const buffer = Buffer.from(base64, 'base64')
@@ -171,7 +172,7 @@ export default {
       if (this.type) { args['msgType'] = this.type }
 
       let response = await axios.get(
-        `https://${this.api_server}/api/v0/messages.json`,
+        `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`,
         { params: args }
       )
       this.messages = response.data.messages

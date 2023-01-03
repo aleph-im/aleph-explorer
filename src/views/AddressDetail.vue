@@ -82,6 +82,7 @@ import MessageList from '@/components/MessageList.vue'
 import {aggregates} from 'aleph-js'
 import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
+import 'vue-json-pretty/lib/styles.css'
 
 export default {
   name: 'address-detail',
@@ -124,7 +125,7 @@ export default {
       await this.getMessages()
     },
     async getAggregates() {
-      this.aggregates = await aggregates.fetch(this.address, {api_server: 'https://' + this.api_server})
+      this.aggregates = await aggregates.fetch(this.address, {api_server: 'https://' + this.api_server.host})
       
       if (this.aggregates === null)
         this.aggregates = {}
@@ -137,7 +138,7 @@ export default {
     },
     async getPosts() {
       // own posts`
-      let response = await axios.get(`https://${this.api_server}/api/v0/posts.json`, {
+      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/posts.json`, {
         params: {
           'types': 'blog_pers,comment,social',
           'addresses': this.address,
@@ -153,7 +154,7 @@ export default {
     },
     async getMessages() {
       // own posts`
-      let response = await axios.get(`https://${this.api_server}/api/v0/messages.json`, {
+      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`, {
         params: {
           'addresses': this.address,
           'pagination': this.msg_per_page,
@@ -167,7 +168,7 @@ export default {
       // this.current_msg_page = response.data.pagination_page
     },
     async getStats() {
-      let response = await axios.get(`https://${this.api_server}/api/v0/addresses/stats.json`, {
+      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/addresses/stats.json`, {
         params: {
           addresses: [this.address]
         }

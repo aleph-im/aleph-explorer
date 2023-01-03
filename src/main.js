@@ -15,3 +15,12 @@ new Vue({
   store,
   render: h => h(App)
 }).$mount('#app')
+
+console.log(`%c
+Welcome to Aleph Explorer
+=========================
+You are currently connected to ${store.state.api_server.host}, type:
+set_api_node('http(s)://xxx.xxx.xxx.xxx:4024') to manually set the API server
+`, 'color: #6777ef; font-size: 140%;')
+
+window.set_api_node = url => store.commit('set_api_server', url)
