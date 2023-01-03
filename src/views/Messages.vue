@@ -70,7 +70,7 @@ export default {
       await this.getChannels()
     },
     async getMessages () {
-      let response = await axios.get(`https://${this.api_server}/api/v0/messages.json`, {
+      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`, {
         params: {
           'pagination': this.per_page,
           'page': this.page,
@@ -83,7 +83,7 @@ export default {
       this.total_msg = response.data.pagination_total
     },
     async getChannels () {
-      let response = await axios.get(`https://${this.api_server}/api/v0/channels/list.json`)
+      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/channels/list.json`)
       let channels = response.data.channels
 
       this.channels = channels // display all for now
@@ -98,6 +98,9 @@ export default {
       await this.refresh()
     },
     async page () {
+      await this.refresh()
+    },
+    async 'api_server.host'() {
       await this.refresh()
     }
   },

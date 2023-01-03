@@ -5,13 +5,17 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    api_server: 'api2.aleph.im',
     network_id: 261,
     ipfs_gateway: 'https://ipfs.io/ipfs/',
     account: null,
     profiles: {},
     addresses_stats: [],
     last_broadcast: null,
+    api_server: {
+      host: 'api2.aleph.im',
+      protocol: 'https:',
+      ws_protocol: 'wss:'
+    },
     categories: [ // categories are hard-coded for now...
       'Crypto',
       'Aleph',
@@ -42,6 +46,19 @@ export default new Vuex.Store({
       state.address_alias = {}
       state.alias_address = {}
       state.last_broadcast = null
+    },
+    set_api_server (state, payload) {
+      try {
+        const url = new URL(payload)
+        state.api_server = {
+          host: url.host,
+          protocol: url.protocol,
+          ws_protocol: url.protocol.match('s') ? 'wss:' : 'ws:'
+        }
+        console.log(`API server set to ${state.api_server.host}`)
+      } catch (error) {
+        console.error('Invalid URL format, please prefix with protocol (http(s)://...)')
+      }
     }
   },
   actions: {
