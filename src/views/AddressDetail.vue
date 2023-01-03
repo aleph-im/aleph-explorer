@@ -82,6 +82,7 @@ import MessageList from '@/components/MessageList.vue'
 import {aggregates} from 'aleph-js'
 import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
+import 'vue-json-pretty/lib/styles.css'
 
 export default {
   name: 'address-detail',

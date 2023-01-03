@@ -37,7 +37,6 @@
 import { mapState } from 'vuex'
 import MessageList from '@/components/MessageList.vue'
 import axios from 'axios'
-import VueJsonPretty from 'vue-json-pretty'
 import 'vue-select/dist/vue-select.css';
 
 export default {
@@ -63,7 +62,7 @@ export default {
     }
   },
   components: {
-    MessageList, VueJsonPretty
+    MessageList
   },
   methods: {
     async refresh () {
