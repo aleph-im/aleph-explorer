@@ -79,7 +79,6 @@ import { mapState } from 'vuex'
 import AccountAvatar from '@/components/AccountAvatar.vue'
 import AccountName from '@/components/AccountName.vue'
 import MessageList from '@/components/MessageList.vue'
-import {aggregates} from 'aleph-js'
 import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
@@ -125,16 +124,25 @@ export default {
       await this.getMessages()
     },
     async getAggregates() {
-      this.aggregates = await aggregates.fetch(this.address, {api_server: 'https://' + this.api_server.host})
-      
-      if (this.aggregates === null)
-        this.aggregates = {}
-      else if (this.aggregates.profile !== undefined)
-        this.$store.commit('store_profile', {
-          address: this.address,
-          profile: this.aggregates['profile']
-        })
-      this.component_key = this.component_key + 1;
+      try{
+        const { data } = await axios.get(
+          `${this.api_server.protocol}//${this.api_server.host}/api/v0/aggregates/${this.address}.json`,
+          { params: { limit: 1000 } }
+        )
+        this.aggregates = data.data
+        
+        if (this.aggregates === null)
+          this.aggregates = {}
+        else if (this.aggregates.profile !== undefined)
+          this.$store.commit('store_profile', {
+            address: this.address,
+            profile: this.aggregates['profile']
+          })
+        this.component_key = this.component_key + 1;
+      }
+      catch(err){
+        console.log("Cannot fetch aggregate");
+      }
     },
     async getPosts() {
       // own posts`
