@@ -92,7 +92,7 @@ export default {
         height: 0
       },
       'display_menu': false,
-      app_version: 'GIT_DESCRIBE_TAGS'
+      app_version: window.GIT_DESCRIBE_TAGS || 'unknown build'
     }
   },
   computed: mapState({
@@ -104,13 +104,13 @@ export default {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
     this.loadAddresses()
-
-//     if (!GIT_DESCRIBE_TAGS) {
-//       console.warn(`
-// No build version detected.
-// This bundle was probably not built from a git repository,
-// or your build process might be broken! `)
-//     }
+    
+    if (!window.GIT_DESCRIBE_TAGS) {
+      console.warn(`
+No build version detected.
+This bundle was probably not built from a git repository,
+or your build process might be broken! `)
+    }
   },
   destroyed () {
     window.removeEventListener('resize', this.handleResize)
