@@ -10,43 +10,34 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: () => import(/* webpackChunkName: "home" */ './views/Home.vue')
+      component: () => import('./views/Home.vue')
     },
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      component: () => import('./views/About.vue')
     },
     {
       path: '/address/:chain?/:address?/message/:type?/:hash',
       name: 'message-detail',
-      component: () => import(/* webpackChunkName: "message_detail" */ './views/MessageDetail.vue'),
+      component: () => import('./views/MessageDetail.vue'),
       props: true
     },
     {
       path: '/address/:chain?/:address',
       name: 'address-detail',
-      component: () => import(/* webpackChunkName: "address_detail" */ './views/AddressDetail.vue'),
+      component: () => import('./views/AddressDetail.vue'),
       props: true
     },
     {
       path: '/messages/',
       name: 'messages',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "messages" */ './views/Messages.vue')
+      component: () => import('./views/Messages.vue')
     },
     {
       path: '/addresses',
       name: 'addresses',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "addresses" */ './views/Addresses.vue')
+      component: () => import('./views/Addresses.vue')
     }
   ]
 })

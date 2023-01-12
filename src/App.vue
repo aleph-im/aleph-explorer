@@ -5,7 +5,8 @@
         <div class="navbar-bg"></div>
         <nav class="navbar navbar-expand-lg main-navbar">
           <ul class="navbar-nav mr-auto mr-3">
-            <li v-if="window.width < 1024"><b-link @click="display_menu = !display_menu" href="#" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></b-link></li>
+            <li v-if="window.width < 1024"><b-link @click="display_menu = !display_menu" href="#"
+                class="nav-link nav-link-lg"><i class="fas fa-bars"></i></b-link></li>
           </ul>
           <b-navbar-brand v-if="window.width < 1024" to="/">א.im</b-navbar-brand>
           <b-navbar-brand v-else to="/">א.im network Explorer</b-navbar-brand>
@@ -23,7 +24,7 @@
         <!-- Main Content -->
         <div class="main-content">
           <section class="section">
-            <router-view/>
+            <router-view />
           </section>
         </div>
         <footer class="main-footer px-5">
@@ -39,10 +40,10 @@
                 {{ app_version }}
               </template>
             </template>
-            <a href="https://github.com/aleph-im/aleph-explorer" class="card-link"
-                 target="_blank" rel="noopener noreferrer">
-                <i class="fab fa-github"></i>
-              </a>
+            <a href="https://github.com/aleph-im/aleph-explorer" class="card-link" target="_blank"
+              rel="noopener noreferrer">
+              <i class="fab fa-github"></i>
+            </a>
           </div>
         </footer>
       </div>
@@ -53,7 +54,7 @@
               <i class="fas fa-times"></i>
             </div>
             <div class="sidebar-brand">
-              <b-link target="/">Aleph.im<br/>Explorer</b-link>
+              <b-link target="/">Aleph.im<br />Explorer</b-link>
             </div>
             <ul class="sidebar-menu">
               <li class="menu-header">Dashboard</li>
@@ -70,7 +71,8 @@
             </ul>
             <div class="p-3 mt-4 mb-4 hide-sidebar-mini">
               <b-link to="/about" class="btn btn-primary btn-lg btn-icon-split btn-block">
-                <i class="far fa-question-circle"></i> <div>About</div>
+                <i class="far fa-question-circle"></i>
+                <div>About</div>
               </b-link>
             </div>
           </aside>
@@ -85,14 +87,14 @@ import axios from 'axios'
 import { mapState } from 'vuex'
 export default {
   name: 'app',
-  data () {
+  data() {
     return {
       window: {
         width: 0,
         height: 0
       },
       'display_menu': false,
-      app_version: GIT_DESCRIBE_TAGS
+      app_version: GIT_DESCRIBE_TAGS || 'unknown build'
     }
   },
   computed: mapState({
@@ -100,41 +102,41 @@ export default {
     api_server: state => state.api_server,
     profiles: state => state.profiles
   }),
-  created () {
+  created() {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
     this.loadAddresses()
 
-    if (!GIT_DESCRIBE_TAGS) {
+    if (GIT_DESCRIBE_TAGS) {
       console.warn(`
 No build version detected.
 This bundle was probably not built from a git repository,
 or your build process might be broken! `)
     }
   },
-  destroyed () {
+  destroyed() {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
-    handleResize () {
+    handleResize() {
       this.window.width = window.innerWidth
       this.window.height = window.innerHeight
     },
-    async loadAddresses () {
+    async loadAddresses() {
       // VERY BAD, we load everything for now!
       // TODO: gotta do it on demand.
       let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/addresses/stats.json`)
       this.$store.commit('set_addresses_stats', response.data.data)
     },
-    last_release_is_a_tag () {
+    last_release_is_a_tag() {
       return /\d+-.[0-9A-F]{7}$/i.test(this.app_version)
     }
   },
   watch: {
-    '$route' (to, from) {
+    '$route'(to, from) {
       this.display_menu = false
     },
-    async 'api_server.host'(){
+    async 'api_server.host'() {
       await this.loadAddresses()
     }
   }
@@ -151,10 +153,16 @@ or your build process might be broken! `)
 
 @import './assets/style.scss';
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity .5s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+
+.fade-enter,
+.fade-leave-to
+
+/* .fade-leave-active below version 2.1.8 */
+  {
   opacity: 0;
 }
 </style>
