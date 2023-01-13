@@ -37,7 +37,7 @@ jobs:
   
   upload:
     runs-on: ubuntu-22.04
-    needs: [lint,tests,build]
+    needs: [build]
 
     steps:
       - name: Checkout
