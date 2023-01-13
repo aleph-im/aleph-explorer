@@ -3,8 +3,14 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
+function getBase() {
+  const { pathname } = new URL(window.location)
+  return pathname.replace(/\/(about|addresse?s?|messages)\/?.*$/gi, '') || '/'
+}
+
 export default new Router({
   mode: 'history',
+  base: getBase(),
   routes: [
     {
       path: '/',
