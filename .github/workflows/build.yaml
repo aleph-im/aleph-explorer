@@ -29,8 +29,3 @@ jobs:
 
       - name: Build
         run: yarn build
-      
-      - uses: actions/upload-artifact@v3
-        with:
-          name: aleph-explorer
-          path: dist/
