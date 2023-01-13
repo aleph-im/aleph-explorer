@@ -29,3 +29,37 @@ jobs:
 
       - name: Build
         run: yarn build
+      
+      - uses: actions/upload-artifact@v3
+        with:
+          name: aleph-explorer
+          path: dist/
+  
+  upload:
+    runs-on: ubuntu-22.04
+    needs: [lint,tests,build]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: aleph-explorer
+          path: dist/
+
+      - name: Upload the build on an IPFS node
+        run: |
+          find .
+          pip install 'aioipfs>=0.6.2'
+          python3 ./upload_build.py
+          export IPFS_CID=$(python3 ./upload_build.py)
+          echo "ipfs_cid=$IPFS_CID" >> $GITHUB_ENV
+
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Deployed (not pinned) on https://ipfs-2.aleph.im/ipfs/${{ env.ipfs_cid }}
