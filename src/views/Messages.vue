@@ -1,11 +1,8 @@
 <template>
   <div>
     <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0" style="min-width: 200px;">
-      <v-select :options="channels" 
-                @input="select_channel" 
-                placeholder="Filter channels" 
-                :value="selected_channel"
-                multiple />
+      <v-select :options="channels" @input="select_channel" placeholder="Filter channels" :value="selected_channel"
+        multiple />
     </div>
 
 
@@ -13,29 +10,16 @@
       <b-card-header class="d-flex justify-content-between">
         <h4>Messages</h4>
 
-        <b-pagination
-          v-model="page"
-          :total-rows="total_msg"
-          :per-page="per_page"
-          limit="4"
-          class="mb-0" size="sm"
-          v-if="!isLoading"
-        ></b-pagination>
+        <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="4" class="mb-0" size="sm"
+          v-if="!isLoading"></b-pagination>
       </b-card-header>
 
       <MessageList :messages="messages" class="compact" detailed />
 
       <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
-        Total: {{total_msg}}
-        <b-pagination
-          v-model="page"
-          :total-rows="total_msg"
-          :per-page="per_page"
-          limit="9"
-          class="mb-0" 
-          size="sm"
-          v-if="!isLoading"
-        ></b-pagination>
+        Total: {{ total_msg }}
+        <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="9" class="mb-0" size="sm"
+          v-if="!isLoading"></b-pagination>
       </b-card-footer>
     </b-card>
   </div>
@@ -49,7 +33,7 @@ import 'vue-select/dist/vue-select.css'
 
 export default {
   name: 'messages',
-  data () {
+  data() {
     return {
       messages: [],
       channels: [],
@@ -74,11 +58,11 @@ export default {
     MessageList
   },
   methods: {
-    async refresh () {
+    async refresh() {
       await this.getMessages()
       await this.getChannels()
     },
-    async getMessages () {
+    async getMessages() {
       let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`, {
         params: {
           'pagination': this.per_page,
@@ -91,14 +75,20 @@ export default {
       this.messages = messages // display all for now
       this.total_msg = response.data.pagination_total
     },
-    async getChannels () {
-      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/channels/list.json`)
-      let channels = response.data.channels
+    async getChannels() {
+      const response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/channels/list.json`)
+      try {
+        const { channels } = response.data
 
-      this.channels = channels // display all for now
+        // FIXME
+        // A null channel is stopping the select component from rendering
+        this.channels = channels.filter(x => x != null)
+      } catch (error) {
+        this.channels = [] // display all for now
+      }
     },
-    select_channel (channel) {
-      if(channel.length === 0){
+    select_channel(channel) {
+      if (channel.length === 0) {
         channel = null
       }
 
@@ -107,7 +97,7 @@ export default {
         query: channel && { channels: channel.join(','), page: 1 }
       })
     },
-    async loadQP (qp) {
+    async loadQP(qp) {
       if (qp) {
         try {
           this.selected_channel = qp.channels && qp.channels.split(',')
@@ -123,15 +113,15 @@ export default {
     }
   },
   watch: {
-    async $route (to) {
-      const { query } = to 
+    async $route(to) {
+      const { query } = to
       await this.loadQP(query)
     },
     async 'api_server.host'() {
       await this.refresh()
     }
   },
-  async created () {
+  async created() {
     await this.getChannels()
     await this.loadQP(this.$route.query)
 
@@ -154,7 +144,7 @@ export default {
 </script>
 
 <style>
-:root{
+:root {
   /*
     Overriding the default text size from the vue-select component
     more info: https://vue-select.org/guide/css.html#css-variables
@@ -165,7 +155,7 @@ export default {
   --vs-selected-border-color: #6777ef;
 }
 
-.vs__selected{
+.vs__selected {
   --vs-controls-color: #FFF;
 }
 </style>
