@@ -5,7 +5,8 @@
         <b-col cols="12" md="6">
           <b-card no-body>
             <b-card-header>
-              <h4>Last messages</h4>
+              <h4>Last messages <b-spinner small class="ml-3" label="Loading messages" v-if="query_status.is_loading" />
+              </h4>
               <div class="card-header-action">
                 <b-link class="btn btn-primary" to="/messages">View all <i class="fas fa-chevron-right"></i></b-link>
               </div>
@@ -62,6 +63,10 @@ export default {
         { key: 'posts', label: 'Posts', class: 'text-right' },
         { key: 'aggregates', label: 'Aggregates', class: 'text-right' }
       ],
+      query_status: {
+        is_loading: false,
+        has_error: false
+      }
     }
   },
   computed: {
@@ -104,10 +109,12 @@ export default {
       // so the "MessageList" component only updates once it is filled
       const prefillQueue = []
       this.last_messages = []
+      this.query_status.is_loading = true
 
       socket.addEventListener('message', (e) => {
         let data
         try {
+          this.query_status.is_loading = false
           data = JSON.parse(e.data)
           if (!data)
             return
@@ -122,6 +129,8 @@ export default {
         if (prefillQueue.length === QUEUE_SIZE)
           this.last_messages = [...prefillQueue]
       })
+
+      socket.addEventListener('error', () => this.query_status.has_error = true)
       this.message_socket = socket
     }
   },
