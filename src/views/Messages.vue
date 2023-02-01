@@ -74,7 +74,7 @@
           <v-select :options="channels" @input="e => setQP('channels', e?.join(','))" placeholder="Filter channels"
             :value="filters.channels" multiple />
         </div>
-        <div style="margin-left: 15px;padding-left: 15px; border-left: 1px solid #FFF;display:flex;align-items:center;">
+        <div class="ml-3 pl-3 border-left border-light d-flex align-items-center">
           <span class="filtertoggle" @click="toggleAdvancedFilters()">Show advanced filters</span>
         </div>
       </div>
