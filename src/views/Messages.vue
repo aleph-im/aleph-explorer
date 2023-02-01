@@ -1,10 +1,84 @@
 <template>
   <div>
-    <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0" style="min-width: 200px;">
-      <v-select :options="channels" @input="select_channel" placeholder="Filter channels" :value="selected_channel"
-        multiple />
-    </div>
+    <template v-if="showAdvancedFilters">
+      <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0 d-flex">
+        <span class="filtertoggle" @click="toggleAdvancedFilters()">Hide advanced filters</span>
+      </div>
 
+      <b-card>
+        <b-container fluid>
+          <b-row class="my-1">
+            <b-col sm="6">
+              <b-form-group id="fg_channel" label="Channel(s)" label-for="_input_channels">
+                <v-select :options="channels" @input="e => setQP('channels', e?.join(','))"
+                  placeholder="Filter channels" :value="filters.channels" id="_input_channels" multiple />
+              </b-form-group>
+            </b-col>
+            <b-col sm="6">
+              <b-form-group id="fg_sender" label="Sent by address (exact match)" label-for="_input_sender">
+                <b-form-input id="_input_sender" size="sm" :value="filters.sender" @update="e => setQP('sender', e)"
+                  debounce="750" trim></b-form-input>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row class="my-1">
+            <b-col sm="6">
+              <b-form-group id="fg_type" label="Message type" label-for="_input_type">
+                <b-form-radio-group id="_input_type" @input="e => setQP('type', e)" :checked="filters.type">
+                  <b-form-radio value="ALL">All</b-form-radio>
+                  <b-form-radio value="AGGREGATE">Aggregate</b-form-radio>
+                  <b-form-radio value="FORGET">Forget</b-form-radio>
+                  <b-form-radio value="POST">Post</b-form-radio>
+                  <b-form-radio value="PROGRAM">Program</b-form-radio>
+                  <b-form-radio value="STORE">Store</b-form-radio>
+                </b-form-radio-group>
+              </b-form-group>
+            </b-col>
+            <b-col sm="3">
+              <b-form-group id="fg_date_from" label="Sent after" label-for="_input_date_from">
+                <b-form-input id="date_from" type="date" size="sm" @update="e => setQP('startDate', e)"
+                  :value="filters.startDate" debounce="750" trim></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col sm="3">
+              <b-form-group id="fg_date_to" label="Sent before" label-for="_input_date_to">
+                <b-form-input id="date_to" type="date" size="sm" @update="e => setQP('endDate', e)"
+                  :value="filters.endDate" debounce="750" trim></b-form-input>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row class="my-1">
+            <b-col sm="6">
+              <b-form-group id="fg_refs" label="Refs (comma separated values)" label-for="_input_refs">
+                <b-form-input id="_input_refs" size="sm" :value="filters.refs" @update="e => setQP('refs', e)"
+                  debounce="750" trim></b-form-input>
+              </b-form-group>
+            </b-col>
+
+            <b-col sm="6">
+              <b-form-group id="fg_keys" label="keys (comma separated values)" label-for="_input_keys">
+                <b-form-input id="_input_keys" size="sm" :value="filters.keys" @update="e => setQP('keys', e)"
+                  debounce="750" trim></b-form-input>
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-container>
+      </b-card>
+    </template>
+
+    <template v-else>
+      <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0 d-flex">
+        <div style="min-width: 200px;">
+          <v-select :options="channels" @input="e => setQP('channels', e?.join(','))" placeholder="Filter channels"
+            :value="filters.channels" multiple />
+        </div>
+        <div style="margin-left: 15px;padding-left: 15px; border-left: 1px solid #FFF;display:flex;align-items:center;">
+          <span class="filtertoggle" @click="toggleAdvancedFilters()">Show advanced filters</span>
+        </div>
+      </div>
+    </template>
 
     <b-card no-body class="card-primary">
       <b-card-header class="d-flex justify-content-between">
@@ -27,9 +101,11 @@
 
 <script>
 import { mapState } from 'vuex'
-import MessageList from '@/components/MessageList.vue'
 import axios from 'axios'
 import 'vue-select/dist/vue-select.css'
+
+import MessageList from '@/components/MessageList.vue'
+import { toUnixTimestamp } from '../helpers.js'
 
 export default {
   name: 'messages',
@@ -37,11 +113,20 @@ export default {
     return {
       messages: [],
       channels: [],
-      selected_channel: null,
       per_page: 15,
       total_msg: 0,
       page: 1,
-      isLoading: true
+      isLoading: true,
+      showAdvancedFilters: false,
+      filters: {
+        channels: null,
+        sender: null,
+        type: 'ALL',
+        keys: null,
+        refs: null,
+        startDate: null,
+        endDate: null
+      }
     }
   },
   computed: mapState({
@@ -65,9 +150,15 @@ export default {
     async getMessages() {
       let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`, {
         params: {
-          'pagination': this.per_page,
-          'page': this.page,
-          'channels': this.selected_channel ? this.selected_channel.join(',') : undefined
+          pagination: this.per_page,
+          page: this.page,
+          channels: this.filters.channels ? this.filters.channels.join(',') : undefined,
+          addresses: this.filters.sender || undefined,
+          msgType: this.filters.type !== 'ALL' ? this.filters.type : undefined,
+          startDate: toUnixTimestamp(this.filters.startDate),
+          endDate: toUnixTimestamp(this.filters.endDate),
+          refs: this.filters.refs ? this.filters.refs.replaceAll(/\s/gi) : undefined,
+          contentKeys: this.filters.keys ? this.filters.keys.replaceAll(/\s/gi) : undefined,
         }
       })
       let messages = response.data.messages
@@ -84,24 +175,41 @@ export default {
         // A null channel is stopping the select component from rendering
         this.channels = channels.filter(x => x != null)
       } catch (error) {
-        this.channels = [] // display all for now
+        this.channels = []
       }
     },
-    select_channel(channel) {
-      if (channel.length === 0) {
-        channel = null
-      }
-
+    toggleAdvancedFilters() {
       return this.$router.push({
         name: 'messages',
-        query: channel && { channels: channel.join(','), page: 1 }
+        query: {
+          showAdvancedFilters: Number(!this.showAdvancedFilters),
+          channels: this.filters.channels ? this.filters.channels.join(',') : null
+        }
+      })
+    },
+    setQP(name, value) {
+      return this.$router.push({
+        name: 'messages',
+        query: {
+          ...this.$route.query,
+          [name]: value || undefined,
+          page: 1
+        }
       })
     },
     async loadQP(qp) {
       if (qp) {
         try {
-          this.selected_channel = qp.channels && qp.channels.split(',')
+          this.showAdvancedFilters = Boolean(parseInt(qp.showAdvancedFilters))
           this.page = parseInt(qp.page) || 1
+          this.filters.channels = qp.channels && qp.channels?.split(',')
+          this.filters.sender = qp.sender || null
+          this.filters.type = qp.type || 'ALL'
+          this.filters.startDate = qp.startDate
+          this.filters.endDate = qp.endDate
+          this.filters.keys = qp.keys
+          this.filters.refs = qp.refs
+
         }
         catch (err) {
           console.log('Could not load query parameter')
@@ -157,5 +265,15 @@ export default {
 
 .vs__selected {
   --vs-controls-color: #FFF;
+}
+
+.filtertoggle {
+  color: #FFF;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.filtertoggle:hover {
+  text-decoration: none;
 }
 </style>
