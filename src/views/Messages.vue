@@ -167,10 +167,16 @@ export default {
       this.total_msg = response.data.pagination_total
     },
     async getChannels() {
-      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/channels/list.json`)
-      let channels = response.data.channels
+      const response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/channels/list.json`)
+      try {
+        const { channels } = response.data
 
-      this.channels = channels // display all for now
+        // FIXME
+        // A null channel is stopping the select component from rendering
+        this.channels = channels.filter(x => x != null)
+      } catch (error) {
+        this.channels = []
+      }
     },
     toggleAdvancedFilters() {
       return this.$router.push({
