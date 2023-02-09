@@ -74,7 +74,7 @@
           <v-select :options="channels" @input="e => setQP('channels', e?.join(','))" placeholder="Filter channels"
             :value="filters.channels" multiple />
         </div>
-        <div style="margin-left: 15px;padding-left: 15px; border-left: 1px solid #FFF;display:flex;align-items:center;">
+        <div class="ml-3 pl-3 border-left border-light d-flex align-items-center">
           <span class="filtertoggle" @click="toggleAdvancedFilters()">Show advanced filters</span>
         </div>
       </div>
@@ -82,10 +82,10 @@
 
     <b-card no-body class="card-primary">
       <b-card-header class="d-flex justify-content-between">
-        <h4>Messages</h4>
+        <h4>Messages <b-spinner small class="ml-3" label="Loading messages" v-if="query_status.is_loading" /></h4>
 
         <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="4" class="mb-0" size="sm"
-          v-if="!isLoading"></b-pagination>
+          v-if="!hasPageLoaded"></b-pagination>
       </b-card-header>
 
       <MessageList :messages="messages" class="compact" detailed />
@@ -93,7 +93,7 @@
       <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
         Total: {{ total_msg }}
         <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="9" class="mb-0" size="sm"
-          v-if="!isLoading"></b-pagination>
+          v-if="!hasPageLoaded"></b-pagination>
       </b-card-footer>
     </b-card>
   </div>
@@ -116,7 +116,7 @@ export default {
       per_page: 15,
       total_msg: 0,
       page: 1,
-      isLoading: true,
+      hasPageLoaded: true,
       showAdvancedFilters: false,
       filters: {
         channels: null,
@@ -126,6 +126,10 @@ export default {
         refs: null,
         startDate: null,
         endDate: null
+      },
+      query_status: {
+        is_loading: false,
+        has_error: false
       }
     }
   },
@@ -148,6 +152,7 @@ export default {
       await this.getChannels()
     },
     async getMessages() {
+      this.query_status.is_loading = true
       let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`, {
         params: {
           pagination: this.per_page,
@@ -162,6 +167,7 @@ export default {
         }
       })
       let messages = response.data.messages
+      this.query_status.is_loading = false
 
       this.messages = messages // display all for now
       this.total_msg = response.data.pagination_total
@@ -246,7 +252,7 @@ export default {
     // Fixes a bug in the pagination component 
     // Where it would not display the correct number at page load
     // src: https://github.com/bootstrap-vue/bootstrap-vue/issues/6960#issuecomment-1103795173
-    this.isLoading = false
+    this.hasPageLoaded = false
   }
 }
 </script>
