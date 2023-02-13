@@ -146,9 +146,9 @@ or your build process might be broken! `)
 <style lang="scss">
 @import '~bootstrap/dist/css/bootstrap.css';
 @import '~bootstrap-vue/dist/bootstrap-vue.css';
-@import '~stisla-theme/dist/scss/style.scss';
 
 /* optional imports */
+@import './assets/stisla-style.scss';
 @import '~stisla-theme/dist/scss/components.scss';
 
 @import './assets/style.scss';

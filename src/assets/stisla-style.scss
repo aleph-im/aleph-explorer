@@ -1,0 +1,119 @@
+/**
+ * Stisla
+ *
+ * Stisla is a clean & modern HTML5 admin template based on Bootstrap 4.
+ * Stisla will make it easier for you to create your own admin interface.
+ *
+ * @package	Stisla
+ * @version	2.3.0
+ * @author 	Muhamad Nauval Azhar
+ * @url 	https://getstisla.com
+ *
+ */
+
+ // @import '~stisla-theme/dist/scss/_functions';
+
+ /**
+  * TABLE OF CONTENTS
+  *
+  * 1. Variable
+  * 2. Mixin
+  * 3. Bootstrap Override
+  * 	  3.1 Misc
+  * 	  3.2 Form
+  * 	  3.3 List
+  * 	  3.4 Alert
+  * 	  3.5 Card
+  * 	  3.6 Table
+  * 	  3.7 Tooltip
+  * 	  3.8 Modal
+  * 	  3.9 Nav
+  * 	  3.10 Pagination
+  * 	  3.11 Badge
+  * 	  3.12 Button
+  * 	  3.13 Media
+  * 	  3.14 Breadcrumb
+  * 	  3.15 Accordion
+  * 	  3.16 Popover
+  * 	  3.17 Grid
+  * 	  3.18 Navbar
+  * 	  3.19 Dropdown
+  * 	  3.20 Tab
+  * 	  3.21 Progressbar
+  * 	  3.22 Jumbotron
+  * 	  3.23 Carousel
+  * 4. Theme Style
+  * 	  4.1 Misc
+  * 	  4.2 Section
+  * 	  4.3 Page
+  * 	  4.4 Layout
+  * 	  4.5 Animation
+  * 5. Responsive
+  *
+  */
+ 
+ /* 1. Variable */
+ @import "./stisla-variables";
+ 
+ /* 2. Mixin */
+ @import "~stisla-theme/dist/scss/_mixin";
+ 
+ /* 3. Bootstrap Override */
+ /* 3.1 Misc */
+ @import "~stisla-theme/dist/scss/override/_misc";
+ /* 3.2 Form */
+ @import "~stisla-theme/dist/scss/override/_form";
+ /* 3.3 List */
+ @import "~stisla-theme/dist/scss/override/_list";
+ /* 3.4 Alert */
+ @import "~stisla-theme/dist/scss/override/_alert";
+ /* 3.5 Card */
+ @import "~stisla-theme/dist/scss/override/_card";
+ /* 3.6 Table */
+ @import "~stisla-theme/dist/scss/override/_table";
+ /* 3.7 Tooltip */
+ @import "~stisla-theme/dist/scss/override/_tooltip";
+ /* 3.8 Modal */
+ @import "~stisla-theme/dist/scss/override/_modal";
+ /* 3.9 Nav */
+ @import "~stisla-theme/dist/scss/override/_nav";
+ /* 3.10 Pagination */
+ @import "~stisla-theme/dist/scss/override/_pagination";
+ /* 3.11 Badge */
+ @import "~stisla-theme/dist/scss/override/_badge";
+ /* 3.12 Button */
+ @import "~stisla-theme/dist/scss/override/_button";
+ /* 3.13 Media */
+ @import "~stisla-theme/dist/scss/override/_media";
+ /* 3.14 Breadcrumb */
+ @import "~stisla-theme/dist/scss/override/_breadcrumb";
+ /* 3.15 Accordion */
+ @import "~stisla-theme/dist/scss/override/_accordion";
+ /* 3.16 Popover */
+ @import "~stisla-theme/dist/scss/override/_popover";
+ /* 3.17 Grid */
+ @import "~stisla-theme/dist/scss/override/_grid";
+ /* 3.18 Navbar */
+ @import "~stisla-theme/dist/scss/override/_navbar";
+ /* 3.19 Dropdown */
+ @import "~stisla-theme/dist/scss/override/_dropdown";
+ /* 3.20 Dropdown */
+ @import "~stisla-theme/dist/scss/override/_tab";
+ /* 3.21 Progress Bar */
+ @import "~stisla-theme/dist/scss/override/_progressbar";
+ /* 3.22 Jumbotron */
+ @import "~stisla-theme/dist/scss/override/_jumbotron";
+ /* 3.23 Carousel */
+ @import "~stisla-theme/dist/scss/override/_carousel";
+ 
+ /* 4. Theme Style */
+ /* 4.1 Misc */
+ @import "~stisla-theme/dist/scss/theme/misc";
+ /* 4.2 Section */
+ @import "~stisla-theme/dist/scss/theme/section";
+ /* 4.3 Page */
+ @import "~stisla-theme/dist/scss/theme/page";
+ /* 4.4 Layout */
+ @import "~stisla-theme/dist/scss/theme/layout";
+ /* 4.5 Animation */
+ @import "~stisla-theme/dist/scss/theme/animation";
