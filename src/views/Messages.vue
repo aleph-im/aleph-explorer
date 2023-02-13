@@ -36,7 +36,7 @@
               </b-form-group>
             </b-col>
             <b-col sm="3">
-              <b-form-group id="fg_date_from" label="Sent after" label-for="_input_date_from">
+              <b-form-group id="fg_date_from" label="Sent on or after" label-for="_input_date_from">
                 <b-form-input id="date_from" type="date" size="sm" @update="e => setQP('startDate', e)"
                   :value="filters.startDate" debounce="750" trim></b-form-input>
               </b-form-group>
@@ -58,9 +58,9 @@
             </b-col>
 
             <b-col sm="6">
-              <b-form-group id="fg_keys" label="keys (comma separated values)" label-for="_input_keys">
+              <b-form-group id="fg_keys" label="Aggregate key" label-for="_input_keys">
                 <b-form-input id="_input_keys" size="sm" :value="filters.keys" @update="e => setQP('keys', e)"
-                  debounce="750" trim></b-form-input>
+                  debounce="750" trim :disabled="filters.type !== 'AGGREGATE'"></b-form-input>
               </b-form-group>
             </b-col>
           </b-row>
