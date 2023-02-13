@@ -264,9 +264,9 @@ export default {
     more info: https://vue-select.org/guide/css.html#css-variables
   */
   --vs-font-size: unset;
-  --vs-selected-bg: #6777ef;
+  --vs-selected-bg: #0045ff;
   --vs-selected-color: white;
-  --vs-selected-border-color: #6777ef;
+  --vs-selected-border-color: #0045ff;
 }
 
 .vs__selected {
