@@ -10,8 +10,8 @@
           <b-row class="my-1">
             <b-col sm="6">
               <b-form-group id="fg_channel" label="Channel(s)" label-for="_input_channels">
-                <v-select :options="channels" @input="e => setQP('channels', e?.join(','))"
-                  placeholder="Filter channels" :value="filters.channels" id="_input_channels" multiple />
+                <v-select :options="channels" @input="e => setQP('channels', e?.join(','))" placeholder="Filter channels"
+                  :value="filters.channels" id="_input_channels" multiple />
               </b-form-group>
             </b-col>
             <b-col sm="6">
@@ -264,9 +264,9 @@ export default {
     more info: https://vue-select.org/guide/css.html#css-variables
   */
   --vs-font-size: unset;
-  --vs-selected-bg: #0045ff;
+  --vs-selected-bg: #029AFF;
   --vs-selected-color: white;
-  --vs-selected-border-color: #0045ff;
+  --vs-selected-border-color: #029AFF;
 }
 
 .vs__selected {
