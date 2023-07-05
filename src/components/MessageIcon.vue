@@ -21,6 +21,10 @@ const iconStyles = {
     background: 'warning',
     text: 'VM'
   },
+  INSTANCE: {
+    background: 'bg-dark',
+    text: 'VM'
+  },
   FORGET: {
     background: 'bg-secondary',
     text: 'F'
