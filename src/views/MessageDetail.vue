@@ -66,7 +66,7 @@
 
                   <b-list-group-item class="d-flex w-100 font-small justify-content-between">
                     <span>Runtime</span>
-                    <span><a :href="`/messages/${message.content.runtime.ref}`">
+                    <span><a :href="`/message/${message.content.runtime.ref}`">
                       <template v-if="message.content.runtime.comment">
                         {{ message.content.runtime.comment }}
                       </template>
@@ -224,6 +224,8 @@ export default {
       let args = {
         hashes: this.hash
       }
+
+      console.log(this.hash)
 
       if (this.address) { args['addresses'] = this.address }
 
