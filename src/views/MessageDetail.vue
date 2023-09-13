@@ -52,6 +52,61 @@
           </b-card>
         </b-col>
         <b-col cols="12" xl="4">
+          <b-card no-body v-if="message.type === 'PROGRAM'">
+            <b-card-header>
+              <h4>Program details</h4>
+            </b-card-header>
+            <b-list-group flush>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Run program</span>
+                    <span><a :href="'https://aleph.sh/vm/' + message.item_hash" target="_blank" referrerpolicy="no-referrer">
+                      <i class="fas fa-external-link-alt" />&nbsp;aleph.sh
+                    </a></span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Runtime</span>
+                    <span><a :href="`/messages/${message.content.runtime.ref}`">
+                      <template v-if="message.content.runtime.comment">
+                        {{ message.content.runtime.comment }}
+                      </template>
+                      <template v-else>
+                        custom
+                      </template>
+                      </a></span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Source code</span>
+                    <template v-if="isProgramSourceLoading">
+                      <b-spinner small class="ml-3" label="Loading messages" />
+                    </template>
+                    <template v-else-if="programSource">
+                      <span><a :href="programSource" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-download" />&nbsp;
+                        Download
+                        <template v-if="message.content.code.encoding === 'plain'">
+                          script
+                        </template>
+                        <template v-else>
+                          ({{ message.content.code.encoding }})
+                        </template>
+                      </a></span>
+                    </template>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>vCPUs</span>
+                    <span>{{  message.content.resources.vcpus }}</span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>RAM</span>
+                    <span>{{ Number(message.content.resources.memory / 1024).toFixed(2) }}&nbsp;Gb</span>
+                  </b-list-group-item>
+            </b-list-group>
+          </b-card>
+
           <b-card no-body>
             <b-card-header>
               <h4>Message details</h4>
@@ -105,35 +160,6 @@
                 </div>
                 <span v-else>None</span>
               </b-list-group-item>
-              <template v-if="message.type === 'PROGRAM'">
-                <b-list-group-item class="d-flex w-100 font-small justify-content-between">
-                  <span>Execute on</span>
-                  <span><a :href="'https://aleph.sh/vm/' + message.item_hash">aleph.sh</a></span>
-                </b-list-group-item>
-
-                <b-list-group-item class="d-flex w-100 font-small justify-content-between">
-                  <span>Runtime</span>
-                  <template v-if="message.content.runtime.comment">
-                    <span><a :href="`/messages/${message.content.runtime.ref}`">{{ message.content.runtime.comment }}</a></span>
-                  </template>
-                  <template v-else>
-                    <span>-</span>
-                  </template>
-                </b-list-group-item>
-
-                <b-list-group-item class="d-flex w-100 font-small justify-content-between">
-                  <span>Source code</span>
-                  <template v-if="isProgramSourceLoading">
-                    <b-spinner small class="ml-3" label="Loading messages" />
-                  </template>
-                  <template v-else>
-                    <span style="cursor:pointer" class="text-primary" @click="getProgramSource">
-                      <i class="fas fa-download" />&nbsp;
-                      Download
-                    </span>
-                  </template>
-                </b-list-group-item>
-              </template>
             </b-list-group>
           </b-card>
         </b-col>
@@ -149,8 +175,6 @@ import moment from 'moment'
 import AddressLink from '@/components/AddressLink'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
-
-import { downloadBlob } from '../helpers'
 
 function base64toHEX (base64) {
   const buffer = Buffer.from(base64, 'base64')
@@ -193,6 +217,7 @@ export default {
     },
     async update () {
       await this.getMessages()
+      if(this.messages[0].type === 'PROGRAM') await this.getProgramSource()
       this.$forceUpdate()
     },
     async getMessages () {
@@ -213,7 +238,6 @@ export default {
     async getProgramSource () {
       try {
         const ref = this.messages[0].content.runtime.ref
-        
   
         if(ref || !this.isProgramSourceLoading || !this.programSource){
           this.isProgramSourceLoading = true
@@ -223,13 +247,16 @@ export default {
           if(!srcQuery.data.messages[0].content.item_hash){
             throw new Error('No source code found')
           }
-  
-          this.programSource = 'https://api2.aleph.im/api/v0/storage/raw/' + srcQuery.data.messages[0].content.item_hash
+
+          const rawSrc = srcQuery.data.messages[0].content.item_hash
+
+          // Shady hack to retrieve the source code from the IPFS gateway instead of the Aleph API
+          if(rawSrc.startsWith('Q') || rawSrc.startsWith('bafy'))
+            this.programSource = 'https://ipfs.io/ipfs/' + rawSrc
+          else
+            this.programSource = 'https://api2.aleph.im/api/v0/storage/raw/' + rawSrc
         }
-  
-        const blobQuery = await axios.get(this.programSource, { responseType: 'blob' })
-        downloadBlob(blobQuery.data, 'source.zip')
-  
+
         this.isProgramSourceLoading = false
       } catch (err) {
         this.isProgramSourceLoading = false
