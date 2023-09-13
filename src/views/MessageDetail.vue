@@ -1,5 +1,9 @@
 <template>
   <div>
+    <b-toast :visible="programSourceError" variant="danger">
+      Cannot fetch program source
+    </b-toast>
+
     <div class="section-header">
       <h1>Message detail</h1>
     </div>
@@ -101,11 +105,35 @@
                 </div>
                 <span v-else>None</span>
               </b-list-group-item>
-              <b-list-group-item class="d-flex w-100 font-small justify-content-between"
-                                 v-if="message.type === 'PROGRAM'">
-                <span>Execute on</span>
-                <span><a :href="'https://aleph.sh/vm/' + message.item_hash">aleph.sh</a></span>
-              </b-list-group-item>
+              <template v-if="message.type === 'PROGRAM'">
+                <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                  <span>Execute on</span>
+                  <span><a :href="'https://aleph.sh/vm/' + message.item_hash">aleph.sh</a></span>
+                </b-list-group-item>
+
+                <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                  <span>Runtime</span>
+                  <template v-if="message.content.runtime.comment">
+                    <span><a :href="`/messages/${message.content.runtime.ref}`">{{ message.content.runtime.comment }}</a></span>
+                  </template>
+                  <template v-else>
+                    <span>-</span>
+                  </template>
+                </b-list-group-item>
+
+                <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                  <span>Source code</span>
+                  <template v-if="isProgramSourceLoading">
+                    <b-spinner small class="ml-3" label="Loading messages" />
+                  </template>
+                  <template v-else>
+                    <span style="cursor:pointer" class="text-primary" @click="getProgramSource">
+                      <i class="fas fa-download" />&nbsp;
+                      Download
+                    </span>
+                  </template>
+                </b-list-group-item>
+              </template>
             </b-list-group>
           </b-card>
         </b-col>
@@ -121,6 +149,8 @@ import moment from 'moment'
 import AddressLink from '@/components/AddressLink'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
+
+import { downloadBlob } from '../helpers'
 
 function base64toHEX (base64) {
   const buffer = Buffer.from(base64, 'base64')
@@ -139,7 +169,10 @@ export default {
   }),
   data () {
     return {
-      messages: []
+      messages: [],
+      programSource: null,
+      isProgramSourceLoading: false,
+      programSourceError: false
     }
   },
   props: {
@@ -176,6 +209,33 @@ export default {
         { params: args }
       )
       this.messages = response.data.messages
+    },
+    async getProgramSource () {
+      try {
+        const ref = this.messages[0].content.runtime.ref
+        
+  
+        if(ref || !this.isProgramSourceLoading || !this.programSource){
+          this.isProgramSourceLoading = true
+          
+          const srcQuery = await axios.get(`https://api2.aleph.im/api/v0/messages.json?hashes=${ref}`)
+  
+          if(!srcQuery.data.messages[0].content.item_hash){
+            throw new Error('No source code found')
+          }
+  
+          this.programSource = 'https://api2.aleph.im/api/v0/storage/raw/' + srcQuery.data.messages[0].content.item_hash
+        }
+  
+        const blobQuery = await axios.get(this.programSource, { responseType: 'blob' })
+        downloadBlob(blobQuery.data, 'source.zip')
+  
+        this.isProgramSourceLoading = false
+      } catch (err) {
+        this.isProgramSourceLoading = false
+        this.programSource = null
+        this.programSourceError = true
+      }
     }
   },
   watch: {
