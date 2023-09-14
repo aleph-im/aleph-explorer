@@ -10,15 +10,6 @@
           </ul>
           <b-navbar-brand v-if="window.width < 1024" to="/">א.im</b-navbar-brand>
           <b-navbar-brand v-else to="/">א.im network Explorer</b-navbar-brand>
-          <!-- <form class="form-inline ml-auto">
-            <ul class="navbar-nav">
-              <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li>
-            </ul>
-            <div class="search-element">
-              <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn" type="submit"><i class="fas fa-search"></i></button>
-            </div>
-          </form> -->
         </nav>
 
         <!-- Main Content -->

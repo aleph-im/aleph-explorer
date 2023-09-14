@@ -23,6 +23,12 @@ export default new Router({
       props: true
     },
     {
+      path: '/message/:hash',
+      name: 'message-detail',
+      component: () => import('./views/MessageDetail.vue'),
+      props: true
+    },
+    {
       path: '/address/:chain?/:address',
       name: 'address-detail',
       component: () => import('./views/AddressDetail.vue'),
