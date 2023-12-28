@@ -65,6 +65,28 @@ nav.navbar {
   position: inherit !important;
   min-width: 250px;
   height: auto;
+  background: #121122;
+  color: #fff;
+  a {
+    color: #fff !important;
+    &.active,
+    &.router-link-exact-active {
+      color: #029AFF !important;
+    }
+    &:hover {
+      background-color: #201f30 !important;
+    }
+  }
+
+  .btn-primary,
+  .btn-primary:active {
+    box-shadow: none !important;
+    background-color: #201f30;
+    border: none;
+  }
+
+  li.nav-item {
+  }
 
   #sidebar-wrapper {
     display: flex;
