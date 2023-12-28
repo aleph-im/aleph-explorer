@@ -53,6 +53,9 @@ export default defineConfig({
     GIT_DESCRIBE_TAGS: JSON.stringify(getGitDescription())
   },
   server: {
-    port: 8080
+    port: 8080,
+    hmr: {
+      overlay: false
+    }
   },
 })

@@ -15,7 +15,50 @@
 
 nav.navbar {
   position: inherit !important;
-  background: #029AFF;
+  background: #121122;
+}
+
+.navbar-bg {
+  background: #121122;
+}
+
+.navigator {
+  background: #0e0d1b;
+  width: 4.5rem;
+  padding-top: 1rem;
+
+  span.logo {
+    padding: 1rem 1.25rem;
+    padding-bottom: 3.25rem;
+    svg {
+      height: 1.75rem;
+    }
+    display: block;
+  }
+
+  nav>div {
+    padding: 0.5rem 1.35rem;
+    cursor: pointer;
+    opacity: .4;
+    transition: opacity 0.25s ease-in-out 0.05s;
+
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &.active {
+      opacity: 1;
+    }
+
+    svg {
+      fill: #029aff;
+      color: #029aff;
+      height: 1.5rem;
+      max-width: 1rem;
+      margin: 0 .25rem;
+    }
+  }
 }
 
 .main-sidebar {
