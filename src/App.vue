@@ -70,7 +70,7 @@
         </div>
       </transition>
       <!-- left bar to navigate between brand sites -->
-      <div class="navigator">
+      <div class="navigator"  v-if="window.width >= 1024">
           <nav class="site-navigator">
             <span class="logo">
               <svg height="1.2em" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg">
