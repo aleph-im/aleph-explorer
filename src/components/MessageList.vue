@@ -71,6 +71,7 @@ export default {
     },
     preview_format (message) {
       let text = JSON.stringify(message.content.content)
+      if (text === undefined || text === null) { text = "No content" }
       if (text.length > 80) { return text.substring(0, 80) + '...' } else { return text }
     }
   }
