@@ -70,8 +70,9 @@ export default {
       return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`
     },
     preview_format (message) {
-      let text = JSON.stringify(message.content.content)
-      if (text === undefined || text === null) { text = "No content" }
+      const content = message.content.content
+      if (content === undefined || content === null) { return "No content" }
+      const text = JSON.stringify(content)
       if (text.length > 80) { return text.substring(0, 80) + '...' } else { return text }
     }
   }
