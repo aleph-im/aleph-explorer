@@ -239,7 +239,7 @@ export default {
     },
     async getProgramSource () {
       try {
-        const ref = this.messages[0].content.runtime.ref
+        const ref = this.messages[0].content.code.ref
   
         if(ref || !this.isProgramSourceLoading || !this.programSource){
           this.isProgramSourceLoading = true
