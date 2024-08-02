@@ -2473,10 +2473,10 @@ vue-functional-data-merge@^3.1.0:
   resolved "https://registry.yarnpkg.com/vue-functional-data-merge/-/vue-functional-data-merge-3.1.0.tgz#08a7797583b7f35680587f8a1d51d729aa1dc657"
   integrity sha512-leT4kdJVQyeZNY1kmnS1xiUlQ9z1B/kdBFCILIjYYQDqZgLqCLa0UhjSSeRX6c3mUe6U5qYeM8LrEqkHJ1B4LA==
 
-vue-json-pretty@1.9.3:
-  version "1.9.3"
-  resolved "https://registry.yarnpkg.com/vue-json-pretty/-/vue-json-pretty-1.9.3.tgz#aa140406adb28b2c91563fb7f29d530a3be0425d"
-  integrity sha512-b13DP1WGQ+ACUU2K5hmwFfHrHnydCFSTerE7fppeYMojSWN/5EOPODQECfIIRaJ7zzHtPW9OifkThFGPyY0xRg==
+vue-json-pretty@1.9.5:
+  version "1.9.5"
+  resolved "https://registry.yarnpkg.com/vue-json-pretty/-/vue-json-pretty-1.9.5.tgz#b59861710e352ee50dc8fafde1090382fa655111"
+  integrity sha512-fwbiH/ky/raX1D4MXRZZLFeKm157e9AkumMD7Y+djdLU1Sb0Tp5q2iOPvCnkWNzRpUfxx/zUjONUG+MIWsqx/w==
 
 vue-router@^3.0.3:
   version "3.6.5"
