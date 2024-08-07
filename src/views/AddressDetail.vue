@@ -212,6 +212,5 @@ export default {
 .vjs-tree {
   font-size: 10px !important;
   line-height: 1.5em;
-  word-wrap: anywhere;
 }
 </style>
