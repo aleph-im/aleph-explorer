@@ -12,7 +12,6 @@
   }
 }
 
-
 nav.navbar {
   position: inherit !important;
   background: #121122;
@@ -36,12 +35,11 @@ nav.navbar {
     display: block;
   }
 
-  nav>div {
+  nav > div {
     padding: 0.5rem 1.35rem;
     cursor: pointer;
-    opacity: .4;
+    opacity: 0.4;
     transition: opacity 0.25s ease-in-out 0.05s;
-
 
     &:hover {
       opacity: 1;
@@ -56,7 +54,7 @@ nav.navbar {
       color: #029aff;
       height: 1.5rem;
       max-width: 1rem;
-      margin: 0 .25rem;
+      margin: 0 0.25rem;
     }
   }
 }
@@ -71,7 +69,7 @@ nav.navbar {
     color: #fff !important;
     &.active,
     &.router-link-exact-active {
-      color: #029AFF !important;
+      color: #029aff !important;
     }
     &:hover {
       background-color: #201f30 !important;
@@ -83,9 +81,6 @@ nav.navbar {
     box-shadow: none !important;
     background-color: #201f30;
     border: none;
-  }
-
-  li.nav-item {
   }
 
   #sidebar-wrapper {
@@ -116,7 +111,7 @@ nav.navbar {
     }
 
     cursor: pointer;
-    opacity: .5;
+    opacity: 0.5;
 
     &:hover {
       opacity: 1;
@@ -140,12 +135,11 @@ nav.navbar {
 }
 
 .main-sidebar .sidebar-menu li a.router-link-exact-active {
-  color: #029AFF;
+  color: #029aff;
   font-weight: 600;
 }
 
 .card table.compact {
-
   td,
   th {
     height: 3em !important;
@@ -170,7 +164,6 @@ nav.navbar {
   }
 
   td {
-
     &.hash,
     &.address {
       display: block;
@@ -179,7 +172,6 @@ nav.navbar {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      vertical-align: middle;
     }
   }
 }
@@ -190,7 +182,6 @@ nav.navbar {
 
 a,
 span {
-
   &.hash,
   &.address {
     display: inline-block;
