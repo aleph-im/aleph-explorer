@@ -12,17 +12,18 @@
   }
 }
 
+// Using variables from stisla-variables.scss
 nav.navbar {
   position: inherit !important;
-  background: #121122;
+  background: $navbar-bg;
 }
 
 .navbar-bg {
-  background: #121122;
+  background: $navbar-bg;
 }
 
 .navigator {
-  background: #0e0d1b;
+  background: $navigator-bg;
   width: 4.5rem;
   padding-top: 1rem;
 
@@ -50,8 +51,8 @@ nav.navbar {
     }
 
     svg {
-      fill: #029aff;
-      color: #029aff;
+      fill: $icon-blue;
+      color: $icon-blue;
       height: 1.5rem;
       max-width: 1rem;
       margin: 0 0.25rem;
@@ -63,23 +64,24 @@ nav.navbar {
   position: inherit !important;
   min-width: 250px;
   height: auto;
-  background: #121122;
-  color: #fff;
+  background: $sidebar-bg;
+  color: $white;
   a {
-    color: #fff !important;
+    color: $white !important;
     &.active,
     &.router-link-exact-active {
-      color: #029aff !important;
+      color: $icon-blue !important;
     }
     &:hover {
-      background-color: #201f30 !important;
+      color: $sidebar-link-hover !important;
+      background-color: $navbar-bg !important;
     }
   }
 
   .btn-primary,
   .btn-primary:active {
     box-shadow: none !important;
-    background-color: #201f30;
+    background-color: $sidebar-button-bg;
     border: none;
   }
 
@@ -135,7 +137,7 @@ nav.navbar {
 }
 
 .main-sidebar .sidebar-menu li a.router-link-exact-active {
-  color: #029aff;
+  color: $icon-blue;
   font-weight: 600;
 }
 

@@ -1,3 +1,4 @@
+// Map for stisla colors
 $colors: (
   primary: #5100cd,
   secondary: #d4ff00,
@@ -24,15 +25,16 @@ $colors: (
 
   // Utilities
   section_title_line: #5100cd,
-
-  // Custom colors from style.scss
-  navbar_bg: #121122,
-  navigator_bg: #0e0d1b,
-  icon_blue: #029aff,
-  sidebar_bg: #121122,
-  sidebar_link_hover: #201f30,
-  sidebar_button_bg: #201f30,
 );
+
+// Define explicit SCSS variables for our custom colors
+$navbar-bg: #1f1f31;
+$navigator-bg: #000000;
+$icon-blue: #d4ff00;
+$sidebar-bg: #1f1f31;
+$sidebar-link-hover: #d4ff00;
+$sidebar-button-bg: #000000;
+$white: #ffffff;
 
 $font_family: "Nunito", "Segoe UI", arial;
 $font_weight: 400;
