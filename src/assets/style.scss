@@ -39,7 +39,7 @@ nav.navbar {
 
   nav > div {
     text-align: center;
-    padding: 0.657rem 0;
+    padding: 0.647rem 0;
     cursor: pointer;
     transition: color 0.25s ease-in-out 0.05s;
 
@@ -59,8 +59,8 @@ nav.navbar {
 
     svg {
       fill: color(white);
-      height: 0.9rem;
-      width: 0.9rem;
+      height: 0.865rem;
+      width: 0.865rem;
       max-width: 1rem;
     }
   }
@@ -72,12 +72,24 @@ nav.navbar {
   height: auto;
   background: $sidebar-bg;
   color: color(white);
+
   a {
+    height: 2.61rem !important;
     color: color(white) !important;
+    font-weight: bold;
+
     &.active,
     &.router-link-exact-active {
-      color: $secondary !important;
+      color: $sidebar-bg !important;
+      background: $secondary !important;
+
+      &:hover {
+        color: $sidebar-bg !important;
+        background: $secondary !important;
+        cursor: default !important;
+      }
     }
+
     &:hover {
       color: $sidebar-link-hover !important;
       background-color: $navbar-bg !important;
@@ -85,9 +97,11 @@ nav.navbar {
   }
 
   .sidebar-menu li.menu-header {
+    margin-top: 1rem;
     color: $sidebar-menu-header;
     font-size: 14px;
     font-weight: bold;
+    height: 2.61rem;
   }
 
   .btn-primary,
@@ -150,7 +164,7 @@ nav.navbar {
 
 .main-sidebar .sidebar-menu li a.router-link-exact-active {
   color: $secondary;
-  font-weight: 600;
+  font-weight: bold;
 }
 
 .card table.compact {
