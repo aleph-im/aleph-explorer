@@ -65,9 +65,9 @@ nav.navbar {
   min-width: 250px;
   height: auto;
   background: $sidebar-bg;
-  color: $white;
+  color: color(white);
   a {
-    color: $white !important;
+    color: color(white) !important;
     &.active,
     &.router-link-exact-active {
       color: $icon-blue !important;
@@ -79,7 +79,9 @@ nav.navbar {
   }
 
   .sidebar-menu li.menu-header {
-    color: #f9f4ff80;
+    color: $sidebar-menu-header;
+    font-size: 14px;
+    font-weight: bold;
   }
 
   .btn-primary,
