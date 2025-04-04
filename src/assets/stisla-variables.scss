@@ -1,31 +1,40 @@
 $colors: (
-  primary: #53b9f2,
-  secondary: #5cffb1,
-  success: #47c363,
-  info: #3abaf4,
-  warning: #ffa426,
-  danger: #fc544b,
-  light: #e3eaef,
-  grey: #868e96,
-  whitesmoke: #f7f9f9,
-  dark: #0e0d1b,
-  muted: #98a6ad,
-  body: #f4f6f9,
-  font: #6c757d,
-  fontdark: #34395e,
+  primary: #5100cd,
+  secondary: #d4ff00,
+  success: #47ff59,
+  info: #5100cd,
+  warning: #fecd17,
+  danger: #d9245a,
+
+  light: #f5edff,
+  grey: #c8adf0,
+  whitesmoke: #f1e9fd,
+  dark: #1d1d2a,
+  muted: #81818f,
+  body: #f9f4ff,
+  font: #141421,
+  fontdark: #1f1f31,
   white: #ffffff,
 
   // Form Control
-  formcontrol_normal_background: #fdfdff,
-  formcontrol_normal_border: #e4e6fc,
-  formcontrol_focus_background: #fefeff,
-  formcontrol_focus_border: #95a0f4,
+  formcontrol_normal_background: #f9f4ff,
+  formcontrol_normal_border: #f5edff,
+  formcontrol_focus_background: #f9f4ff,
+  formcontrol_focus_border: #5100cd,
 
   // Utilities
-  section_title_line: #029AFF,
+  section_title_line: #5100cd,
+
+  // Custom colors from style.scss
+  navbar_bg: #121122,
+  navigator_bg: #0e0d1b,
+  icon_blue: #029aff,
+  sidebar_bg: #121122,
+  sidebar_link_hover: #201f30,
+  sidebar_button_bg: #201f30,
 );
 
-$font_family: 'Nunito', 'Segoe UI', arial;
+$font_family: "Nunito", "Segoe UI", arial;
 $font_weight: 400;
 $font_size: 14px;
 
@@ -34,11 +43,11 @@ $grid-breakpoints: (
   sm: 576px,
   md: 768px,
   lg: 992px,
-  xl: 1200px) !default;
+  xl: 1200px,
+) !default;
 
 @function color($key) {
-  @return map-get($colors, $key
-);
+  @return map-get($colors, $key);
 }
 
 @function color_lighten($key, $amount) {
