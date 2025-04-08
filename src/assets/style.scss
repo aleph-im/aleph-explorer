@@ -35,17 +35,28 @@ nav.navbar {
     height: $spacing-xxl;
 
     svg {
-      height: $spacing-xl;
+      height: $navigator-logo-height;
       fill: $navigator-bg;
     }
     background: $secondary;
   }
 
   nav > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: $spacing-sm 0;
+    height: $spacing-xl;
+
+    // padding: $spacing-sm 0;
     cursor: pointer;
     transition: $transition-hover;
+
+    a div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     &:hover {
       svg {
