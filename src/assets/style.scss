@@ -4,7 +4,7 @@
 
 // App styles
 .main-content {
-  padding: 10px 30px 30px 30px;
+  padding: $spacing-sm $spacing-lg $spacing-lg $spacing-lg;
 }
 
 .main-wrapper {
@@ -29,17 +29,17 @@ nav.navbar {
 
 .navigator {
   background: $navigator-bg;
-  width: 4.348rem;
+  width: $navigator-width;
 
   span.logo {
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    height: 5.6875rem;
+    height: $spacing-xxl;
 
     svg {
-      height: 2.5rem;
+      height: $spacing-xl;
       fill: $navigator-bg;
     }
     background: $secondary;
@@ -47,9 +47,9 @@ nav.navbar {
 
   nav > div {
     text-align: center;
-    padding: 0.657rem 0;
+    padding: $spacing-sm 0;
     cursor: pointer;
-    transition: color 0.25s ease-in-out 0.05s;
+    transition: $transition-hover;
 
     &:hover {
       svg {
@@ -67,25 +67,25 @@ nav.navbar {
 
     svg {
       fill: color(white);
-      height: 0.865rem;
-      width: 0.865rem;
-      max-width: 1rem;
+      height: $icon-size-sm;
+      width: $icon-size-sm;
+      max-width: $icon-size-md;
     }
   }
 }
 
 .main-sidebar {
   position: inherit !important;
-  min-width: 250px;
+  min-width: $sidebar-min-width;
   height: auto;
   background: $sidebar-bg;
   color: color(white);
-  font-family: "rigid-square", sans-serif;
+  font-family: $font-family-title;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: $font-size-sm;
 
   a {
-    height: 2.625rem !important;
+    height: $menu-item-height !important;
     font-weight: 600;
     letter-spacing: normal;
     color: color(white) !important;
@@ -109,15 +109,15 @@ nav.navbar {
   }
 
   .sidebar-menu {
-    padding-top: 5.6875rem;
+    padding-top: $spacing-xxl;
 
     li.menu-header {
       color: $sidebar-menu-header;
-      height: 2.625rem;
+      height: $menu-item-height;
       font-weight: 600;
-      font-size: 0.984rem;
+      font-size: $font-size-md;
       letter-spacing: normal;
-      padding: 0.4375rem 1.5rem;
+      padding: $spacing-xs $spacing-lg;
       margin: 0 !important;
     }
 
@@ -148,22 +148,22 @@ nav.navbar {
     position: absolute;
     right: 0;
     top: 0;
-    padding: 20px;
+    padding: $close-button-padding;
 
     i {
-      font-size: 24px;
+      font-size: $font-size-lg;
     }
 
     cursor: pointer;
-    opacity: 0.5;
+    opacity: $opacity-dim;
 
     &:hover {
-      opacity: 1;
+      opacity: $opacity-full;
     }
   }
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: map-get($grid-breakpoints, lg)) {
   .main-wrapper {
     flex-direction: column-reverse;
 
@@ -187,7 +187,7 @@ nav.navbar {
   td,
   th {
     height: 3em !important;
-    font-size: 80%;
+    font-size: $font-size-xs;
     padding: 0 2px !important;
 
     &:first-child {
@@ -203,7 +203,7 @@ nav.navbar {
       bottom: auto !important;
       position: inherit !important;
       display: inline-block !important;
-      margin-left: 1em;
+      margin-left: $spacing-base;
     }
   }
 
@@ -211,8 +211,7 @@ nav.navbar {
     &.hash,
     &.address {
       display: block;
-      width: 200px;
-      /* However wide you want the cell to be before ellipsis */
+      width: $table-cell-width;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -221,7 +220,7 @@ nav.navbar {
 }
 
 .card .list-group.compact {
-  font-size: 80%;
+  font-size: $font-size-xs;
 }
 
 a,
@@ -232,19 +231,19 @@ span {
     vertical-align: bottom;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 20vw;
+    max-width: $hash-max-width-base;
     word-wrap: normal;
   }
 
   &.break-xs {
-    max-width: 10em;
+    max-width: $hash-max-width-xs;
   }
 }
 
 .avatar-xxl {
-  font-size: 40px;
-  height: 100px;
-  width: 100px;
+  font-size: $font-size-xl;
+  height: $avatar-xxl-size;
+  width: $avatar-xxl-size;
 }
 
 .clear-button {

@@ -1,3 +1,7 @@
+// =============================================
+// COLOR SYSTEM
+// =============================================
+
 // Map for stisla colors
 $colors: (
   primary: #5100cd,
@@ -27,8 +31,14 @@ $colors: (
   section_title_line: #5100cd,
 );
 
-// Define explicit SCSS variables for our custom colors
+// =============================================
+// THEME COLORS
+// =============================================
+
+// Core theme colors
 $secondary: #d4ff00;
+
+// Layout colors
 $navbar-bg: #1f1f31;
 $navigator-bg: #000000;
 $sidebar-bg: #1f1f31;
@@ -36,9 +46,88 @@ $sidebar-link-hover: #d4ff00;
 $sidebar-button-bg: #000000;
 $sidebar-menu-header: #f9f4ff80;
 
-$font_family: "Titillium Web", "Nunito", "Segoe UI", arial;
-$font_weight: 400;
-$font_size: 14px;
+// =============================================
+// TYPOGRAPHY
+// =============================================
+
+// Font families
+$font-family: "Titillium Web", "Nunito", "Segoe UI", arial;
+$font-family-title: "rigid-square", sans-serif;
+
+// Font weights
+$font-weight: 400;
+$font-weight-bold: 600;
+$font-weight-bolder: 700;
+
+// Font sizes
+$font-size: 14px;
+$font-size-xs: 0.8rem; //
+$font-size-sm: 0.95rem;
+$font-size-md: 0.984rem;
+$font-size-lg: 1.5rem;
+$font-size-xl: 2.5rem;
+
+// =============================================
+// SPACING
+// =============================================
+
+$spacing-xs: 0.4375rem;
+$spacing-sm: 0.657rem;
+$spacing-md: 0.865rem;
+$spacing-base: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2.5rem;
+$spacing-xxl: 5.6875rem;
+
+// =============================================
+// LAYOUT DIMENSIONS
+// =============================================
+
+// Navigation
+$navigator-width: 4.348rem;
+
+// Sidebar
+$sidebar-min-width: 250px;
+$menu-item-height: 2.625rem;
+
+// Buttons & Controls
+$close-button-padding: 20px;
+
+// =============================================
+// COMPONENT DIMENSIONS
+// =============================================
+
+// Icons
+$icon-size-sm: 0.865rem;
+$icon-size-md: 1rem;
+$icon-size-lg: 1.5rem;
+$icon-size-xl: 2rem;
+
+// Avatars
+$avatar-xxl-size: 100px;
+
+// Content elements
+$hash-max-width-base: 20vw;
+$hash-max-width-xs: 10em;
+$table-cell-width: 200px;
+
+// =============================================
+// TRANSITIONS & EFFECTS
+// =============================================
+
+// Transitions
+$transition-hover: color 0.25s ease-in-out 0.05s;
+
+// Z-index layers
+$z-index-overlay: 100;
+
+// Opacity
+$opacity-dim: 0.5;
+$opacity-full: 1;
+
+// =============================================
+// BREAKPOINTS
+// =============================================
 
 $grid-breakpoints: (
   xs: 0,
@@ -47,6 +136,10 @@ $grid-breakpoints: (
   lg: 992px,
   xl: 1200px,
 ) !default;
+
+// =============================================
+// FUNCTIONS
+// =============================================
 
 @function color($key) {
   @return map-get($colors, $key);
