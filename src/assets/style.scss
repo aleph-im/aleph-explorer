@@ -1,3 +1,8 @@
+// Import fonts
+@import url("https://use.typekit.net/acb7qvn.css");
+@import url("https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap");
+
+// App styles
 .main-content {
   padding: 10px 30px 30px 30px;
 }
@@ -24,22 +29,25 @@ nav.navbar {
 
 .navigator {
   background: $navigator-bg;
-  width: 4rem;
+  width: 4.348rem;
 
   span.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 1.6rem 0;
+    height: 5.6875rem;
+
     svg {
       height: 2.5rem;
       fill: $navigator-bg;
     }
-    display: block;
     background: $secondary;
   }
 
   nav > div {
     text-align: center;
-    padding: 0.647rem 0;
+    padding: 0.657rem 0;
     cursor: pointer;
     transition: color 0.25s ease-in-out 0.05s;
 
@@ -72,11 +80,15 @@ nav.navbar {
   height: auto;
   background: $sidebar-bg;
   color: color(white);
+  font-family: "rigid-square", sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
 
   a {
-    height: 2.61rem !important;
+    height: 2.625rem !important;
+    font-weight: 600;
+    letter-spacing: normal;
     color: color(white) !important;
-    font-weight: bold;
 
     &.active,
     &.router-link-exact-active {
@@ -96,12 +108,22 @@ nav.navbar {
     }
   }
 
-  .sidebar-menu li.menu-header {
-    margin-top: 1rem;
-    color: $sidebar-menu-header;
-    font-size: 14px;
-    font-weight: bold;
-    height: 2.61rem;
+  .sidebar-menu {
+    padding-top: 5.6875rem;
+
+    li.menu-header {
+      color: $sidebar-menu-header;
+      height: 2.625rem;
+      font-weight: 600;
+      font-size: 0.984rem;
+      letter-spacing: normal;
+      padding: 0.4375rem 1.5rem;
+      margin: 0 !important;
+    }
+
+    li a {
+      letter-spacing: normal;
+    }
   }
 
   .btn-primary,
@@ -120,12 +142,6 @@ nav.navbar {
       /*min-height: calc(100vh - 75.6px - 42.5px - 5rem);*/
       flex-grow: 1;
     }
-  }
-
-  .sidebar-brand {
-    height: auto;
-    line-height: 1.2em;
-    padding: 1.5em 0;
   }
 
   .close-button {

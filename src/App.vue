@@ -18,7 +18,7 @@
             >Aleph Cloud</b-navbar-brand
           >
           <b-navbar-brand v-else to="/"
-            >Aleph Cloud network Explorer</b-navbar-brand
+            >Aleph Cloud <br>network Explorer</b-navbar-brand
           >
         </nav>
 
@@ -64,13 +64,10 @@
             <div class="d-lg-none close-button" @click="display_menu = false">
               <i class="fas fa-times"></i>
             </div>
-            <div class="sidebar-brand">
-              <b-link target="/">Aleph Cloud<br />Explorer</b-link>
-            </div>
             <ul class="sidebar-menu">
-              <li class="menu-header">Dashboard</li>
+              <li class="menu-header">Explorer</li>
               <b-nav-item to="/">
-                <i class="fas fa-chart-line"></i><span>General Dashboard</span>
+                <i class="fas fa-chart-line"></i><span>Dashboard</span>
               </b-nav-item>
               <li class="menu-header">Insights</li>
               <b-nav-item to="/messages">
