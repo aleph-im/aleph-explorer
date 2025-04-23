@@ -4,7 +4,7 @@
       <b-card-header>
         <h4>
           What is
-          <a href="https://aleph.im" target="_blank" rel="noopener noreferrer"
+          <a href="https:/cloud" target="_blank" rel="noopener noreferrer"
             >Aleph Cloud</a
           >?
         </h4>
@@ -19,7 +19,7 @@
       </b-card-body>
       <b-card-footer class="bg-whitesmoke">
         <a
-          href="https://aleph.im"
+          href="https://aleph.cloud"
           class="card-link"
           target="_blank"
           rel="noopener noreferrer"

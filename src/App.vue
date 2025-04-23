@@ -30,7 +30,7 @@
         </div>
         <footer class="main-footer px-5">
           <div class="footer-left">
-            Copyright © 2018-present <a href="https://aleph.im">Aleph Cloud</a>
+            Copyright © 2018-present <a href="https://aleph.cloud">Aleph Cloud</a>
           </div>
           <div class="footer-right">
             <template v-if="app_version">
@@ -114,7 +114,7 @@
             </svg>
           </span>
           <div>
-            <a target="_blank" href="https://console.aleph.im/">
+            <a target="_blank" href="https://app.aleph.cloud/console/">
               <div class="styles__StyledRouterLink-sc-11bcwqi-1 fnIBfA tp-nav">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 502 512">
                   <path
@@ -125,7 +125,7 @@
             </a>
           </div>
           <div>
-            <a target="_blank" href="https://account.aleph.im/">
+            <a target="_blank" href="https://app.aleph.cloud/account/">
               <div>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 338 512">
                   <path
@@ -136,7 +136,7 @@
             </a>
           </div>
           <div class="active">
-            <a target="_blank" class="active" href="https://explorer.aleph.im/">
+            <a target="_blank" class="active" href="/">
               <div>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 736 512">
                   <path
@@ -147,7 +147,7 @@
             </a>
           </div>
           <div>
-            <a target="_blank" href="https://swap.aleph.im/">
+            <a target="_blank" href="https://swap.aleph.cloud/">
               <div>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 365 512">
                   <path

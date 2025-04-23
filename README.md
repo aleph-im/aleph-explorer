@@ -1,6 +1,6 @@
 # Aleph Explorer
 
-This repository contains the code of [explorer.aleph.im](https://explorer.aleph.im).
+This repository contains the code of [explorer.aleph.cloud](https://explorer.aleph.cloud).
 
 The explorer allows you to easily watch the state of the Aleph Network, by fetching incoming and past messages in realtime.
 
