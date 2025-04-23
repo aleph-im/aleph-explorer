@@ -1,44 +1,149 @@
+// =============================================
+// COLOR SYSTEM
+// =============================================
+
+// Map for stisla colors
 $colors: (
-  primary: #53b9f2,
-  secondary: #5cffb1,
-  success: #47c363,
-  info: #3abaf4,
-  warning: #ffa426,
-  danger: #fc544b,
-  light: #e3eaef,
-  grey: #868e96,
-  whitesmoke: #f7f9f9,
-  dark: #0e0d1b,
-  muted: #98a6ad,
-  body: #f4f6f9,
-  font: #6c757d,
-  fontdark: #34395e,
+  primary: #5100cd,
+  secondary: #d4ff00,
+  success: #47ff59,
+  info: #5100cd,
+  warning: #fecd17,
+  danger: #d9245a,
+
+  light: #f5edff,
+  grey: #c8adf0,
+  whitesmoke: #f1e9fd,
+  dark: #1d1d2a,
+  muted: #09090a,
+  body: #f9f4ff,
+  font: #141421,
+  fontdark: #1f1f31,
   white: #ffffff,
 
   // Form Control
-  formcontrol_normal_background: #fdfdff,
-  formcontrol_normal_border: #e4e6fc,
-  formcontrol_focus_background: #fefeff,
-  formcontrol_focus_border: #95a0f4,
+  formcontrol_normal_background: #f9f4ff,
+  formcontrol_normal_border: #f5edff,
+  formcontrol_focus_background: #f9f4ff,
+  formcontrol_focus_border: #5100cd,
 
   // Utilities
-  section_title_line: #029AFF,
+  section_title_line: #5100cd,
 );
 
-$font_family: 'Nunito', 'Segoe UI', arial;
-$font_weight: 400;
-$font_size: 14px;
+// =============================================
+// THEME COLORS
+// =============================================
+
+// Core theme colors
+$secondary: #d4ff00;
+
+// Layout colors
+$navbar-bg: #1f1f31;
+$navigator-bg: #000000;
+$sidebar-bg: #1f1f31;
+$sidebar-link-hover: #d4ff00;
+$sidebar-button-bg: #000000;
+$sidebar-menu-header: #f9f4ff80;
+
+// =============================================
+// TYPOGRAPHY
+// =============================================
+
+// Font families
+$font-family: "Titillium Web", "Nunito", "Segoe UI", arial;
+$font-family-title: "rigid-square", sans-serif;
+
+// Font weights
+$font-weight: 400;
+$font-weight-bold: 600;
+$font-weight-bolder: 700;
+
+// Font sizes
+$font-size: 14px;
+$font-size-xs: 0.8rem; //
+$font-size-sm: 0.95rem;
+$font-size-md: 0.984rem;
+$font-size-lg: 1.5rem;
+$font-size-xl: 2.5rem;
+
+// =============================================
+// SPACING
+// =============================================
+
+$spacing-xs: 0.4375rem;
+$spacing-sm: 0.657rem;
+$spacing-md: 0.865rem;
+$spacing-base: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2.625rem;
+$spacing-xxl: 5.6875rem;
+
+// =============================================
+// LAYOUT DIMENSIONS
+// =============================================
+
+// Navigation
+$navigator-logo-height: 2.5rem;
+$navigator-width: 3.938rem;
+
+// Sidebar
+$sidebar-min-width: 250px;
+$menu-item-height: 2.625rem;
+
+// Buttons & Controls
+$close-button-padding: 20px;
+
+// =============================================
+// COMPONENT DIMENSIONS
+// =============================================
+
+// Icons
+$icon-size-sm: 0.865rem;
+$icon-size-md: 1rem;
+$icon-size-lg: 1.5rem;
+$icon-size-xl: 2rem;
+
+// Avatars
+$avatar-xxl-size: 100px;
+
+// Content elements
+$hash-max-width-base: 20vw;
+$hash-max-width-xs: 10em;
+$table-cell-width: 200px;
+
+// =============================================
+// TRANSITIONS & EFFECTS
+// =============================================
+
+// Transitions
+$transition-hover: color 0.25s ease-in-out 0.05s;
+
+// Z-index layers
+$z-index-overlay: 100;
+
+// Opacity
+$opacity-dim: 0.5;
+$opacity-full: 1;
+
+// =============================================
+// BREAKPOINTS
+// =============================================
 
 $grid-breakpoints: (
   xs: 0,
   sm: 576px,
   md: 768px,
   lg: 992px,
-  xl: 1200px) !default;
+  xl: 1200px,
+) !default;
+
+// =============================================
+// FUNCTIONS
+// =============================================
 
 @function color($key) {
-  @return map-get($colors, $key
-);
+  @return map-get($colors, $key);
 }
 
 @function color_lighten($key, $amount) {

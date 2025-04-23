@@ -1,0 +1,44 @@
+name: Push on IPFS
+
+on:
+  push:
+    branches:
+      - release/**
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install and Build
+        run: |
+          yarn
+          yarn build
+          touch dist/.nojekyll
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aleph-explorer
+          path: dist/
+          overwrite: true
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: aleph-explorer
+          path: out/
+
+      - name: Push on IPFS
+        run: |
+          find .
+          pip install 'aioipfs>=0.6.2'
+          python3 ./scripts/push_on_ipfs.py
+          export IPFS_CID=$(python3 ./scripts/push_on_ipfs.py)
+          echo $IPFS_CID
+          echo "CID: $IPFS_CID" >> $GITHUB_STEP_SUMMARY

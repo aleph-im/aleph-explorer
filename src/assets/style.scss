@@ -1,5 +1,6 @@
+// App styles
 .main-content {
-  padding: 10px 30px 30px 30px;
+  padding: $spacing-sm $spacing-lg $spacing-lg $spacing-lg;
 }
 
 .main-wrapper {
@@ -12,80 +13,131 @@
   }
 }
 
-
+// Using variables from stisla-variables.scss
 nav.navbar {
   position: inherit !important;
-  background: #121122;
+  background: $navbar-bg;
 }
 
 .navbar-bg {
-  background: #121122;
+  background: $navbar-bg;
 }
 
 .navigator {
-  background: #0e0d1b;
-  width: 4.5rem;
-  padding-top: 1rem;
+  background: $navigator-bg;
+  width: $navigator-width;
 
   span.logo {
-    padding: 1rem 1.25rem;
-    padding-bottom: 3.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: $spacing-xxl;
+
     svg {
-      height: 1.75rem;
+      height: $navigator-logo-height;
+      fill: $navigator-bg;
     }
-    display: block;
+    background: $secondary;
   }
 
-  nav>div {
-    padding: 0.5rem 1.35rem;
-    cursor: pointer;
-    opacity: .4;
-    transition: opacity 0.25s ease-in-out 0.05s;
+  nav > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: $spacing-xl;
 
+    // padding: $spacing-sm 0;
+    cursor: pointer;
+    transition: $transition-hover;
+
+    a div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     &:hover {
-      opacity: 1;
+      svg {
+        fill: $secondary;
+      }
     }
 
     &.active {
-      opacity: 1;
+      background: $sidebar-bg;
+
+      svg {
+        fill: $secondary;
+      }
     }
 
     svg {
-      fill: #029aff;
-      color: #029aff;
-      height: 1.5rem;
-      max-width: 1rem;
-      margin: 0 .25rem;
+      fill: color(white);
+      height: $icon-size-sm;
+      width: $icon-size-sm;
+      max-width: $icon-size-md;
     }
   }
 }
 
 .main-sidebar {
   position: inherit !important;
-  min-width: 250px;
+  min-width: $sidebar-min-width;
   height: auto;
-  background: #121122;
-  color: #fff;
+  background: $sidebar-bg;
+  color: color(white);
+  font-family: $font-family-title;
+  font-weight: 600;
+  font-size: $font-size-sm;
+
   a {
-    color: #fff !important;
+    height: $menu-item-height !important;
+    font-weight: 600;
+    letter-spacing: normal;
+    color: color(white) !important;
+
     &.active,
     &.router-link-exact-active {
-      color: #029AFF !important;
+      color: $sidebar-bg !important;
+      background: $secondary !important;
+
+      &:hover {
+        color: $sidebar-bg !important;
+        background: $secondary !important;
+        cursor: default !important;
+      }
     }
+
     &:hover {
-      background-color: #201f30 !important;
+      color: $sidebar-link-hover !important;
+      background-color: $navbar-bg !important;
+    }
+  }
+
+  .sidebar-menu {
+    padding-top: $spacing-xxl;
+
+    li.menu-header {
+      color: $sidebar-menu-header;
+      height: $menu-item-height;
+      font-weight: 600;
+      font-size: $font-size-md;
+      letter-spacing: normal;
+      padding: $spacing-xs $spacing-lg;
+      margin: 0 !important;
+    }
+
+    li a {
+      letter-spacing: normal;
     }
   }
 
   .btn-primary,
   .btn-primary:active {
     box-shadow: none !important;
-    background-color: #201f30;
+    background-color: $sidebar-button-bg;
     border: none;
-  }
-
-  li.nav-item {
   }
 
   #sidebar-wrapper {
@@ -99,32 +151,26 @@ nav.navbar {
     }
   }
 
-  .sidebar-brand {
-    height: auto;
-    line-height: 1.2em;
-    padding: 1.5em 0;
-  }
-
   .close-button {
     position: absolute;
     right: 0;
     top: 0;
-    padding: 20px;
+    padding: $close-button-padding;
 
     i {
-      font-size: 24px;
+      font-size: $font-size-lg;
     }
 
     cursor: pointer;
-    opacity: .5;
+    opacity: $opacity-dim;
 
     &:hover {
-      opacity: 1;
+      opacity: $opacity-full;
     }
   }
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: map-get($grid-breakpoints, lg)) {
   .main-wrapper {
     flex-direction: column-reverse;
 
@@ -140,16 +186,15 @@ nav.navbar {
 }
 
 .main-sidebar .sidebar-menu li a.router-link-exact-active {
-  color: #029AFF;
-  font-weight: 600;
+  color: $secondary;
+  font-weight: bold;
 }
 
 .card table.compact {
-
   td,
   th {
     height: 3em !important;
-    font-size: 80%;
+    font-size: $font-size-xs;
     padding: 0 2px !important;
 
     &:first-child {
@@ -165,49 +210,49 @@ nav.navbar {
       bottom: auto !important;
       position: inherit !important;
       display: inline-block !important;
-      margin-left: 1em;
+      margin-left: $spacing-base;
     }
   }
 
   td {
-
     &.hash,
     &.address {
       display: block;
-      width: 200px;
-      /* However wide you want the cell to be before ellipsis */
+      width: $table-cell-width;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      vertical-align: middle;
     }
   }
 }
 
 .card .list-group.compact {
-  font-size: 80%;
+  font-size: $font-size-xs;
 }
 
 a,
 span {
-
   &.hash,
   &.address {
     display: inline-block;
     vertical-align: bottom;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 20vw;
+    max-width: $hash-max-width-base;
     word-wrap: normal;
   }
 
   &.break-xs {
-    max-width: 10em;
+    max-width: $hash-max-width-xs;
   }
 }
 
 .avatar-xxl {
-  font-size: 40px;
-  height: 100px;
-  width: 100px;
+  font-size: $font-size-xl;
+  height: $avatar-xxl-size;
+  width: $avatar-xxl-size;
+}
+
+.clear-button {
+  color: color(font) !important;
 }
