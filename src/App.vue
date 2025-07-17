@@ -14,11 +14,8 @@
               ></b-link>
             </li>
           </ul>
-          <b-navbar-brand v-if="window.width < 1024" to="/"
-            >Aleph Cloud</b-navbar-brand
-          >
-          <b-navbar-brand v-else to="/"
-            >Aleph Cloud <br>network Explorer</b-navbar-brand
+          <b-navbar-brand to="/"
+            ><h1 class="h3-size">Aleph Cloud<br />explorer</h1></b-navbar-brand
           >
         </nav>
 
@@ -30,7 +27,8 @@
         </div>
         <footer class="main-footer px-5">
           <div class="footer-left">
-            Copyright © 2018-present <a href="https://aleph.cloud">Aleph Cloud</a>
+            Copyright © 2018-present
+            <a href="https://aleph.cloud">Aleph Cloud</a>
           </div>
           <div class="footer-right">
             <template v-if="app_version">
@@ -246,5 +244,11 @@ or your build process might be broken! `);
 
 /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+
+.h3-size {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
 }
 </style>
