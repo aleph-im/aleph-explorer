@@ -29,16 +29,22 @@ jobs:
           path: dist/
           overwrite: true
 
-      - uses: actions/download-artifact@v4
+  push-to-ipfs:
+    name: Push site to IPFS
+    needs: build
+    runs-on: ubuntu-22.04
+    outputs:
+      cid_v0: ${{ steps.push_to_ipfs.outputs.cid_v0 }}
+      cid_v1: ${{ steps.push_to_ipfs.outputs.cid_v1 }}
+    steps:
+      - name: Download export artifact
+        uses: actions/download-artifact@v4
         with:
           name: aleph-explorer
-          path: out/
+          path: out
 
-      - name: Push on IPFS
-        run: |
-          find .
-          pip install 'aioipfs>=0.6.2'
-          python3 ./scripts/push_on_ipfs.py
-          export IPFS_CID=$(python3 ./scripts/push_on_ipfs.py)
-          echo $IPFS_CID
-          echo "CID: $IPFS_CID" >> $GITHUB_STEP_SUMMARY
+      - name: Push to IPFS
+        id: push_to_ipfs
+        uses: aleph-im/aleph-github-actions/push-to-ipfs@v1.3.1
+        with:
+          upload-dir: out
