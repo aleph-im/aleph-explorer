@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'path';
-import { createVuePlugin } from 'vite-plugin-vue2';
+import vuePlugin from '@vitejs/plugin-vue2';
 import envCompatible from 'vite-plugin-env-compatible';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
@@ -38,7 +38,7 @@ export default defineConfig({
     ]
   },
   plugins: [
-    createVuePlugin({ jsx: true }),
+    vuePlugin({ jsx: true }),
     viteCommonjs(),
     envCompatible(),
     createHtmlPlugin({
