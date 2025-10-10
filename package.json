@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "axios": "^1.12.0",
-    "bootstrap-vue": "^2.0.4",
+    "bootstrap-vue": "^2.23.1",
     "moment": "^2.29.4",
     "stisla-theme": "^1.0.5",
     "vue": "^2.7.0",
@@ -30,6 +30,10 @@
     "@vitejs/plugin-vue2": "^2.3.4"
   },
   "overrides": {
+    "ejs": ">=3.1.10",
+    "braces": ">=3.0.3"
+  },
+  "resolutions": {
     "ejs": ">=3.1.10",
     "braces": ">=3.0.3"
   }
