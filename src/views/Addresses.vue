@@ -6,7 +6,7 @@
 
         <b-form-group label-cols-sm="3" class="mb-0">
           <b-input-group>
-            <b-form-input v-model="filter" debounce="750" placeholder="Type to Search"></b-form-input>
+            <b-form-input v-model="filter" debounce="750" placeholder="Search by address"></b-form-input>
             <b-input-group-append>
               <b-button :disabled="!filter" @click="filter = ''" class="clear-button">Clear</b-button>
             </b-input-group-append>
