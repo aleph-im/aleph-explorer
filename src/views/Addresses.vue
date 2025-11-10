@@ -6,7 +6,7 @@
 
         <b-form-group label-cols-sm="3" class="mb-0">
           <b-input-group>
-            <b-form-input v-model="filter" placeholder="Type to Search"></b-form-input>
+            <b-form-input v-model="filter" debounce="750" placeholder="Search by address"></b-form-input>
             <b-input-group-append>
               <b-button :disabled="!filter" @click="filter = ''" class="clear-button">Clear</b-button>
             </b-input-group-append>
@@ -15,7 +15,7 @@
       </b-card-header>
 
       <b-table responsive table-class="compact" :items="items" :fields="addresses_fields" stacked="sm"
-        :current-page="page" :per-page="per_page" :filter="filter" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
+        :current-page="page" :per-page="per_page" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
         :sort-direction="sortDirection" @filtered="onFiltered">
         <template v-slot:cell(address)="data">
           <AddressLink :address="data.value" class="address" />
@@ -61,6 +61,13 @@ export default {
   computed: {
     items() {
       return Object.entries(this.addresses_stats)
+        .filter(
+          address => (
+            !this.filter || address[0].toLowerCase().includes(
+              this.filter.toLowerCase()
+            )
+          )
+        )
         .map(([address, stats]) => ({ address, ...stats }))
     },
     ...mapState({
