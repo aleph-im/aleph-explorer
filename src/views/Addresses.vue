@@ -6,26 +6,27 @@
 
         <b-form-group label-cols-sm="3" class="mb-0">
           <b-input-group>
-            <b-form-input v-model="filter" debounce="750" placeholder="Search by address"></b-form-input>
+            <b-form-input v-model="filter" placeholder="Search by address"></b-form-input>
             <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''" class="clear-button">Clear</b-button>
+              <b-button :disabled="!filter" @click="clearFilter" class="clear-button">Clear</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
       </b-card-header>
 
+      <!-- Table implementation for addresses -->
       <b-table responsive table-class="compact" :items="items" :fields="addresses_fields" stacked="sm"
-        :current-page="page" :per-page="per_page" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-        :sort-direction="sortDirection" @filtered="onFiltered">
+        :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" @sort-changed="onSort">
         <template v-slot:cell(address)="data">
           <AddressLink :address="data.value" class="address" />
         </template>
       </b-table>
 
-      <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
-        Total: {{ total }}
+      <b-card-footer class="d-flex justify-content-between align-items-center bg-whitesmoke">
+        <span>Total: {{ total }}</span>
         <b-pagination v-model="page" :total-rows="total" :per-page="per_page" limit="9" class="mb-0"
-          size="sm"></b-pagination>
+          size="sm" @change="changePage">
+        </b-pagination>
       </b-card-footer>
       <!--
         <b-card-body class="p-0">
@@ -44,7 +45,6 @@ export default {
   data() {
     return {
       per_page: 20,
-      total: 0,
       page: 1,
       filter: '',
       sortBy: 'messages',
@@ -54,29 +54,28 @@ export default {
         { key: 'address', label: 'Address', sortable: true },
         { key: 'posts', label: 'Posts count', class: 'text-right', sortable: true },
         { key: 'aggregates', label: 'Aggregates count', class: 'text-right', sortable: true },
-        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: true }
-      ]
+        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: true, sortDirection: 'desc' }
+      ],
+      filterDebounceTimer: null,
     }
   },
   computed: {
     items() {
-      return Object.entries(this.addresses_stats)
-        .filter(
-          address => (
-            !this.filter || address[0].toLowerCase().includes(
-              this.filter.toLowerCase()
-            )
-          )
-        )
-        .map(([address, stats]) => ({ address, ...stats }))
+      // Force to be an array
+      return Object.values(this.addresses_stats);
     },
     ...mapState({
       account: 'account',
       api_server: 'api_server',
       profiles: 'profiles',
-      addresses_stats: 'addresses_stats'
-    })
+      addresses_stats: 'addresses_stats',
+      addresses_pagination: 'addresses_pagination'
+    }),
+    total() {
+      return this.addresses_pagination?.total
+    }
   },
+
   props: {
     msg_type: {
       type: String
@@ -86,15 +85,69 @@ export default {
     AddressLink
   },
   methods: {
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.total = filteredItems.length
-      this.page = 1
+    loadAddresses() {
+        this.$store.dispatch("load_addresses", {
+          page: this.page,
+          perPage: this.per_page,
+          sortBy: this.sortBy,
+          sortOrder: this.sortDesc ? -1 : 1,
+          addressContains: this.filter
+        })
+
+
+    },
+
+    onFilterUpdate() {
+      // Use search from API instead of client-side filtering
+      if (this.filterDebounceTimer) {
+        clearTimeout(this.filterDebounceTimer);
+      }
+
+      this.filterDebounceTimer = setTimeout(() => {
+        // Reset to first page when filtering
+        this.page = 1;
+        this.loadAddresses();
+      }, 500);
+    },
+
+    changePage(newPage) {
+      this.page = newPage;
+      this.loadAddresses();
+    },
+
+    onSort(ctx) {
+      this.loadAddresses();
+    },
+
+    clearFilter() {
+      this.filter = '';
+      this.page = 1;
+      this.loadAddresses();
+    }
+  },
+  watch: {
+    page(newPage, oldPage) {
+      if (newPage !== oldPage) {
+        this.loadAddresses();
+      }
+    },
+    sortBy() {
+      this.loadAddresses();
+    },
+    sortDesc() {
+      this.loadAddresses();
+    },
+    filter() {
+      this.onFilterUpdate();
     }
   },
   mounted() {
-    // Set the initial number of items
-    this.total = this.items.length
+    // Set initial pagination values
+    this.page = this.addresses_pagination.page || 1;
+    this.per_page = this.addresses_pagination.per_page || 20;
+
+    // Always load first page data to ensure it's fresh
+    this.loadAddresses();
   }
 }
 </script>

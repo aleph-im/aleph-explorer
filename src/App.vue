@@ -162,7 +162,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapState } from "vuex";
 export default {
   name: "app",
@@ -184,7 +183,7 @@ export default {
   created() {
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
-    this.loadAddresses();
+    this.$store.dispatch("load_addresses")
 
     if (GIT_DESCRIBE_TAGS) {
       console.warn(`
@@ -201,14 +200,6 @@ or your build process might be broken! `);
       this.window.width = window.innerWidth;
       this.window.height = window.innerHeight;
     },
-    async loadAddresses() {
-      // VERY BAD, we load everything for now!
-      // TODO: gotta do it on demand.
-      let response = await axios.get(
-        `${this.api_server.protocol}//${this.api_server.host}/api/v0/addresses/stats.json`
-      );
-      this.$store.commit("set_addresses_stats", response.data.data);
-    },
     last_release_is_a_tag() {
       return /\d+-.[0-9A-F]{7}$/i.test(this.app_version);
     },
@@ -218,7 +209,7 @@ or your build process might be broken! `);
       this.display_menu = false;
     },
     async "api_server.host"() {
-      await this.loadAddresses();
+      await this.$store.dispatch("load_addresses");
     },
   },
 };
