@@ -111,7 +111,7 @@
             <b-card-header>
               <h4>Message details</h4>
             </b-card-header>
-            <b-list-group flush>
+            <b-list-group flush v-if="message.status !== 'forgotten'">
               <b-list-group-item class="d-flex w-100 font-small justify-content-between">
                 <span>Message type</span>
                 <span>{{message.type}}</span>
@@ -159,6 +159,11 @@
                   </span>
                 </div>
                 <span v-else>None</span>
+              </b-list-group-item>
+            </b-list-group>
+            <b-list-group flush v-else>
+              <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                <span>This message has been forgotten by the sender</span>
               </b-list-group-item>
             </b-list-group>
           </b-card>
@@ -221,19 +226,23 @@ export default {
       this.$forceUpdate()
     },
     async getMessages () {
-      let args = {
-        hashes: this.hash
+      if(!this.address || !this.type){
+        const q = await axios.get(
+          `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages/${this.hash}`,
+        )
+        this.messages = [q.data]
+
+        return
       }
-
-      console.log(this.hash)
-
-      if (this.address) { args['addresses'] = this.address }
-
-      if (this.type) { args['msgType'] = this.type }
 
       let response = await axios.get(
         `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`,
-        { params: args }
+        { params: {
+            hashes: this.hash,
+            adresses: this.address,
+            msgType: this.type
+          } 
+        }
       )
       this.messages = response.data.messages
     },
