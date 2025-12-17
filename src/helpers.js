@@ -7,7 +7,7 @@ export const toUnixTimestamp = d => d ? new Date(d).getTime() / 1000 : undefined
  * Map frontend column names to API expected values
  */
 export const sortByMapping = {
-  'messages': 'messages',
+  'messages': 'MESSAGES',
   'posts': 'POST',
   'aggregates': 'AGGREGATE',
   'store': 'STORE',
