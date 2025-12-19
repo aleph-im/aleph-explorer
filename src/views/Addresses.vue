@@ -144,6 +144,11 @@ export default {
 
     // Always load first page data to ensure it's fresh
     this.loadAddresses();
+  },
+  beforeDestroy() {
+    if (this.filterDebounceTimer) {
+      clearTimeout(this.filterDebounceTimer);
+    }
   }
 }
 </script>
