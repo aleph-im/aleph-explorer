@@ -52,9 +52,9 @@ export default {
       sortDirection: 'desc',
       addresses_fields: [
         { key: 'address', label: 'Address', sortable: false },
-        { key: 'posts', label: 'Posts count', class: 'text-right', sortable: false },
-        { key: 'aggregates', label: 'Aggregates count', class: 'text-right', sortable: false },
-        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: false, sortDirection: 'desc' }
+        { key: 'posts', label: 'Posts count', class: 'text-right', sortable: true },
+        { key: 'aggregates', label: 'Aggregates count', class: 'text-right', sortable: true },
+        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: true, sortDirection: 'desc' }
       ],
       filterDebounceTimer: null,
     }
