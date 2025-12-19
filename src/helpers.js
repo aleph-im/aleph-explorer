@@ -19,7 +19,7 @@ export const sortByMapping = {
 /**
  * Fetch addresses with pagination, sorting and filtering
  * Only uses v1 API endpoint
- * 
+ *
  * @param {Object} api_server The API server configuration
  * @param {Object} options Query parameters
  * @returns {Promise<Object>} The API response
@@ -28,13 +28,13 @@ export const fetchAddresses = async (api_server, options = {}) => {
   const {
     page = 1,
     perPage = 20,
-    sortBy = 'messages',
+    sortBy = sortByMapping.messages,
     sortOrder = -1,
     addressContains = ''
   } = options;
 
   // Convert frontend column names to API expected values
-  const apiSortBy = sortByMapping[sortBy] || 'messages';
+  const apiSortBy = sortByMapping[sortBy] || sortByMapping.messages;
 
   try {
     const response = await axios.get(
@@ -49,7 +49,7 @@ export const fetchAddresses = async (api_server, options = {}) => {
         }
       }
     );
-    
+
     // Process the data - convert API data format to frontend format
     const addressList = response.data.data.map(item => {
       return {
