@@ -18,12 +18,13 @@
           <MessageList :messages="messages" class="compact" />
 
           <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
-            Total: {{total_msg}}
+            Total: {{messages_pagination.total}}
             <b-pagination
               v-model="current_msg_page"
-              :total-rows="total_msg"
-              :per-page="msg_per_page"
+              :total-rows="messages_pagination.total"
+              :per-page="messages_pagination.per_page"
               class="ml-auto mb-0" size="sm"
+              @change="onMessagesPageChange"
             ></b-pagination>
           </b-card-footer>
         </b-card>
@@ -35,15 +36,15 @@
             <div class="profile-widget-items">
               <div class="profile-widget-item">
                 <div class="profile-widget-item-label">Messages</div>
-                <div class="profile-widget-item-value">{{stats ? stats.messages : 0}}</div>
+                <div class="profile-widget-item-value">{{stats.messages || 0}}</div>
               </div>
               <div class="profile-widget-item">
                 <div class="profile-widget-item-label">Posts</div>
-                <div class="profile-widget-item-value">{{stats ? stats.posts : 0}}</div>
+                <div class="profile-widget-item-value">{{stats.posts || 0}}</div>
               </div>
               <div class="profile-widget-item">
                 <div class="profile-widget-item-label">Aggregates</div>
-                <div class="profile-widget-item-value">{{stats ? stats.aggregates : 0}}</div>
+                <div class="profile-widget-item-value">{{stats.aggregates || 0}}</div>
               </div>
             </div>
           </div>
@@ -55,7 +56,7 @@
       </b-col>
     </b-row>
 
-    <b-card no-body v-if="aggregates" class="card-info">
+    <b-card no-body v-if="Object.keys(aggregates).length > 0" class="card-info">
       <b-card-header>
         <h4>Aggregates detail</h4>
       </b-card-header>
@@ -79,7 +80,6 @@ import { mapState } from 'vuex'
 import AccountAvatar from '@/components/AccountAvatar.vue'
 import AccountName from '@/components/AccountName.vue'
 import MessageList from '@/components/MessageList.vue'
-import axios from 'axios'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
 
@@ -87,24 +87,38 @@ export default {
   name: 'address-detail',
   data() {
     return {
-      aggregates: {},
-      stats: {},
-      messages: [],
-      msg_per_page: 10,
-      total_msg: 0,
       current_msg_page: 1,
-      posts: [],
-      posts_per_page: 20,
-      total_posts: 0,
       current_post_page: 1,
-      component_key: 0
+      component_key: 0,
+      polling: null
     }
   },
-  computed: mapState({
-    account: state => state.account,
-    api_server: state => state.api_server,
-    profiles: state => state.profiles
-  }),
+  computed: {
+    ...mapState({
+      account: state => state.account,
+      api_server: state => state.api_server,
+      profiles: state => state.profiles,
+      address_detail: state => state.address_detail
+    }),
+    stats() {
+      return this.address_detail.stats || {}
+    },
+    aggregates() {
+      return this.address_detail.aggregates || {}
+    },
+    messages() {
+      return this.address_detail.messages || []
+    },
+    messages_pagination() {
+      return this.address_detail.messages_pagination || { page: 1, per_page: 10, total: 0 }
+    },
+    posts() {
+      return this.address_detail.posts || []
+    },
+    posts_pagination() {
+      return this.address_detail.posts_pagination || { page: 1, per_page: 20, total: 0 }
+    }
+  },
   components: {
     MessageList, AccountAvatar, AccountName, VueJsonPretty
   },
@@ -113,93 +127,40 @@ export default {
     chain: String
   },
   methods: {
-    async refresh() {
-      await this.getStats()
-      await this.getAggregates()
-      await this.getPosts()
-      await this.getMessages()
+    loadAllData() {
+      this.$store.dispatch('load_address_detail', this.address)
     },
-    async partialRefresh() {
-      await this.getPosts()
-      await this.getMessages()
-    },
-    async getAggregates() {
-      try{
-        const { data } = await axios.get(
-          `${this.api_server.protocol}//${this.api_server.host}/api/v0/aggregates/${this.address}.json`,
-          { params: { limit: 1000 } }
-        )
-        this.aggregates = data.data
-        
-        if (this.aggregates === null)
-          this.aggregates = {}
-        else if (this.aggregates.profile !== undefined)
-          this.$store.commit('store_profile', {
-            address: this.address,
-            profile: this.aggregates['profile']
-          })
-        this.component_key = this.component_key + 1;
-      }
-      catch(err){
-        console.log("Cannot fetch aggregate");
-      }
-    },
-    async getPosts() {
-      // own posts`
-      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/posts.json`, {
-        params: {
-          'types': 'blog_pers,comment,social',
-          'addresses': this.address,
-          'pagination': this.per_page,
-          'page': this.current_page
-        }
+    refreshMessages() {
+      this.$store.dispatch('load_address_messages', {
+        address: this.address,
+        page: this.current_msg_page
       })
-      let posts = response.data.posts
-
-      this.posts = posts // display all for now
-      this.total_posts = response.data.pagination_total
-      // this.current_post_page = response.data.pagination_page
     },
-    async getMessages() {
-      // own posts`
-      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`, {
-        params: {
-          'addresses': this.address,
-          'pagination': this.msg_per_page,
-          'page': this.current_msg_page
-        }
+    refreshPosts() {
+      this.$store.dispatch('load_address_posts', {
+        address: this.address,
+        page: this.current_post_page
       })
-      let messages = response.data.messages
-
-      this.messages = messages // display all for now
-      this.total_msg = response.data.pagination_total
-      // this.current_msg_page = response.data.pagination_page
     },
-    async getStats() {
-      let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/addresses/stats.json`, {
-        params: {
-          addresses: [this.address]
-        }
-      })
-      let stats = response.data.data[this.address]
-      if (stats !== undefined) { this.$set(this, 'stats', stats) } else { this.$set(this, 'stats', {}) }
+    partialRefresh() {
+      this.refreshMessages()
+      this.refreshPosts()
+    },
+    onMessagesPageChange(newPage) {
+      this.current_msg_page = newPage
+      this.refreshMessages()
     }
   },
   watch: {
     async $route(to, from) {
-      await this.refresh()
-    },
-    async current_msg_page() {
-      await this.getMessages()
+      this.loadAllData()
     }
   },
-  async created() {
-    await this.refresh()
+  created() {
+    this.loadAllData()
   },
-  async mounted() {
-    // We may not have a correct account list yet... So wait a bit.
-    // this.$nextTick(this.partialUpdate.bind(this))
-    //setTimeout(this.update.bind(this), 500)
+  mounted() {
+    // Set up polling to refresh messages and posts data
     this.polling = setInterval(this.partialRefresh.bind(this), 10000)
   },
   beforeDestroy () {
