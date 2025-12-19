@@ -16,7 +16,7 @@
 
       <!-- Table implementation for addresses -->
       <b-table responsive table-class="compact" :items="items" :fields="addresses_fields" stacked="sm"
-        :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" @sort-changed="onSort">
+        :sort-by.sync="sortBy" :sort-desc.sync="sortDesc">
         <template v-slot:cell(address)="data">
           <AddressLink :address="data.value" class="address" />
         </template>
@@ -51,10 +51,10 @@ export default {
       sortDesc: true,
       sortDirection: 'desc',
       addresses_fields: [
-        { key: 'address', label: 'Address', sortable: true },
-        { key: 'posts', label: 'Posts count', class: 'text-right', sortable: true },
-        { key: 'aggregates', label: 'Aggregates count', class: 'text-right', sortable: true },
-        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: true, sortDirection: 'desc' }
+        { key: 'address', label: 'Address', sortable: false },
+        { key: 'posts', label: 'Posts count', class: 'text-right', sortable: false },
+        { key: 'aggregates', label: 'Aggregates count', class: 'text-right', sortable: false },
+        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: false, sortDirection: 'desc' }
       ],
       filterDebounceTimer: null,
     }
@@ -112,10 +112,6 @@ export default {
 
     changePage(newPage) {
       this.page = newPage;
-      this.loadAddresses();
-    },
-
-    onSort(ctx) {
       this.loadAddresses();
     },
 
