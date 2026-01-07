@@ -47,22 +47,26 @@ export default {
       per_page: 20,
       page: 1,
       filter: '',
-      sortBy: 'messages',
+      sortBy: 'total',
       sortDesc: true,
       sortDirection: 'desc',
       addresses_fields: [
         { key: 'address', label: 'Address', sortable: false },
-        { key: 'posts', label: 'Posts count', class: 'text-right', sortable: true },
-        { key: 'aggregates', label: 'Aggregates count', class: 'text-right', sortable: true },
-        { key: 'messages', label: 'Total Messages', class: 'text-right', sortable: true, sortDirection: 'desc' }
+        { key: 'post', label: 'Posts count', class: 'text-right', sortable: true },
+        { key: 'aggregate', label: 'Aggregates count', class: 'text-right', sortable: true },
+        { key: 'total', label: 'Total Messages', class: 'text-right', sortable: true, sortDirection: 'desc' }
       ],
       filterDebounceTimer: null,
     }
   },
   computed: {
     items() {
-      // Force to be an array
-      return Object.values(this.addresses_stats);
+      // Transform addresses_stats and ensure total property for sorting
+      return Object.entries(this.addresses_stats).map(([address, stats]) => ({
+        address,
+        ...stats,
+        total: stats.messages || 0  // Add total field which represents total messages
+      }));
     },
     ...mapState({
       account: 'account',

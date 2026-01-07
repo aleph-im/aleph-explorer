@@ -4,19 +4,6 @@ export const toUnixTimestamp = d => d ? new Date(d).getTime() / 1000 : undefined
 
 
 /**
- * Map frontend column names to API expected values
- */
-export const sortByMapping = {
-  'messages': 'MESSAGES',
-  'posts': 'POST',
-  'aggregates': 'AGGREGATE',
-  'store': 'STORE',
-  'program': 'PROGRAM',
-  'instance': 'INSTANCE',
-  'forget': 'FORGET'
-}
-
-/**
  * Fetch addresses with pagination, sorting and filtering
  * Only uses v1 API endpoint
  *
@@ -28,13 +15,12 @@ export const fetchAddresses = async (api_server, options = {}) => {
   const {
     page = 1,
     perPage = 20,
-    sortBy = sortByMapping.messages,
+    sortBy = 'total',
     sortOrder = -1,
     addressContains = ''
   } = options;
 
-  // Convert frontend column names to API expected values
-  const apiSortBy = sortByMapping[sortBy] || sortByMapping.messages;
+  const apiSortBy = sortBy || 'total';
 
   try {
     const response = await axios.get(
@@ -49,25 +35,25 @@ export const fetchAddresses = async (api_server, options = {}) => {
         }
       }
     );
-
-    // Process the data - convert API data format to frontend format
-    const addressList = response.data.data.map(item => {
-      return {
-        address: item.address,
-        messages: item.messages || 0,
-        posts: item.post || 0,
-        aggregates: item.aggregate || 0,
-        store: item.store || 0,
-        program: item.program || 0,
-        instance: item.instance || 0,
-        forget: item.forget || 0
-      };
-    });
-
-    // Also prepare the traditional object format for compatibility
+    const addressList = [];
     const addressesObject = {};
-    addressList.forEach(item => {
-      addressesObject[item.address] = item;
+
+    // Loop through the response data
+    Object.entries(response.data.data).forEach(([address, stats]) => {
+      const addressData = {
+        address: address,
+        messages: stats.messages || 0,
+        post: stats.post || 0,
+        aggregate: stats.aggregate || 0,
+        store: stats.store || 0,
+        program: stats.program || 0,
+        instance: stats.instance || 0,
+        forget: stats.forget || 0
+      };
+
+      // Add to list and object
+      addressList.push(addressData);
+      addressesObject[address] = addressData;
     });
 
     return {

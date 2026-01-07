@@ -11,7 +11,7 @@ export default new Vuex.Store({
     ipfs_gateway: 'https://ipfs.io/ipfs/',
     account: null,
     profiles: {},
-    addresses_stats: [],
+    addresses_stats: {},
     addresses_pagination: {
       page: 1,
       per_page: 20,
@@ -56,7 +56,6 @@ export default new Vuex.Store({
         console.log('Cannot delete null key')
       }
 
-      // Important: We need to replace the array to trigger reactivity
       state.addresses_stats = { ...addresses_stats }
     },
     set_addresses_pagination (state, pagination) {
@@ -117,7 +116,7 @@ export default new Vuex.Store({
         const {
           page = 1,
           perPage = 20,
-          sortBy = 'messages',
+          sortBy = 'total',
           sortOrder = -1,
           addressContains = ''
         } = payload;
@@ -137,7 +136,7 @@ export default new Vuex.Store({
 
       } catch (error) {
         commit("set_addresses_pagination", {page: 1, per_page: 20,total: 0})
-        commit("set_addresses_stats", []);
+        commit("set_addresses_stats", {});
         console.error("Failed to load addresses:", error);
       }
     },
