@@ -136,6 +136,12 @@ export default {
   },
   mounted() {
     this.openWS()
+    this.$store.dispatch('load_addresses', {
+      page: 1,
+      perPage: 25,
+      sortBy: 'messages',
+      sortOrder: -1
+    })
   },
   watch: {
     'api_server.host'() {
