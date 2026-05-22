@@ -163,8 +163,8 @@ export default {
           msgType: this.filters.type !== 'ALL' ? this.filters.type : undefined,
           startDate: toUnixTimestamp(this.filters.startDate),
           endDate: toUnixTimestamp(this.filters.endDate),
-          refs: this.filters.refs ? this.filters.refs.replaceAll(/\s/gi) : undefined,
-          contentKeys: this.filters.keys ? this.filters.keys.replaceAll(/\s/gi) : undefined,
+          refs: this.filters.refs ? this.filters.refs.replace(/\s/g, '') : undefined,
+          contentKeys: this.filters.keys ? this.filters.keys.replace(/\s/g, '') : undefined,
         }
       })
       let messages = response.data.messages
