@@ -139,7 +139,7 @@ export default {
     this.$store.dispatch('load_addresses', {
       page: 1,
       perPage: 25,
-      sortBy: 'messages',
+      sortBy: 'total',
       sortOrder: -1
     })
   },
