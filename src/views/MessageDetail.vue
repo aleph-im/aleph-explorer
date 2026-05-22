@@ -260,12 +260,12 @@ export default {
     }
   },
   watch: {
-    async hash () {
-      await this.update()
+    hash: {
+      immediate: true,
+      async handler () {
+        await this.update()
+      }
     }
-  },
-  async mounted () {
-    await this.update()
   }
 }
 </script>
