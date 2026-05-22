@@ -4,6 +4,12 @@ import router from './router'
 import store from './store'
 import BootstrapVue from 'bootstrap-vue'
 import vSelect from 'vue-select'
+import dayjs from 'dayjs'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(localizedFormat)
+dayjs.extend(relativeTime)
 
 Vue.component('v-select', vSelect)
 Vue.use(BootstrapVue)

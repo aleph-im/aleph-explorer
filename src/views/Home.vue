@@ -39,7 +39,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import MessageList from '@/components/MessageList.vue'
 import MessageTable from '@/components/MessageTable.vue'
 import AddressLink from '@/components/AddressLink'
@@ -91,10 +91,10 @@ export default {
   },
   methods: {
     dateformat(dt) {
-      return moment.unix(dt).format('lll')
+      return dayjs.unix(dt).format('lll')
     },
     reldateformat(dt) {
-      return moment.unix(dt).fromNow()
+      return dayjs.unix(dt).fromNow()
     },
     confirm_text(message) {
       let chains = [...new Set(message.confirmations.map(c => c.chain))];

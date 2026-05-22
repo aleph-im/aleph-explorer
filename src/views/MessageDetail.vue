@@ -171,7 +171,7 @@
 <script>
 import { mapState } from 'vuex'
 import axios from 'axios'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import AddressLink from '@/components/AddressLink'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
@@ -208,10 +208,10 @@ export default {
   },
   methods: {
     dateformat (dt) {
-      return moment.unix(dt).format('lll')
+      return dayjs.unix(dt).format('lll')
     },
     reldateformat (dt) {
-      return moment.unix(dt).fromNow()
+      return dayjs.unix(dt).fromNow()
     },
     getHash (hash) {
       if (hash.$binary !== undefined) { return base64toHEX(hash.$binary) } else { return hash }

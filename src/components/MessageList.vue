@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import dayjs from 'dayjs'
 import MessageLink from './MessageLink'
 import AddressLink from './AddressLink'
 import MessageIcon from './MessageIcon.vue'
@@ -60,10 +60,10 @@ export default {
 },
   methods: {
     dateformat (dt) {
-      return moment.unix(dt).format('lll')
+      return dayjs.unix(dt).format('lll')
     },
     reldateformat (dt) {
-      return moment.unix(dt).fromNow()
+      return dayjs.unix(dt).fromNow()
     },
     confirm_text (message) {
       let chains = [...new Set(message.confirmations.map(c => c.chain))]
