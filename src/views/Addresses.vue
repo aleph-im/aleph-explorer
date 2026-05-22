@@ -16,7 +16,7 @@
 
       <!-- Table implementation for addresses -->
       <b-table responsive table-class="compact" :items="items" :fields="addresses_fields" stacked="sm"
-        :sort-by.sync="sortBy" :sort-desc.sync="sortDesc">
+        :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" @sort-changed="loadAddresses">
         <template v-slot:cell(address)="data">
           <AddressLink :address="data.value" class="address" />
         </template>
@@ -130,12 +130,6 @@ export default {
       if (newPage !== oldPage) {
         this.loadAddresses();
       }
-    },
-    sortBy() {
-      this.loadAddresses();
-    },
-    sortDesc() {
-      this.loadAddresses();
     },
     filter() {
       this.onFilterUpdate();
