@@ -189,7 +189,8 @@ export default {
   computed: mapState({
     account: state => state.account,
     api_server: state => state.api_server,
-    profiles: state => state.profiles
+    profiles: state => state.profiles,
+    ipfs_gateway: state => state.ipfs_gateway
   }),
   data () {
     return {
@@ -240,23 +241,25 @@ export default {
     async getProgramSource () {
       try {
         const ref = this.messages[0].content.code.ref
-  
+        const apiBase = `${this.api_server.protocol}//${this.api_server.host}`
+
         if(ref || !this.isProgramSourceLoading || !this.programSource){
           this.isProgramSourceLoading = true
-          
-          const srcQuery = await axios.get(`https://api2.aleph.im/api/v0/messages.json?hashes=${ref}`)
-  
+
+          const srcQuery = await axios.get(`${apiBase}/api/v0/messages.json?hashes=${ref}`)
+
           if(!srcQuery.data.messages[0].content.item_hash){
             throw new Error('No source code found')
           }
 
           const rawSrc = srcQuery.data.messages[0].content.item_hash
 
-          // Shady hack to retrieve the source code from the IPFS gateway instead of the Aleph API
+          // IPFS-style hashes go through the configured IPFS gateway,
+          // anything else is served by the active Aleph node.
           if(rawSrc.startsWith('Q') || rawSrc.startsWith('bafy'))
-            this.programSource = 'https://ipfs.io/ipfs/' + rawSrc
+            this.programSource = this.ipfs_gateway + rawSrc
           else
-            this.programSource = 'https://api2.aleph.im/api/v0/storage/raw/' + rawSrc
+            this.programSource = `${apiBase}/api/v0/storage/raw/${rawSrc}`
         }
 
         this.isProgramSourceLoading = false
