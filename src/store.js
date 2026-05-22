@@ -35,6 +35,8 @@ export default new Vuex.Store({
     },
     api_version: 'v1',
     last_broadcast: null,
+    channels: [],
+    channels_loaded_for: null,
     api_server: {
       host: 'api2.aleph.im',
       protocol: 'https:',
@@ -108,9 +110,26 @@ export default new Vuex.Store({
     },
     set_address_posts_pagination (state, pagination) {
       state.address_detail.posts_pagination = pagination
+    },
+    set_channels (state, payload) {
+      state.channels = payload.channels
+      state.channels_loaded_for = payload.host
     }
   },
   actions: {
+    async load_channels({commit, state}) {
+      if (state.channels_loaded_for === state.api_server.host) return
+      try {
+        const response = await axios.get(
+          `${state.api_server.protocol}//${state.api_server.host}/api/v0/channels/list.json`
+        )
+        const channels = (response.data.channels || []).filter(c => c != null)
+        commit('set_channels', { channels, host: state.api_server.host })
+      } catch (error) {
+        console.error('Failed to fetch channels:', error)
+        commit('set_channels', { channels: [], host: state.api_server.host })
+      }
+    },
     async load_addresses({commit, state}, payload = {}) {
       try {
         const {

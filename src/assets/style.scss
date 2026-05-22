@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // App styles
 .main-content {
   padding: $spacing-sm $spacing-lg $spacing-lg $spacing-lg;
@@ -170,7 +172,7 @@ nav.navbar {
   }
 }
 
-@media only screen and (max-width: map-get($grid-breakpoints, lg)) {
+@media only screen and (max-width: map.get($grid-breakpoints, lg)) {
   .main-wrapper {
     flex-direction: column-reverse;
 

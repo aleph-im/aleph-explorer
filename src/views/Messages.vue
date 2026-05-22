@@ -126,7 +126,6 @@ export default {
     return {
       messages: [],
       aggregates: [],
-      channels: [],
       per_page: 15,
       total_msg: 0,
       page: 1,
@@ -159,7 +158,8 @@ export default {
     ...mapState({
       account: state => state.account,
       api_server: state => state.api_server,
-      profiles: state => state.profiles
+      profiles: state => state.profiles,
+      channels: state => state.channels
     })
   },
   props: {
@@ -174,7 +174,7 @@ export default {
   methods: {
     async refresh() {
       await this.loadData()
-      await this.getChannels()
+      await this.$store.dispatch('load_channels')
     },
     contentPreview(value) {
       const json = JSON.stringify(value)
@@ -226,18 +226,6 @@ export default {
 
       this.messages = messages // display all for now
       this.total_msg = response.data.pagination_total
-    },
-    async getChannels() {
-      const response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/channels/list.json`)
-      try {
-        const { channels } = response.data
-
-        // FIXME
-        // A null channel is stopping the select component from rendering
-        this.channels = channels.filter(x => x != null)
-      } catch (error) {
-        this.channels = []
-      }
     },
     toggleAdvancedFilters() {
       return this.$router.push({
@@ -291,7 +279,7 @@ export default {
     }
   },
   async created() {
-    await this.getChannels()
+    await this.$store.dispatch('load_channels')
     await this.loadQP(this.$route.query)
 
     this.$watch('page', page => {

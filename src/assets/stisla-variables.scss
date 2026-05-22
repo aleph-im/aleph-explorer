@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "sass:map";
+
 // =============================================
 // COLOR SYSTEM
 // =============================================
@@ -143,15 +146,15 @@ $grid-breakpoints: (
 // =============================================
 
 @function color($key) {
-  @return map-get($colors, $key);
+  @return map.get($colors, $key);
 }
 
 @function color_lighten($key, $amount) {
-  @return lighten(map-get($colors, $key), $amount);
+  @return color.adjust(map.get($colors, $key), $lightness: $amount);
 }
 
 @function color_darken($key, $amount) {
-  @return darken(map-get($colors, $key), $amount);
+  @return color.adjust(map.get($colors, $key), $lightness: -$amount);
 }
 
 @function to_opacity($color, $opacity) {

@@ -37,6 +37,20 @@ export default defineConfig({
   plugins: [
     vuePlugin({ jsx: true }),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Silence deprecation warnings emitted by stisla-theme's own SCSS
+        // (third-party, can't be fixed from here).
+        quietDeps: true,
+        // stisla-theme still uses @import internally and propagates that
+        // syntax across our entry SCSS. The migration to @use changes
+        // variable scoping and breaks stisla-theme's global expectations,
+        // so silence the @import deprecation until stisla-theme migrates.
+        silenceDeprecations: ['import']
+      }
+    }
+  },
   define: {
     GIT_DESCRIBE_TAGS: JSON.stringify(getGitDescription())
   },
