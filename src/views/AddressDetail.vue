@@ -40,11 +40,11 @@
               </div>
               <div class="profile-widget-item">
                 <div class="profile-widget-item-label">Posts</div>
-                <div class="profile-widget-item-value">{{stats.posts || 0}}</div>
+                <div class="profile-widget-item-value">{{stats.post || 0}}</div>
               </div>
               <div class="profile-widget-item">
                 <div class="profile-widget-item-label">Aggregates</div>
-                <div class="profile-widget-item-value">{{stats.aggregates || 0}}</div>
+                <div class="profile-widget-item-value">{{stats.aggregate || 0}}</div>
               </div>
             </div>
           </div>

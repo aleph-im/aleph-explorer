@@ -60,8 +60,8 @@ export default {
       addresses_fields: [
         { key: 'address', label: 'Address' },
         { key: 'messages', label: 'Messages', class: 'text-right' },
-        { key: 'posts', label: 'Posts', class: 'text-right' },
-        { key: 'aggregates', label: 'Aggregates', class: 'text-right' }
+        { key: 'post', label: 'Posts', class: 'text-right' },
+        { key: 'aggregate', label: 'Aggregates', class: 'text-right' }
       ],
       query_status: {
         is_loading: false,
