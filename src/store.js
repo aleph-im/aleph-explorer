@@ -235,7 +235,6 @@ export default new Vuex.Store({
             `${state.api_server.protocol}//${state.api_server.host}/api/v1/posts.json`,
             {
               params: {
-                'types': 'blog_pers,comment,social',
                 'addresses': address,
                 'pagination': perPage,
                 'page': page
