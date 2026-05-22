@@ -222,21 +222,10 @@ export default {
       this.$forceUpdate()
     },
     async getMessages () {
-      let args = {
-        hashes: this.hash
-      }
-
-      console.log(this.hash)
-
-      if (this.address) { args['addresses'] = this.address }
-
-      if (this.type) { args['msgType'] = this.type }
-
-      let response = await axios.get(
-        `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`,
-        { params: args }
+      const response = await axios.get(
+        `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages/${this.hash}`
       )
-      this.messages = response.data.messages
+      this.messages = response.data.message ? [response.data.message] : []
     },
     async getProgramSource () {
       try {
