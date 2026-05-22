@@ -1,9 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'path';
 import vuePlugin from '@vitejs/plugin-vue2';
-import envCompatible from 'vite-plugin-env-compatible';
-import { createHtmlPlugin } from 'vite-plugin-html';
-import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
 import { execSync } from 'child_process';
 
 const getGitDescription = () => {
@@ -39,15 +36,6 @@ export default defineConfig({
   },
   plugins: [
     vuePlugin({ jsx: true }),
-    viteCommonjs(),
-    envCompatible(),
-    createHtmlPlugin({
-      inject: {
-        data: {
-          title: 'aleph-explorer'
-        }
-      }
-    }),
   ],
   define: {
     GIT_DESCRIBE_TAGS: JSON.stringify(getGitDescription())
