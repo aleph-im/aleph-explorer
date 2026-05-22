@@ -52,6 +52,8 @@ export default {
     return {
       last_messages: [],
       message_socket: null,
+      reconnectTimer: null,
+      reconnectDelay: 1000,
       messages_fields: [
         { key: 'item_hash', label: 'Item Hash', class: 'hash' },
         { key: 'type', label: 'Type' },
@@ -104,14 +106,18 @@ export default {
     },
     openWS() {
       const socket = new WebSocket(`${this.api_server.ws_protocol}//${this.api_server.host}/api/ws0/messages?history=${QUEUE_SIZE}`)
+      socket._intentionallyClosed = false
 
       // Batch the firsts messages in a dedicated queue
       // so the "MessageList" component only updates once it is filled
       const prefillQueue = []
       this.last_messages = []
       this.query_status.is_loading = true
+      this.query_status.has_error = false
 
       socket.addEventListener('message', (e) => {
+        // First message proves the connection is healthy — reset backoff.
+        this.reconnectDelay = 1000
         let data
         try {
           this.query_status.is_loading = false
@@ -120,6 +126,7 @@ export default {
             return
         } catch (error) {
           console.log('Could not parse socket response')
+          return
         }
 
         if (this.last_messages.length === QUEUE_SIZE)
@@ -131,7 +138,30 @@ export default {
       })
 
       socket.addEventListener('error', () => this.query_status.has_error = true)
+      socket.addEventListener('close', () => {
+        if (socket._intentionallyClosed) return
+        this.scheduleReconnect()
+      })
       this.message_socket = socket
+    },
+    scheduleReconnect() {
+      if (this.reconnectTimer) return
+      this.reconnectTimer = setTimeout(() => {
+        this.reconnectTimer = null
+        this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000)
+        this.openWS()
+      }, this.reconnectDelay)
+    },
+    closeWS() {
+      if (this.reconnectTimer) {
+        clearTimeout(this.reconnectTimer)
+        this.reconnectTimer = null
+      }
+      if (this.message_socket) {
+        this.message_socket._intentionallyClosed = true
+        this.message_socket.close()
+        this.message_socket = null
+      }
     }
   },
   mounted() {
@@ -145,14 +175,13 @@ export default {
   },
   watch: {
     'api_server.host'() {
-      if (this.message_socket)
-        this.message_socket.close()
-
+      this.closeWS()
+      this.reconnectDelay = 1000
       this.openWS()
     }
   },
   beforeDestroy() {
-    this.message_socket.close()
+    this.closeWS()
   }
 }
 </script>
