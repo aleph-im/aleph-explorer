@@ -83,13 +83,24 @@
 
     <b-card no-body class="card-primary">
       <b-card-header class="d-flex justify-content-between">
-        <h4>Messages <b-spinner small class="ml-3" label="Loading messages" v-if="query_status.is_loading" /></h4>
+        <h4>{{ isAggregatesView ? 'Aggregates' : 'Messages' }}
+          <b-spinner small class="ml-3" label="Loading" v-if="query_status.is_loading" />
+        </h4>
 
         <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="4" class="mb-0" size="sm"
           v-if="!hasPageLoaded"></b-pagination>
       </b-card-header>
 
-      <MessageList :messages="messages" class="compact" detailed />
+      <b-table v-if="isAggregatesView" responsive table-class="compact mb-0" :items="aggregates"
+        :fields="aggregate_fields" stacked="sm">
+        <template v-slot:cell(address)="data">
+          <AddressLink :address="data.value" class="address" />
+        </template>
+        <template v-slot:cell(content)="data">
+          <code class="aggregate-content">{{ contentPreview(data.value) }}</code>
+        </template>
+      </b-table>
+      <MessageList v-else :messages="messages" class="compact" detailed />
 
       <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
         Total: {{ total_msg }}
@@ -106,6 +117,7 @@ import axios from 'axios'
 import 'vue-select/dist/vue-select.css'
 
 import MessageList from '@/components/MessageList.vue'
+import AddressLink from '@/components/AddressLink.vue'
 import { toUnixTimestamp } from '../helpers.js'
 
 export default {
@@ -113,6 +125,7 @@ export default {
   data() {
     return {
       messages: [],
+      aggregates: [],
       channels: [],
       per_page: 15,
       total_msg: 0,
@@ -128,29 +141,71 @@ export default {
         startDate: null,
         endDate: null
       },
+      aggregate_fields: [
+        { key: 'address', label: 'Address' },
+        { key: 'key', label: 'Key' },
+        { key: 'content', label: 'Content' }
+      ],
       query_status: {
         is_loading: false,
         has_error: false
       }
     }
   },
-  computed: mapState({
-    account: state => state.account,
-    api_server: state => state.api_server,
-    profiles: state => state.profiles
-  }),
+  computed: {
+    isAggregatesView() {
+      return this.filters.type === 'AGGREGATE'
+    },
+    ...mapState({
+      account: state => state.account,
+      api_server: state => state.api_server,
+      profiles: state => state.profiles
+    })
+  },
   props: {
     msg_type: {
       type: String
     }
   },
   components: {
-    MessageList
+    MessageList,
+    AddressLink
   },
   methods: {
     async refresh() {
-      await this.getMessages()
+      await this.loadData()
       await this.getChannels()
+    },
+    contentPreview(value) {
+      const json = JSON.stringify(value)
+      return json.length > 200 ? json.slice(0, 200) + '…' : json
+    },
+    async loadData() {
+      if (this.isAggregatesView) {
+        await this.getAggregates()
+      } else {
+        await this.getMessages()
+      }
+    },
+    async getAggregates() {
+      this.query_status.is_loading = true
+      try {
+        const response = await axios.get(
+          `${this.api_server.protocol}//${this.api_server.host}/api/v0/aggregates`,
+          {
+            params: {
+              pagination: this.per_page,
+              page: this.page,
+              addresses: this.filters.sender || undefined,
+              keys: this.filters.keys ? this.filters.keys.replace(/\s/g, '') : undefined
+            }
+          }
+        )
+        this.aggregates = response.data.aggregates || []
+        this.total_msg = response.data.pagination_total || 0
+      } finally {
+        this.query_status.is_loading = false
+      }
     },
     async getMessages() {
       this.query_status.is_loading = true
@@ -164,7 +219,6 @@ export default {
           startDate: toUnixTimestamp(this.filters.startDate),
           endDate: toUnixTimestamp(this.filters.endDate),
           refs: this.filters.refs ? this.filters.refs.replace(/\s/g, '') : undefined,
-          contentKeys: this.filters.keys ? this.filters.keys.replace(/\s/g, '') : undefined,
         }
       })
       let messages = response.data.messages
@@ -224,7 +278,7 @@ export default {
         }
       }
 
-      await this.getMessages()
+      await this.loadData()
     }
   },
   watch: {
@@ -282,5 +336,15 @@ export default {
 
 .filtertoggle:hover {
   text-decoration: none;
+}
+
+.aggregate-content {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.85em;
+  color: #555;
 }
 </style>
