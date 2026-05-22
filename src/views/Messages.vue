@@ -65,6 +65,75 @@
               </b-form-group>
             </b-col>
           </b-row>
+
+          <b-row class="my-1">
+            <b-col sm="12" class="d-flex justify-content-end">
+              <span class="filtertoggle filtertoggle-inline" @click="toggleMoreFilters()">
+                <i class="fas" :class="showMoreFilters ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                {{ showMoreFilters ? 'Hide more filters' : 'Show more filters' }}
+              </span>
+            </b-col>
+          </b-row>
+
+          <template v-if="showMoreFilters">
+            <b-row class="my-1">
+              <b-col sm="6">
+                <b-form-group id="fg_hashes" label="Item hashes (comma separated)" label-for="_input_hashes">
+                  <b-form-input id="_input_hashes" size="sm" :value="filters.hashes" @update="e => setQP('hashes', e)"
+                    debounce="750" trim :disabled="isAggregatesView"></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col sm="6">
+                <b-form-group id="fg_tags" label="Tags (comma separated)" label-for="_input_tags">
+                  <b-form-input id="_input_tags" size="sm" :value="filters.tags" @update="e => setQP('tags', e)"
+                    debounce="750" trim :disabled="isAggregatesView"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+
+            <b-row class="my-1">
+              <b-col sm="6">
+                <b-form-group id="fg_content_types" label="Content types (comma separated)"
+                  label-for="_input_content_types">
+                  <b-form-input id="_input_content_types" size="sm" :value="filters.contentTypes"
+                    @update="e => setQP('contentTypes', e)" debounce="750" trim
+                    :disabled="isAggregatesView"></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col sm="6">
+                <b-form-group id="fg_chains" label="Chains (comma separated, e.g. ETH,AVAX,SOL)"
+                  label-for="_input_chains">
+                  <b-form-input id="_input_chains" size="sm" :value="filters.chains"
+                    @update="e => setQP('chains', e)" debounce="750" trim
+                    :disabled="isAggregatesView"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+
+            <b-row class="my-1">
+              <b-col sm="6">
+                <b-form-group id="fg_statuses" label="Message status" label-for="_input_statuses">
+                  <v-select :options="statusOptions" placeholder="Any status"
+                    :value="filters.statuses" id="_input_statuses" multiple
+                    @input="e => setQP('statuses', e?.join(','))" :disabled="isAggregatesView" />
+                </b-form-group>
+              </b-col>
+              <b-col sm="3">
+                <b-form-group id="fg_block_from" label="From block" label-for="_input_block_from">
+                  <b-form-input id="_input_block_from" type="number" size="sm" :value="filters.startBlock"
+                    @update="e => setQP('startBlock', e)" debounce="750" trim
+                    :disabled="isAggregatesView"></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col sm="3">
+                <b-form-group id="fg_block_to" label="To block" label-for="_input_block_to">
+                  <b-form-input id="_input_block_to" type="number" size="sm" :value="filters.endBlock"
+                    @update="e => setQP('endBlock', e)" debounce="750" trim
+                    :disabled="isAggregatesView"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </template>
         </b-container>
       </b-card>
     </template>
@@ -131,6 +200,7 @@ export default {
       page: 1,
       hasPageLoaded: true,
       showAdvancedFilters: false,
+      showMoreFilters: false,
       filters: {
         channels: null,
         sender: null,
@@ -138,8 +208,16 @@ export default {
         keys: null,
         refs: null,
         startDate: null,
-        endDate: null
+        endDate: null,
+        hashes: null,
+        tags: null,
+        contentTypes: null,
+        chains: null,
+        statuses: null,
+        startBlock: null,
+        endBlock: null
       },
+      statusOptions: ['processed', 'pending', 'rejected', 'forgotten', 'removing', 'removed'],
       aggregate_fields: [
         { key: 'address', label: 'Address' },
         { key: 'key', label: 'Key' },
@@ -207,6 +285,13 @@ export default {
         this.query_status.is_loading = false
       }
     },
+    csvParam(value) {
+      return value ? value.replace(/\s/g, '') || undefined : undefined
+    },
+    intParam(value) {
+      const n = parseInt(value, 10)
+      return Number.isFinite(n) ? n : undefined
+    },
     async getMessages() {
       this.query_status.is_loading = true
       let response = await axios.get(`${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`, {
@@ -218,7 +303,16 @@ export default {
           msgType: this.filters.type !== 'ALL' ? this.filters.type : undefined,
           startDate: toUnixTimestamp(this.filters.startDate),
           endDate: toUnixTimestamp(this.filters.endDate),
-          refs: this.filters.refs ? this.filters.refs.replace(/\s/g, '') : undefined,
+          refs: this.csvParam(this.filters.refs),
+          hashes: this.csvParam(this.filters.hashes),
+          tags: this.csvParam(this.filters.tags),
+          contentTypes: this.csvParam(this.filters.contentTypes),
+          chains: this.csvParam(this.filters.chains),
+          msgStatuses: this.filters.statuses && this.filters.statuses.length
+            ? this.filters.statuses.join(',')
+            : undefined,
+          startBlock: this.intParam(this.filters.startBlock),
+          endBlock: this.intParam(this.filters.endBlock),
         }
       })
       let messages = response.data.messages
@@ -236,6 +330,15 @@ export default {
         }
       })
     },
+    toggleMoreFilters() {
+      return this.$router.push({
+        name: 'messages',
+        query: {
+          ...this.$route.query,
+          showMoreFilters: Number(!this.showMoreFilters) || undefined
+        }
+      })
+    },
     setQP(name, value) {
       return this.$router.push({
         name: 'messages',
@@ -250,6 +353,7 @@ export default {
       if (qp) {
         try {
           this.showAdvancedFilters = Boolean(parseInt(qp.showAdvancedFilters))
+          this.showMoreFilters = Boolean(parseInt(qp.showMoreFilters))
           this.page = parseInt(qp.page) || 1
           this.filters.channels = qp.channels && qp.channels?.split(',')
           this.filters.sender = qp.sender || null
@@ -258,7 +362,13 @@ export default {
           this.filters.endDate = qp.endDate
           this.filters.keys = qp.keys
           this.filters.refs = qp.refs
-
+          this.filters.hashes = qp.hashes || null
+          this.filters.tags = qp.tags || null
+          this.filters.contentTypes = qp.contentTypes || null
+          this.filters.chains = qp.chains || null
+          this.filters.statuses = qp.statuses ? qp.statuses.split(',') : null
+          this.filters.startBlock = qp.startBlock || null
+          this.filters.endBlock = qp.endBlock || null
         }
         catch (err) {
           console.log('Could not load query parameter')
@@ -324,6 +434,11 @@ export default {
 
 .filtertoggle:hover {
   text-decoration: none;
+}
+
+.filtertoggle.filtertoggle-inline {
+  color: inherit;
+  font-size: 0.85em;
 }
 
 .aggregate-content {
