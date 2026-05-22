@@ -142,22 +142,14 @@ export default new Vuex.Store({
     },
     async load_address_stats({commit, state}, address) {
       try {
-        // Use our helper function to get address stats with exact address matching
+        // A full-length address as the substring filter matches at most itself,
+        // so a single-row page is enough to find it (or confirm it's absent).
         const result = await fetchAddresses(state.api_server, {
           addressContains: address,
-          perPage: 20  // Get enough addresses to ensure we find the one we're looking for
+          perPage: 1
         });
-
-        // Find the exact match for this address
-        const addressItem = Object.values(result.addressesObject)
-          .find(item => item.address === address);
-
-        if (addressItem) {
-          commit("set_address_stats", addressItem);
-        } else {
-          // If no exact match found, set empty stats
-          commit("set_address_stats", {});
-        }
+        const [addressItem] = Object.values(result.addressesObject);
+        commit("set_address_stats", addressItem || {});
       } catch (error) {
         console.error("Failed to get address stats:", error);
         commit("set_address_stats", {});
