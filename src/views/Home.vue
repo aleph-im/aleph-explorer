@@ -1,6 +1,8 @@
 <template>
   <div>
     <div class="section-body">
+      <DashboardStats />
+
       <b-row>
         <b-col cols="12" md="6">
           <b-card no-body>
@@ -43,6 +45,7 @@ import dayjs from 'dayjs'
 import MessageList from '@/components/MessageList.vue'
 import MessageTable from '@/components/MessageTable.vue'
 import AddressLink from '@/components/AddressLink'
+import DashboardStats from '@/components/DashboardStats.vue'
 
 const QUEUE_SIZE = 15
 
@@ -54,6 +57,8 @@ export default {
       message_socket: null,
       reconnectTimer: null,
       reconnectDelay: 1000,
+      metricsTimer: null,
+      ratesTimer: null,
       messages_fields: [
         { key: 'item_hash', label: 'Item Hash', class: 'hash' },
         { key: 'type', label: 'Type' },
@@ -87,7 +92,8 @@ export default {
   components: {
     MessageList,
     MessageTable,
-    AddressLink
+    AddressLink,
+    DashboardStats
   },
   methods: {
     dateformat(dt) {
@@ -162,6 +168,27 @@ export default {
         this.message_socket.close()
         this.message_socket = null
       }
+    },
+    startDashboardPolling() {
+      this.$store.dispatch('load_metrics')
+      this.$store.dispatch('load_message_rates')
+      if (!this.metricsTimer) {
+        this.metricsTimer = setInterval(() => this.$store.dispatch('load_metrics'), 10000)
+      }
+      if (!this.ratesTimer) {
+        this.ratesTimer = setInterval(() => this.$store.dispatch('load_message_rates'), 60000)
+      }
+    },
+    stopDashboardPolling() {
+      if (this.metricsTimer) { clearInterval(this.metricsTimer); this.metricsTimer = null }
+      if (this.ratesTimer) { clearInterval(this.ratesTimer); this.ratesTimer = null }
+    },
+    onVisibilityChange() {
+      if (document.hidden) {
+        this.stopDashboardPolling()
+      } else {
+        this.startDashboardPolling()
+      }
     }
   },
   mounted() {
@@ -172,16 +199,21 @@ export default {
       sortBy: 'total',
       sortOrder: -1
     })
+    this.startDashboardPolling()
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
   },
   watch: {
     'api_server.host'() {
       this.closeWS()
       this.reconnectDelay = 1000
       this.openWS()
+      this.startDashboardPolling()
     }
   },
   beforeDestroy() {
     this.closeWS()
+    this.stopDashboardPolling()
+    document.removeEventListener('visibilitychange', this.onVisibilityChange)
   }
 }
 </script>

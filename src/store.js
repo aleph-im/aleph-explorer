@@ -37,6 +37,11 @@ export default new Vuex.Store({
     last_broadcast: null,
     channels: [],
     channels_loaded_for: null,
+    metrics: null,
+    metrics_observed_at: null,
+    eth_block_observed_at: null,
+    eth_block_committed_at: null,
+    message_rates: { h1: null, h24: null },
     api_server: {
       host: 'api2.aleph.im',
       protocol: 'https:',
@@ -114,9 +119,76 @@ export default new Vuex.Store({
     set_channels (state, payload) {
       state.channels = payload.channels
       state.channels_loaded_for = payload.host
+    },
+    set_metrics (state, payload) {
+      const previousHeight = state.metrics
+        && state.metrics.pyaleph_status_chain_eth_last_committed_height
+      const newHeight = payload && payload.pyaleph_status_chain_eth_last_committed_height
+      // Wall-clock fallback used by the countdown if the RPC lookup fails.
+      // Reset only when the height actually advances so the countdown survives
+      // intermediate metrics polls.
+      if (newHeight !== undefined && newHeight !== previousHeight) {
+        state.eth_block_observed_at = Date.now()
+      }
+      state.metrics = payload
+      state.metrics_observed_at = Date.now()
+    },
+    set_eth_block_committed_at (state, timestamp) {
+      state.eth_block_committed_at = timestamp
+    },
+    set_message_rates (state, payload) {
+      state.message_rates = payload
     }
   },
   actions: {
+    async load_metrics({commit, dispatch, state}) {
+      try {
+        const previousHeight = state.metrics
+          && state.metrics.pyaleph_status_chain_eth_last_committed_height
+        const { data } = await axios.get(
+          `${state.api_server.protocol}//${state.api_server.host}/metrics.json`
+        )
+        commit('set_metrics', data)
+        const newHeight = data && data.pyaleph_status_chain_eth_last_committed_height
+        if (newHeight !== undefined && newHeight !== previousHeight) {
+          dispatch('load_eth_block_timestamp', newHeight)
+        }
+      } catch (error) {
+        console.error('Failed to fetch metrics:', error)
+      }
+    },
+    async load_eth_block_timestamp({commit}, height) {
+      try {
+        const hex = '0x' + height.toString(16)
+        const { data } = await axios.post('https://ethereum-rpc.publicnode.com', {
+          jsonrpc: '2.0',
+          method: 'eth_getBlockByNumber',
+          params: [hex, false],
+          id: 1
+        })
+        const tsHex = data && data.result && data.result.timestamp
+        if (!tsHex) return
+        commit('set_eth_block_committed_at', parseInt(tsHex, 16) * 1000)
+      } catch (error) {
+        console.error('Failed to fetch ETH block timestamp:', error)
+      }
+    },
+    async load_message_rates({commit, state}) {
+      const now = Math.floor(Date.now() / 1000)
+      const baseUrl = `${state.api_server.protocol}//${state.api_server.host}/api/v0/messages.json`
+      try {
+        const [h1, h24] = await Promise.all([
+          axios.get(baseUrl, { params: { startDate: now - 3600, pagination: 1, page: 1 } }),
+          axios.get(baseUrl, { params: { startDate: now - 86400, pagination: 1, page: 1 } })
+        ])
+        commit('set_message_rates', {
+          h1: h1.data.pagination_total ?? null,
+          h24: h24.data.pagination_total ?? null
+        })
+      } catch (error) {
+        console.error('Failed to fetch message rates:', error)
+      }
+    },
     async load_channels({commit, state}) {
       if (state.channels_loaded_for === state.api_server.host) return
       try {

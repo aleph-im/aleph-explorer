@@ -4,7 +4,7 @@
       <div class="main-zone">
         <div class="navbar-bg"></div>
         <nav class="navbar navbar-expand-lg main-navbar">
-          <ul class="navbar-nav mr-auto mr-3">
+          <ul class="navbar-nav mr-3">
             <li v-if="window.width < 1024">
               <b-link
                 @click="display_menu = !display_menu"
@@ -14,7 +14,10 @@
               ></b-link>
             </li>
           </ul>
-          <b-navbar-brand to="/"
+          <div class="header-search">
+            <SearchBar />
+          </div>
+          <b-navbar-brand to="/" class="ml-auto pl-3"
             ><h1 class="h3-size">Aleph Cloud<br />explorer</h1></b-navbar-brand
           >
         </nav>
@@ -163,8 +166,10 @@
 
 <script>
 import { mapState } from "vuex";
+import SearchBar from "@/components/SearchBar.vue";
 export default {
   name: "app",
+  components: { SearchBar },
   data() {
     return {
       window: {
@@ -241,5 +246,26 @@ or your build process might be broken! `);
   font-size: 1.25rem;
   font-weight: 500;
   margin: 0;
+}
+
+.main-navbar {
+  align-items: center;
+}
+
+.main-navbar .header-search {
+  flex: 1 1 auto;
+  max-width: 720px;
+  min-width: 220px;
+}
+
+.main-navbar .header-search .dashboard-search {
+  margin-bottom: 0;
+}
+
+@media (max-width: 575px) {
+  .main-navbar .header-search {
+    max-width: none;
+    min-width: 140px;
+  }
 }
 </style>

@@ -140,6 +140,11 @@ export default {
     this.page = this.addresses_pagination.page || 1;
     this.per_page = this.addresses_pagination.per_page || 20;
 
+    // Seed the search box from ?q=… so links from SearchBar land pre-filtered.
+    if (this.$route.query.q) {
+      this.filter = this.$route.query.q;
+    }
+
     // Always load first page data to ensure it's fresh
     this.loadAddresses();
   },

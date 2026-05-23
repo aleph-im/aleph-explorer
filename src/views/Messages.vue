@@ -1,12 +1,17 @@
 <template>
   <div>
     <template v-if="showAdvancedFilters">
-      <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0 d-flex">
-        <span class="filtertoggle" @click="toggleAdvancedFilters()">Hide advanced filters</span>
-      </div>
-
       <b-card>
         <b-container fluid>
+          <b-row class="mb-2">
+            <b-col sm="12" class="d-flex justify-content-start">
+              <span class="filtertoggle filtertoggle-inline" @click="toggleAdvancedFilters()">
+                <i class="fas fa-chevron-up"></i>
+                Hide advanced filters
+              </span>
+            </b-col>
+          </b-row>
+
           <b-row class="my-1">
             <b-col sm="6">
               <b-form-group id="fg_channel" label="Channel(s)" label-for="_input_channels">
@@ -67,7 +72,7 @@
           </b-row>
 
           <b-row class="my-1">
-            <b-col sm="12" class="d-flex justify-content-end">
+            <b-col sm="12" class="d-flex justify-content-start">
               <span class="filtertoggle filtertoggle-inline" @click="toggleMoreFilters()">
                 <i class="fas" :class="showMoreFilters ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                 {{ showMoreFilters ? 'Hide more filters' : 'Show more filters' }}
@@ -138,26 +143,25 @@
       </b-card>
     </template>
 
-    <template v-else>
-      <div class="position-absolute mt-n5 rounded ml-4 ml-lg-0 d-flex">
-        <div style="min-width: 200px;">
-          <v-select :options="channels" @input="e => setQP('channels', e?.join(','))" placeholder="Filter channels"
-            :value="filters.channels" multiple />
-        </div>
-        <div class="ml-3 pl-3 border-left border-light d-flex align-items-center">
-          <span class="filtertoggle" @click="toggleAdvancedFilters()">Show advanced filters</span>
-        </div>
-      </div>
-    </template>
-
     <b-card no-body class="card-primary">
-      <b-card-header class="d-flex justify-content-between">
-        <h4>{{ isAggregatesView ? 'Aggregates' : 'Messages' }}
-          <b-spinner small class="ml-3" label="Loading" v-if="query_status.is_loading" />
+      <b-card-header class="d-flex align-items-center flex-wrap messages-header">
+        <h4 class="mb-0 mr-3">
+          {{ isAggregatesView ? 'Aggregates' : 'Messages' }}
+          <b-spinner small class="ml-2" label="Loading" v-if="query_status.is_loading" />
         </h4>
 
-        <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="4" class="mb-0" size="sm"
-          v-if="!hasPageLoaded"></b-pagination>
+        <template v-if="!showAdvancedFilters">
+          <div class="header-channel-filter mr-3">
+            <v-select :options="channels" @input="e => setQP('channels', e?.join(','))" placeholder="Filter channels"
+              :value="filters.channels" multiple />
+          </div>
+          <span class="filtertoggle filtertoggle-header" @click="toggleAdvancedFilters()">
+            Show advanced filters
+          </span>
+        </template>
+
+        <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="4" class="mb-0 ml-auto"
+          size="sm" v-if="!hasPageLoaded"></b-pagination>
       </b-card-header>
 
       <b-table v-if="isAggregatesView" responsive table-class="compact mb-0" :items="aggregates"
@@ -439,6 +443,18 @@ export default {
 .filtertoggle.filtertoggle-inline {
   color: inherit;
   font-size: 0.85em;
+}
+
+.messages-header .filtertoggle-header {
+  color: inherit;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.messages-header .header-channel-filter {
+  min-width: 220px;
+  max-width: 360px;
+  flex: 1 1 220px;
 }
 
 .aggregate-content {
