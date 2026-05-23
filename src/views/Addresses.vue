@@ -1,17 +1,19 @@
 <template>
   <div>
     <b-card no-body class="card-primary">
-      <b-card-header class="d-flex justify-content-between">
-        <h4>Addresses <b-spinner small class="ml-3" label="Loading addresses" v-if="is_loading" /></h4>
+      <b-card-header class="d-flex align-items-center flex-wrap">
+        <h4 class="mb-0 mr-3">
+          Addresses <b-spinner small class="ml-3" label="Loading addresses" v-if="is_loading" />
+        </h4>
 
-        <b-form-group label-cols-sm="3" class="mb-0">
-          <b-input-group>
-            <b-form-input v-model="filter" placeholder="Search by address"></b-form-input>
-            <b-input-group-append>
-              <b-button :disabled="!filter" @click="clearFilter" class="clear-button">Clear</b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
+        <b-input-group class="addresses-search ml-auto">
+          <b-form-input v-model="filter" placeholder="Search by address" />
+          <b-input-group-append>
+            <b-button variant="primary" :disabled="!filter" @click="clearFilter">
+              <i class="fas fa-times"></i> Clear
+            </b-button>
+          </b-input-group-append>
+        </b-input-group>
       </b-card-header>
 
       <!-- Table implementation for addresses -->
@@ -190,5 +192,11 @@ export default {
   opacity: 0.2;
   pointer-events: none;
   transition: opacity 0.2s;
+}
+
+.addresses-search {
+  flex: 1 1 auto;
+  max-width: 480px;
+  min-width: 240px;
 }
 </style>
