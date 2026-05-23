@@ -2,7 +2,7 @@
   <div>
     <b-card no-body class="card-primary">
       <b-card-header class="d-flex justify-content-between">
-        <h4>Addresses</h4>
+        <h4>Addresses <b-spinner small class="ml-3" label="Loading addresses" v-if="is_loading" /></h4>
 
         <b-form-group label-cols-sm="3" class="mb-0">
           <b-input-group>
@@ -15,7 +15,9 @@
       </b-card-header>
 
       <!-- Table implementation for addresses -->
-      <b-table responsive table-class="compact" :items="items" :fields="addresses_fields" stacked="sm"
+      <b-table responsive table-class="compact mb-0 addresses-table"
+        :class="{ 'is-loading-data': is_loading }"
+        :items="items" :fields="addresses_fields" stacked="sm"
         :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" @sort-changed="loadAddresses">
         <template v-slot:cell(address)="data">
           <AddressLink :address="data.value" class="address" />
@@ -57,6 +59,7 @@ export default {
         { key: 'total', label: 'Total Messages', class: 'text-right', sortable: true, sortDirection: 'desc' }
       ],
       filterDebounceTimer: null,
+      is_loading: false,
     }
   },
   computed: {
@@ -89,16 +92,19 @@ export default {
     AddressLink
   },
   methods: {
-    loadAddresses() {
-        this.$store.dispatch("load_addresses", {
+    async loadAddresses() {
+      this.is_loading = true
+      try {
+        await this.$store.dispatch("load_addresses", {
           page: this.page,
           perPage: this.per_page,
           sortBy: this.sortBy,
           sortOrder: this.sortDesc ? -1 : 1,
           addressContains: this.filter
         })
-
-
+      } finally {
+        this.is_loading = false
+      }
     },
 
     onFilterUpdate() {
@@ -155,3 +161,34 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Match the Home dashboard table style. ::v-deep is needed because
+   b-table renders thead/tbody internally, outside the scoped attr. */
+::v-deep .addresses-table thead th {
+  padding: 0.55rem 1.25rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #000 !important;
+  text-transform: none !important;
+  background: transparent !important;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+::v-deep .addresses-table tbody td {
+  height: auto !important;
+  padding: 0.5rem 1.25rem !important;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+::v-deep .addresses-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.is-loading-data {
+  opacity: 0.2;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+</style>

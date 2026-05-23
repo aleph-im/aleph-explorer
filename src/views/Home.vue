@@ -7,24 +7,31 @@
         <b-col cols="12" md="6">
           <b-card no-body>
             <b-card-header>
-              <h4>Last messages <b-spinner small class="ml-3" label="Loading messages" v-if="query_status.is_loading" />
-              </h4>
+              <h4>Last messages <b-spinner small class="ml-3" label="Loading messages"
+                v-if="query_status.is_loading" /></h4>
               <div class="card-header-action">
                 <b-link class="btn btn-primary" to="/messages">View all <i class="fas fa-chevron-right"></i></b-link>
               </div>
             </b-card-header>
+            <div class="messages-list-header">
+              <span class="col-hash">#</span>
+              <span class="col-subtype ml-auto d-none d-xl-block">Sub Type / Key</span>
+              <span class="col-confirmed ml-auto">Confirmed</span>
+            </div>
             <MessageList :messages="last_messages" class="compact" animate />
           </b-card>
         </b-col>
         <b-col cols="12" md="6">
           <b-card no-body>
             <b-card-header>
-              <h4>Most active addresses</h4>
+              <h4>Most active addresses <b-spinner small class="ml-3" label="Loading addresses"
+                v-if="addresses_loading" /></h4>
               <div class="card-header-action">
                 <b-link class="btn btn-primary" to="/addresses">View all <i class="fas fa-chevron-right"></i></b-link>
               </div>
             </b-card-header>
-            <b-table responsive table-class="compact" :items="active_addresses" :fields="addresses_fields">
+            <b-table responsive table-class="compact home-addresses-table" :items="active_addresses"
+              :fields="addresses_fields">
               <template slot="address" slot-scope="data">
                 <AddressLink :address="data.item.address" class="address break-xs" />
               </template>
@@ -43,7 +50,6 @@
 import { mapState } from 'vuex'
 import dayjs from 'dayjs'
 import MessageList from '@/components/MessageList.vue'
-import MessageTable from '@/components/MessageTable.vue'
 import AddressLink from '@/components/AddressLink'
 import DashboardStats from '@/components/DashboardStats.vue'
 
@@ -59,6 +65,7 @@ export default {
       reconnectDelay: 1000,
       metricsTimer: null,
       ratesTimer: null,
+      addresses_loading: false,
       messages_fields: [
         { key: 'item_hash', label: 'Item Hash', class: 'hash' },
         { key: 'type', label: 'Type' },
@@ -91,7 +98,6 @@ export default {
   },
   components: {
     MessageList,
-    MessageTable,
     AddressLink,
     DashboardStats
   },
@@ -193,12 +199,13 @@ export default {
   },
   mounted() {
     this.openWS()
+    this.addresses_loading = true
     this.$store.dispatch('load_addresses', {
       page: 1,
       perPage: 25,
       sortBy: 'total',
       sortOrder: -1
-    })
+    }).finally(() => { this.addresses_loading = false })
     this.startDashboardPolling()
     document.addEventListener('visibilitychange', this.onVisibilityChange)
   },
@@ -219,5 +226,48 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.messages-list-header {
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 700 !important;
+  color: #000;
+  text-transform: none;
+  background: transparent;
+  border-bottom: 1px solid #dee2e6;
+}
 
+.messages-list-header .col-hash {
+  flex: 0 0 50%;
+}
+
+.messages-list-header .col-confirmed {
+  text-align: right;
+}
+
+/* Match the messages-list-header look on the addresses table thead.
+   ::v-deep is needed because the b-table renders thead/th internally,
+   outside the scoped data-attribute. */
+::v-deep .home-addresses-table thead th {
+  padding: 0.55rem 1.25rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #000 !important;
+  text-transform: none !important;
+  background: transparent !important;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Match MessageList row padding + border on the addresses table body. */
+::v-deep .home-addresses-table tbody td {
+  height: auto !important;
+  padding: 0.5rem 1.25rem !important;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+::v-deep .home-addresses-table tbody tr:last-child td {
+  border-bottom: none;
+}
 </style>

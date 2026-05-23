@@ -56,17 +56,10 @@
           </b-row>
 
           <b-row class="my-1">
-            <b-col sm="6">
+            <b-col sm="12">
               <b-form-group id="fg_refs" label="Refs (comma separated values)" label-for="_input_refs">
                 <b-form-input id="_input_refs" size="sm" :value="filters.refs" @update="e => setQP('refs', e)"
                   debounce="750" trim></b-form-input>
-              </b-form-group>
-            </b-col>
-
-            <b-col sm="6">
-              <b-form-group id="fg_keys" label="Aggregate key" label-for="_input_keys">
-                <b-form-input id="_input_keys" size="sm" :value="filters.keys" @update="e => setQP('keys', e)"
-                  debounce="750" trim :disabled="filters.type !== 'AGGREGATE'"></b-form-input>
               </b-form-group>
             </b-col>
           </b-row>
@@ -85,13 +78,13 @@
               <b-col sm="6">
                 <b-form-group id="fg_hashes" label="Item hashes (comma separated)" label-for="_input_hashes">
                   <b-form-input id="_input_hashes" size="sm" :value="filters.hashes" @update="e => setQP('hashes', e)"
-                    debounce="750" trim :disabled="isAggregatesView"></b-form-input>
+                    debounce="750" trim></b-form-input>
                 </b-form-group>
               </b-col>
               <b-col sm="6">
                 <b-form-group id="fg_tags" label="Tags (comma separated)" label-for="_input_tags">
                   <b-form-input id="_input_tags" size="sm" :value="filters.tags" @update="e => setQP('tags', e)"
-                    debounce="750" trim :disabled="isAggregatesView"></b-form-input>
+                    debounce="750" trim></b-form-input>
                 </b-form-group>
               </b-col>
             </b-row>
@@ -101,16 +94,14 @@
                 <b-form-group id="fg_content_types" label="Content types (comma separated)"
                   label-for="_input_content_types">
                   <b-form-input id="_input_content_types" size="sm" :value="filters.contentTypes"
-                    @update="e => setQP('contentTypes', e)" debounce="750" trim
-                    :disabled="isAggregatesView"></b-form-input>
+                    @update="e => setQP('contentTypes', e)" debounce="750" trim></b-form-input>
                 </b-form-group>
               </b-col>
               <b-col sm="6">
                 <b-form-group id="fg_chains" label="Chains (comma separated, e.g. ETH,AVAX,SOL)"
                   label-for="_input_chains">
                   <b-form-input id="_input_chains" size="sm" :value="filters.chains"
-                    @update="e => setQP('chains', e)" debounce="750" trim
-                    :disabled="isAggregatesView"></b-form-input>
+                    @update="e => setQP('chains', e)" debounce="750" trim></b-form-input>
                 </b-form-group>
               </b-col>
             </b-row>
@@ -120,21 +111,19 @@
                 <b-form-group id="fg_statuses" label="Message status" label-for="_input_statuses">
                   <v-select :options="statusOptions" placeholder="Any status"
                     :value="filters.statuses" id="_input_statuses" multiple
-                    @input="e => setQP('statuses', e?.join(','))" :disabled="isAggregatesView" />
+                    @input="e => setQP('statuses', e?.join(','))" />
                 </b-form-group>
               </b-col>
               <b-col sm="3">
                 <b-form-group id="fg_block_from" label="From block" label-for="_input_block_from">
                   <b-form-input id="_input_block_from" type="number" size="sm" :value="filters.startBlock"
-                    @update="e => setQP('startBlock', e)" debounce="750" trim
-                    :disabled="isAggregatesView"></b-form-input>
+                    @update="e => setQP('startBlock', e)" debounce="750" trim></b-form-input>
                 </b-form-group>
               </b-col>
               <b-col sm="3">
                 <b-form-group id="fg_block_to" label="To block" label-for="_input_block_to">
                   <b-form-input id="_input_block_to" type="number" size="sm" :value="filters.endBlock"
-                    @update="e => setQP('endBlock', e)" debounce="750" trim
-                    :disabled="isAggregatesView"></b-form-input>
+                    @update="e => setQP('endBlock', e)" debounce="750" trim></b-form-input>
                 </b-form-group>
               </b-col>
             </b-row>
@@ -146,7 +135,7 @@
     <b-card no-body class="card-primary">
       <b-card-header class="d-flex align-items-center flex-wrap messages-header">
         <h4 class="mb-0 mr-3">
-          {{ isAggregatesView ? 'Aggregates' : 'Messages' }}
+          Messages
           <b-spinner small class="ml-2" label="Loading" v-if="query_status.is_loading" />
         </h4>
 
@@ -164,16 +153,50 @@
           size="sm" v-if="!hasPageLoaded"></b-pagination>
       </b-card-header>
 
-      <b-table v-if="isAggregatesView" responsive table-class="compact mb-0" :items="aggregates"
-        :fields="aggregate_fields" stacked="sm">
-        <template v-slot:cell(address)="data">
-          <AddressLink :address="data.value" class="address" />
+      <b-table responsive table-class="compact mb-0 messages-table"
+        :class="{ 'is-loading-data': query_status.is_loading }"
+        :items="messages" :fields="message_fields" stacked="sm">
+        <template v-slot:cell(item_hash)="data">
+          <div class="d-flex align-items-center">
+            <MessageIcon :messageType="data.item.type" />
+            <div class="ml-2 min-w-0">
+              <div class="hash-line">
+                <MessageLink :hash="data.item.item_hash" :chain="data.item.chain" :address="data.item.sender"
+                  :type="data.item.type" className="break-xs" />
+                <span class="text-muted small">By</span>
+                <AddressLink :address="data.item.sender" :chain="data.item.chain" class="break-xs" />
+                <template v-if="data.item.content && data.item.content.address
+                  && data.item.content.address !== data.item.sender">
+                  <span class="text-muted small">For</span>
+                  <AddressLink :address="data.item.content.address" class="break-xs" />
+                </template>
+              </div>
+              <div class="text-muted small mt-1" v-b-tooltip.hover :title="dateformat(data.item.time)">
+                {{ reldateformat(data.item.time) }}
+              </div>
+            </div>
+          </div>
         </template>
-        <template v-slot:cell(content)="data">
-          <code class="aggregate-content">{{ contentPreview(data.value) }}</code>
+
+        <template v-slot:cell(subtype)="data">
+          <b-badge v-if="data.item.type === 'AGGREGATE' && data.item.content && data.item.content.key"
+            variant="light">{{ data.item.content.key }}</b-badge>
+          <b-badge v-else-if="data.item.type === 'POST' && data.item.content && data.item.content.type"
+            variant="light">{{ data.item.content.type }}</b-badge>
+          <span v-else class="text-muted">—</span>
+        </template>
+
+        <template v-slot:cell(channel)="data">
+          <span v-if="data.value">{{ data.value }}</span>
+          <span v-else class="text-muted">—</span>
+        </template>
+
+        <template v-slot:cell(confirmed)="data">
+          <b-badge v-if="data.item.confirmed" variant="light" v-b-tooltip.hover
+            :title="confirmTitle(data.item)">confirmed</b-badge>
+          <b-badge v-else variant="light">pending</b-badge>
         </template>
       </b-table>
-      <MessageList v-else :messages="messages" class="compact" detailed />
 
       <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
         Total: {{ total_msg }}
@@ -189,7 +212,9 @@ import { mapState } from 'vuex'
 import axios from 'axios'
 import 'vue-select/dist/vue-select.css'
 
-import MessageList from '@/components/MessageList.vue'
+import dayjs from 'dayjs'
+import MessageIcon from '@/components/MessageIcon.vue'
+import MessageLink from '@/components/MessageLink.vue'
 import AddressLink from '@/components/AddressLink.vue'
 import { toUnixTimestamp } from '../helpers.js'
 
@@ -198,7 +223,6 @@ export default {
   data() {
     return {
       messages: [],
-      aggregates: [],
       per_page: 15,
       total_msg: 0,
       page: 1,
@@ -209,7 +233,6 @@ export default {
         channels: null,
         sender: null,
         type: 'ALL',
-        keys: null,
         refs: null,
         startDate: null,
         endDate: null,
@@ -222,10 +245,11 @@ export default {
         endBlock: null
       },
       statusOptions: ['processed', 'pending', 'rejected', 'forgotten', 'removing', 'removed'],
-      aggregate_fields: [
-        { key: 'address', label: 'Address' },
-        { key: 'key', label: 'Key' },
-        { key: 'content', label: 'Content' }
+      message_fields: [
+        { key: 'item_hash', label: '#' },
+        { key: 'subtype', label: 'Sub Type / Key' },
+        { key: 'channel', label: 'Channel' },
+        { key: 'confirmed', label: 'Confirmed', class: 'text-center' }
       ],
       query_status: {
         is_loading: false,
@@ -234,9 +258,6 @@ export default {
     }
   },
   computed: {
-    isAggregatesView() {
-      return this.filters.type === 'AGGREGATE'
-    },
     ...mapState({
       account: state => state.account,
       api_server: state => state.api_server,
@@ -250,44 +271,25 @@ export default {
     }
   },
   components: {
-    MessageList,
+    MessageIcon,
+    MessageLink,
     AddressLink
   },
   methods: {
     async refresh() {
-      await this.loadData()
+      await this.getMessages()
       await this.$store.dispatch('load_channels')
     },
-    contentPreview(value) {
-      const json = JSON.stringify(value)
-      return json.length > 200 ? json.slice(0, 200) + '…' : json
+    dateformat(dt) {
+      return dayjs.unix(dt).format('lll')
     },
-    async loadData() {
-      if (this.isAggregatesView) {
-        await this.getAggregates()
-      } else {
-        await this.getMessages()
-      }
+    reldateformat(dt) {
+      return dayjs.unix(dt).fromNow()
     },
-    async getAggregates() {
-      this.query_status.is_loading = true
-      try {
-        const response = await axios.get(
-          `${this.api_server.protocol}//${this.api_server.host}/api/v0/aggregates`,
-          {
-            params: {
-              pagination: this.per_page,
-              page: this.page,
-              addresses: this.filters.sender || undefined,
-              keys: this.filters.keys ? this.filters.keys.replace(/\s/g, '') : undefined
-            }
-          }
-        )
-        this.aggregates = response.data.aggregates || []
-        this.total_msg = response.data.pagination_total || 0
-      } finally {
-        this.query_status.is_loading = false
-      }
+    confirmTitle(message) {
+      if (!message.confirmations || !message.confirmations.length) return 'Confirmed'
+      const chains = [...new Set(message.confirmations.map(c => c.chain))]
+      return `${message.confirmations.length} confirmations:\n${chains.join(', ')}`
     },
     csvParam(value) {
       return value ? value.replace(/\s/g, '') || undefined : undefined
@@ -364,7 +366,6 @@ export default {
           this.filters.type = qp.type || 'ALL'
           this.filters.startDate = qp.startDate
           this.filters.endDate = qp.endDate
-          this.filters.keys = qp.keys
           this.filters.refs = qp.refs
           this.filters.hashes = qp.hashes || null
           this.filters.tags = qp.tags || null
@@ -380,7 +381,7 @@ export default {
         }
       }
 
-      await this.loadData()
+      await this.getMessages()
     }
   },
   watch: {
@@ -457,13 +458,42 @@ export default {
   flex: 1 1 220px;
 }
 
-.aggregate-content {
-  display: inline-block;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.85em;
-  color: #555;
+/* Header + row styling matched with the Home dashboard tables. */
+.card table.compact.messages-table thead th {
+  padding: 0.55rem 1.25rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #000 !important;
+  text-transform: none !important;
+  background: transparent !important;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+.card table.compact.messages-table tbody td {
+  height: auto !important;
+  padding: 0.6rem 1.25rem !important;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card table.compact.messages-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.is-loading-data {
+  opacity: 0.2;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.messages-table .min-w-0 {
+  min-width: 0;
+}
+
+.messages-table .hash-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.25rem;
 }
 </style>

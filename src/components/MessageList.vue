@@ -32,8 +32,9 @@
               {{message.content.size/1000000}} MB</b-badge> -->
           </div>
           <div class="ml-auto">
-            <b-badge v-b-tooltip.hover :title="confirm_text(message)"
-            variant="light" v-if="message.confirmations">{{message.confirmations.length}}</b-badge>
+            <b-badge v-if="message.confirmed" variant="light" v-b-tooltip.hover
+              :title="confirm_text(message)">confirmed</b-badge>
+            <b-badge v-else variant="light">pending</b-badge>
           </div>
         </div>
       </b-list-group-item>
