@@ -52,6 +52,23 @@
         </b-card-body>
       </b-card>
 
+      <!-- Step 1b: Signature verification (cryptographic, chain-agnostic step) -->
+      <b-card v-if="stepSig" no-body class="verify-step mb-3" :class="stepSig.statusClass">
+        <b-card-body>
+          <div class="d-flex align-items-center mb-2">
+            <i class="step-icon fas" :class="stepSig.icon"></i>
+            <h3 class="step-title mb-0 ml-2">{{ stepSig.title }}</h3>
+          </div>
+          <div v-if="stepSig.message" class="verify-step__msg">{{ stepSig.message }}</div>
+          <dl v-if="stepSig.fields" class="verify-fields">
+            <template v-for="field in stepSig.fields">
+              <dt :key="field.label + '-l'">{{ field.label }}</dt>
+              <dd :key="field.label + '-v'"><code>{{ field.value }}</code></dd>
+            </template>
+          </dl>
+        </b-card-body>
+      </b-card>
+
       <!-- Step 2: decode the anchor tx and surface the IPFS CID -->
       <b-card v-if="step2" no-body class="verify-step mb-3" :class="step2.statusClass">
         <b-card-body>
@@ -111,6 +128,7 @@ import axios from 'axios'
 import { mapState } from 'vuex'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
+import { verifyMessageSignature } from '@/lib/signature.js'
 
 const ETH_RPC = 'https://ethereum-rpc.publicnode.com'
 const IPFS_GATEWAY = 'https://ipfs.aleph.cloud/ipfs/'
@@ -167,7 +185,10 @@ export default {
       payloadError: null,
       payload: null,
       payloadSerialized: '',
-      payloadContainsHash: null
+      payloadContainsHash: null,
+      sigStatus: null,    // 'valid' | 'invalid' | 'missing' | 'error' | null
+      sigChain: null,
+      sigError: null
     }
   },
   computed: {
@@ -192,6 +213,7 @@ export default {
       const baseFields = [
         { label: 'item_hash', value: m.item_hash },
         { label: 'type', value: m.type },
+        { label: 'chain', value: m.chain || '(unknown)' },
         { label: 'sender', value: m.sender,
           to: { name: 'address-detail', params: { chain: m.chain, address: m.sender } } },
         { label: 'channel', value: m.channel || '(none)' }
@@ -304,6 +326,43 @@ export default {
       if (bytes < 1024) return bytes + ' B'
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' kB'
       return (bytes / 1024 / 1024).toFixed(2) + ' MB'
+    },
+    stepSig() {
+      if (!this.sigStatus) return null
+      switch (this.sigStatus) {
+        case 'valid':
+          return {
+            title: 'Signature verified',
+            icon: 'fa-key',
+            statusClass: 'verify-step--ok',
+            message: 'The cryptographic signature on this message is valid for sender '
+              + (this.result && this.result.sender) + ' on ' + this.sigChain + '.'
+          }
+        case 'invalid':
+          return {
+            title: 'WARNING: signature does not match sender',
+            icon: 'fa-exclamation-triangle',
+            statusClass: 'verify-step--error',
+            message: 'The signature failed verification against sender '
+              + (this.result && this.result.sender)
+              + '. This is a serious red flag.'
+          }
+        case 'missing':
+          return {
+            title: 'Message has no signature',
+            icon: 'fa-exclamation-triangle',
+            statusClass: 'verify-step--warn',
+            message: this.sigError
+          }
+        case 'error':
+          return {
+            title: 'Could not verify signature',
+            icon: 'fa-exclamation-triangle',
+            statusClass: 'verify-step--error',
+            message: this.sigError
+          }
+      }
+      return null
     }
   },
   watch: {
@@ -340,6 +399,14 @@ export default {
       this.chainError = null
       this.txInput = null
       this.cid = null
+      this.payloadLoading = false
+      this.payloadError = null
+      this.payload = null
+      this.payloadSerialized = ''
+      this.payloadContainsHash = null
+      this.sigStatus = null
+      this.sigChain = null
+      this.sigError = null
       try {
         const url = `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages/${hash}`
         const { data } = await axios.get(url)
@@ -359,10 +426,34 @@ export default {
         this.loading = false
       }
 
+      // Cryptographic check: signature ↔ sender. Lazy-loads the
+      // chain-specific verifier from @aleph-sdk via src/lib/signature.js.
+      this.verifySignature(this.result)
+
       const ethConf = this.result.confirmations
         && this.result.confirmations.find(c => c.chain === 'ETH')
       if (ethConf && ethConf.hash) {
         this.resolveAnchor(ethConf.hash)
+      }
+    },
+    async verifySignature(msg) {
+      this.sigStatus = null
+      this.sigChain = null
+      this.sigError = null
+      const result = await verifyMessageSignature(msg)
+      if (!result.supported) {
+        // Unknown / unsupported chain — leave the signature block hidden.
+        return
+      }
+      this.sigChain = result.chain
+      if (result.missing) {
+        this.sigStatus = 'missing'
+        this.sigError = result.error
+      } else if (result.error) {
+        this.sigStatus = 'error'
+        this.sigError = result.error
+      } else {
+        this.sigStatus = result.valid ? 'valid' : 'invalid'
       }
     },
     async resolveAnchor(txHash) {
