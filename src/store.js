@@ -42,6 +42,7 @@ export default new Vuex.Store({
     eth_block_observed_at: null,
     eth_block_committed_at: null,
     message_rates: { h1: null, h24: null },
+    network: { ccn_count: null, observed_at: null },
     api_server: {
       host: 'api2.aleph.im',
       protocol: 'https:',
@@ -138,6 +139,9 @@ export default new Vuex.Store({
     },
     set_message_rates (state, payload) {
       state.message_rates = payload
+    },
+    set_network_size (state, payload) {
+      state.network = { ...payload, observed_at: Date.now() }
     }
   },
   actions: {
@@ -155,6 +159,30 @@ export default new Vuex.Store({
         }
       } catch (error) {
         console.error('Failed to fetch metrics:', error)
+      }
+    },
+    async load_network_size({commit, state}) {
+      // The canonical corechannel aggregate is published by the Aleph
+      // foundation address. Other addresses also have corechannel entries,
+      // so we filter explicitly to avoid picking the wrong one.
+      try {
+        const { data } = await axios.get(
+          `${state.api_server.protocol}//${state.api_server.host}/api/v0/aggregates`,
+          {
+            params: {
+              keys: 'corechannel',
+              addresses: '0xa1B3bb7d2332383D96b7796B908fB7f7F3c2Be10',
+              pagination: 1
+            }
+          }
+        )
+        const agg = data && data.aggregates && data.aggregates[0]
+        const nodes = agg && agg.content && agg.content.nodes
+        if (Array.isArray(nodes)) {
+          commit('set_network_size', { ccn_count: nodes.length })
+        }
+      } catch (error) {
+        console.error('Failed to fetch network size:', error)
       }
     },
     async load_eth_block_timestamp({commit}, height) {

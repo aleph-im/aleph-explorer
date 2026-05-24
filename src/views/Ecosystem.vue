@@ -10,6 +10,22 @@
         Below is the rest of what the Aleph&nbsp;Cloud teams ship; pick a card to jump in.
       </p>
 
+      <b-card no-body class="ecosystem-redundancy mb-4">
+        <b-card-body>
+          <div class="d-flex align-items-center flex-wrap">
+            <i class="fas fa-shield-alt ecosystem-redundancy__icon"></i>
+            <div class="ml-3 flex-grow-1">
+              <div class="ecosystem-redundancy__label">Storage redundancy</div>
+              <p class="ecosystem-redundancy__text mb-0">
+                Every file pinned on Aleph is replicated across
+                <strong>{{ ccnCount }} Core&nbsp;Channel Nodes</strong> worldwide. No single
+                node, region or operator can take your data offline.
+              </p>
+            </div>
+          </div>
+        </b-card-body>
+      </b-card>
+
       <div v-for="group in groups" :key="group.key" class="ecosystem-group">
         <h3 class="ecosystem-group__title">{{ group.title }}</h3>
         <b-row>
@@ -50,6 +66,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { ECOSYSTEM_GROUPS, RESOURCE_LINKS } from '@/lib/ecosystem.js'
 
 export default {
@@ -58,6 +75,22 @@ export default {
     return {
       groups: ECOSYSTEM_GROUPS,
       resources: RESOURCE_LINKS
+    }
+  },
+  computed: {
+    ...mapState({
+      network: state => state.network
+    }),
+    ccnCount() {
+      const n = this.network && this.network.ccn_count
+      return n != null ? Number(n).toLocaleString('en-US') : '—'
+    }
+  },
+  created() {
+    // Same data source as the dashboard card; safe to dispatch even if the
+    // user lands directly here (action no-ops cheaply when in flight).
+    if (!this.network || this.network.ccn_count == null) {
+      this.$store.dispatch('load_network_size')
     }
   }
 }
@@ -71,6 +104,37 @@ export default {
   color: #2b1865;
   margin-bottom: 2rem;
   max-width: 50em;
+}
+
+.ecosystem-redundancy {
+  border: 1px solid rgba(81, 0, 205, 0.15);
+  background: linear-gradient(135deg, rgba(81, 0, 205, 0.04), rgba(212, 255, 0, 0.05));
+}
+
+.ecosystem-redundancy__icon {
+  font-size: 2rem;
+  color: #5100cd;
+  flex: 0 0 auto;
+}
+
+.ecosystem-redundancy__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6c757d;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.ecosystem-redundancy__text {
+  color: #2b1865;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.ecosystem-redundancy__text strong {
+  color: #5100cd;
+  font-weight: 700;
 }
 
 .ecosystem-group {
