@@ -183,12 +183,12 @@
             variant="light">{{ data.item.content.key }}</b-badge>
           <b-badge v-else-if="data.item.type === 'POST' && data.item.content && data.item.content.type"
             variant="light">{{ data.item.content.type }}</b-badge>
-          <span v-else class="text-muted">—</span>
+          <span v-else class="text-muted">-</span>
         </template>
 
         <template v-slot:cell(channel)="data">
           <span v-if="data.value">{{ data.value }}</span>
-          <span v-else class="text-muted">—</span>
+          <span v-else class="text-muted">-</span>
         </template>
 
         <template v-slot:cell(confirmed)="data">

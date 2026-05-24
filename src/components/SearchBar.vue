@@ -25,7 +25,7 @@ export default {
       } else if (/^0x[0-9a-fA-F]{40}$/.test(value)) {
         this.$router.push({ name: 'address-detail', params: { chain: 'ETH', address: value } })
       } else {
-        // Anything else — let the addresses search do substring matching.
+        // Anything else, let the addresses search do substring matching.
         this.$router.push({ name: 'addresses', query: { q: value } })
       }
     }

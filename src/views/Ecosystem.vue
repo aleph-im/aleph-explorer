@@ -1,0 +1,145 @@
+<template>
+  <div>
+    <div class="section-header">
+      <h1>The Aleph Cloud ecosystem</h1>
+    </div>
+    <div class="section-body">
+      <p class="ecosystem-lead">
+        The explorer you're looking at is one slice of a much bigger network.
+        Below is the rest of what the Aleph Cloud teams ship; pick a card to jump in.
+      </p>
+
+      <div v-for="group in groups" :key="group.key" class="ecosystem-group">
+        <h3 class="ecosystem-group__title">{{ group.title }}</h3>
+        <b-row>
+          <b-col v-for="item in group.items" :key="item.name" cols="12" md="6" lg="4" class="mb-3">
+            <b-card no-body class="ecosystem-card h-100">
+              <b-card-body class="d-flex flex-column">
+                <div class="d-flex align-items-center mb-2">
+                  <span class="ecosystem-card__icon"><i :class="item.icon"></i></span>
+                  <div class="ml-3">
+                    <div class="ecosystem-card__name">{{ item.name }}</div>
+                    <div class="ecosystem-card__tagline">{{ item.tagline }}</div>
+                  </div>
+                </div>
+                <p class="ecosystem-card__description">{{ item.description }}</p>
+                <a :href="item.url" target="_blank" rel="noopener noreferrer"
+                  class="btn btn-primary btn-sm mt-auto align-self-start">
+                  Open <i class="fas fa-external-link-alt fa-xs ml-1"></i>
+                </a>
+              </b-card-body>
+            </b-card>
+          </b-col>
+        </b-row>
+      </div>
+
+      <b-card no-body class="ecosystem-resources">
+        <b-card-body>
+          <h3 class="mb-3">Resources & community</h3>
+          <div class="d-flex flex-wrap">
+            <a v-for="link in resources" :key="link.name" :href="link.url" target="_blank"
+              rel="noopener noreferrer" class="ecosystem-resource">
+              <i :class="link.icon"></i> {{ link.name }}
+            </a>
+          </div>
+        </b-card-body>
+      </b-card>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ECOSYSTEM_GROUPS, RESOURCE_LINKS } from '@/lib/ecosystem.js'
+
+export default {
+  name: 'ecosystem',
+  data() {
+    return {
+      groups: ECOSYSTEM_GROUPS,
+      resources: RESOURCE_LINKS
+    }
+  }
+}
+</script>
+
+<style scoped>
+.ecosystem-lead {
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+  max-width: 60em;
+}
+
+.ecosystem-group {
+  margin-bottom: 1.5rem;
+}
+
+.ecosystem-group__title {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #5100cd;
+  margin-bottom: 0.75rem;
+}
+
+.ecosystem-card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.ecosystem-card:hover {
+  box-shadow: 0 6px 18px rgba(81, 0, 205, 0.08);
+  transform: translateY(-1px);
+}
+
+.ecosystem-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background: rgba(81, 0, 205, 0.08);
+  color: #5100cd;
+  font-size: 1.1rem;
+  flex: 0 0 auto;
+}
+
+.ecosystem-card__name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.ecosystem-card__tagline {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.15rem;
+}
+
+.ecosystem-card__description {
+  font-size: 0.85rem;
+  color: #495057;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.ecosystem-resources {
+  margin-top: 1rem;
+}
+
+.ecosystem-resource {
+  color: #495057;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin: 0 1.25rem 0.5rem 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ecosystem-resource:hover {
+  color: #5100cd;
+}
+</style>

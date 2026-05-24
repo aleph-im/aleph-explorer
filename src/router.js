@@ -43,6 +43,11 @@ export default new Router({
       path: '/addresses',
       name: 'addresses',
       component: () => import('./views/Addresses.vue')
+    },
+    {
+      path: '/ecosystem',
+      name: 'ecosystem',
+      component: () => import('./views/Ecosystem.vue')
     }
   ]
 })

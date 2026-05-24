@@ -29,36 +29,7 @@
             <router-view />
           </section>
         </div>
-        <footer class="main-footer px-5">
-          <div class="footer-left">
-            Copyright © 2018-present
-            <a href="https://aleph.cloud">Aleph Cloud</a>
-          </div>
-          <div class="footer-right">
-            <template v-if="app_version">
-              <template v-if="last_release_is_a_tag()">
-                <a
-                  :href="
-                    'https://github.com/aleph-im/aleph-explorer/tree/' +
-                    app_version
-                  "
-                  >{{ app_version }}</a
-                >
-              </template>
-              <template v-else>
-                {{ app_version }}
-              </template>
-            </template>
-            <a
-              href="https://github.com/aleph-im/aleph-explorer"
-              class="card-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <i class="fab fa-github"></i>
-            </a>
-          </div>
-        </footer>
+        <EcosystemFooter />
       </div>
       <transition name="fade">
         <div class="main-sidebar" v-if="(window.width >= 1024) | display_menu">
@@ -77,6 +48,10 @@
               </b-nav-item>
               <b-nav-item to="/addresses">
                 <i class="fas fa-address-book"></i><span>Addresses</span>
+              </b-nav-item>
+              <li class="menu-header">Discover</li>
+              <b-nav-item to="/ecosystem">
+                <i class="fas fa-th-large"></i><span>Ecosystem</span>
               </b-nav-item>
             </ul>
             <div class="px-3 pt-4 pb-2 hide-sidebar-mini">
@@ -205,9 +180,10 @@
 <script>
 import { mapState } from "vuex";
 import SearchBar from "@/components/SearchBar.vue";
+import EcosystemFooter from "@/components/EcosystemFooter.vue";
 export default {
   name: "app",
-  components: { SearchBar },
+  components: { SearchBar, EcosystemFooter },
   data() {
     return {
       window: {
@@ -215,7 +191,6 @@ export default {
         height: 0,
       },
       display_menu: false,
-      app_version: GIT_DESCRIBE_TAGS || "unknown build",
     };
   },
   computed: mapState({
@@ -242,9 +217,6 @@ or your build process might be broken! `);
     handleResize() {
       this.window.width = window.innerWidth;
       this.window.height = window.innerHeight;
-    },
-    last_release_is_a_tag() {
-      return /\d+-.[0-9A-F]{7}$/i.test(this.app_version);
     },
   },
   watch: {

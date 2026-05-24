@@ -29,7 +29,7 @@
           <a v-if="lastBlock" :href="contractUrl" target="_blank" rel="noopener noreferrer">
             block #{{ lastBlock }} <i class="fas fa-external-link-alt fa-xs"></i>
           </a>
-          <span v-else>—</span>
+          <span v-else>-</span>
         </div>
         <div class="stat-sub" v-if="lastBlock">
           {{ commitAgoText }}
@@ -73,7 +73,7 @@ const COMMIT_CADENCE_MS = 3600 * 1000
 const ALEPH_ETH_CONTRACT = '0x166fd4299364b21c7567e163d85d78d2fb2f8ad5'
 
 const fmt = (n) => {
-  if (n === null || n === undefined) return '—'
+  if (n === null || n === undefined) return '-'
   return Number(n).toLocaleString('en-US')
 }
 
@@ -138,7 +138,7 @@ export default {
       return fmt(this.message_rates?.h24)
     },
     countdownText() {
-      if (!this.commitAnchor) return '—'
+      if (!this.commitAnchor) return '-'
       const target = this.commitAnchor + COMMIT_CADENCE_MS
       const remaining = target - this.now
       return remaining > 0 ? fmtDuration(remaining) : 'overdue'

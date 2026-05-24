@@ -10,8 +10,11 @@ html {
 // App styles
 .main-content {
   padding: $spacing-sm $spacing-lg $spacing-lg $spacing-lg;
+  // Grow to fill the main-zone so the footer below us sticks to the
+  // bottom of the viewport when the page content is short.
+  flex-grow: 1;
   // Clip horizontal overflow so wide tables/cards don't blow out the
-  // viewport on phones — their own `table-responsive` wrappers still
+  // viewport on phones; their own `table-responsive` wrappers still
   // scroll horizontally inside the card.
   overflow-x: hidden;
 }
@@ -54,7 +57,10 @@ html {
   min-height: 100vh;
 
   .main-zone {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
+    min-height: 100vh;
     // Make room for both fixed left bars on desktop: the navigator
     // icon strip and the main sidebar.
     margin-left: calc(#{$navigator-width} + #{$sidebar-min-width});
@@ -236,7 +242,7 @@ nav.navbar {
     flex-direction: column-reverse;
 
     .main-zone {
-      // Mobile sidebar is an overlay (position: absolute) — main-zone
+      // Mobile sidebar is an overlay (position: absolute); main-zone
       // shouldn't reserve room for it.
       margin-left: 0;
     }

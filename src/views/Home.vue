@@ -3,6 +3,8 @@
     <div class="section-body">
       <DashboardStats />
 
+      <TaglineRotator />
+
       <b-row>
         <b-col cols="12" md="6">
           <b-card no-body>
@@ -52,6 +54,7 @@ import dayjs from 'dayjs'
 import MessageList from '@/components/MessageList.vue'
 import AddressLink from '@/components/AddressLink'
 import DashboardStats from '@/components/DashboardStats.vue'
+import TaglineRotator from '@/components/TaglineRotator.vue'
 
 const QUEUE_SIZE = 15
 
@@ -99,7 +102,8 @@ export default {
   components: {
     MessageList,
     AddressLink,
-    DashboardStats
+    DashboardStats,
+    TaglineRotator
   },
   methods: {
     dateformat(dt) {
@@ -128,7 +132,7 @@ export default {
       this.query_status.has_error = false
 
       socket.addEventListener('message', (e) => {
-        // First message proves the connection is healthy — reset backoff.
+        // First message proves the connection is healthy. Reset backoff.
         this.reconnectDelay = 1000
         let data
         try {
@@ -271,7 +275,7 @@ export default {
   border-bottom: none;
 }
 
-/* Keep the table within its card on all viewports — the b-table-stacked
+/* Keep the table within its card on all viewports; the b-table-stacked
    layout otherwise reports natural content width via min-content. */
 ::v-deep .home-addresses-table,
 ::v-deep .home-addresses-table .table-responsive {
