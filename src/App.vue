@@ -51,7 +51,7 @@
               </b-nav-item>
               <li class="menu-header">Trust</li>
               <b-nav-item to="/verify">
-                <i class="fas fa-shield-alt"></i><span>Verify</span>
+                <i class="fas fa-shield-alt"></i><span>Verifier</span>
               </b-nav-item>
               <li class="menu-header">Discover</li>
               <b-nav-item to="/ecosystem">

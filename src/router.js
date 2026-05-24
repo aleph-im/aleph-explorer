@@ -50,9 +50,10 @@ export default new Router({
       component: () => import('./views/Ecosystem.vue')
     },
     {
-      path: '/verify',
+      path: '/verify/:hash?',
       name: 'verify',
-      component: () => import('./views/Verify.vue')
+      component: () => import('./views/Verify.vue'),
+      props: true
     }
   ]
 })

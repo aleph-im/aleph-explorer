@@ -14,9 +14,9 @@
         <b-card-body>
           <b-input-group>
             <b-form-input v-model="query" placeholder="Aleph item_hash (64 hex chars)"
-              @keyup.enter="run" :disabled="loading" trim />
+              @keyup.enter="submit" :disabled="loading" trim />
             <b-input-group-append>
-              <b-button variant="primary" :disabled="!query || loading" @click="run">
+              <b-button variant="primary" :disabled="!query || loading" @click="submit">
                 <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-shield-alt'"></i>
                 Verify
               </b-button>
@@ -52,17 +52,44 @@
         </b-card-body>
       </b-card>
 
-      <!-- Steps 2 + 3 (placeholders for upcoming work) -->
-      <b-card v-if="step1 && step1.canChain" no-body class="verify-step verify-step--placeholder mb-3">
+      <!-- Step 2: decode the anchor tx and surface the IPFS CID -->
+      <b-card v-if="step2" no-body class="verify-step mb-3" :class="step2.statusClass">
         <b-card-body>
-          <div class="d-flex align-items-center">
-            <i class="step-icon fas fa-link text-muted"></i>
-            <h3 class="step-title mb-0 ml-2 text-muted">Anchored on Ethereum</h3>
+          <div class="d-flex align-items-center mb-2">
+            <i class="step-icon fas" :class="step2.icon"></i>
+            <h3 class="step-title mb-0 ml-2">{{ step2.title }}</h3>
           </div>
-          <div class="text-muted small mt-1">
-            Decoding the batch transaction and resolving the IPFS payload will be
-            wired up in the next steps of this page.
+          <div v-if="step2.message" class="verify-step__msg">{{ step2.message }}</div>
+          <dl v-if="step2.fields" class="verify-fields">
+            <template v-for="field in step2.fields">
+              <dt :key="field.label + '-l'">{{ field.label }}</dt>
+              <dd :key="field.label + '-v'">
+                <a v-if="field.href" :href="field.href" target="_blank" rel="noopener noreferrer">
+                  <code>{{ field.value }}</code> <i class="fas fa-external-link-alt fa-xs"></i>
+                </a>
+                <code v-else>{{ field.value }}</code>
+              </dd>
+            </template>
+          </dl>
+        </b-card-body>
+      </b-card>
+
+      <!-- Step 3: fetch the IPFS payload and prove the hash is inside -->
+      <b-card v-if="step3" no-body class="verify-step mb-3" :class="step3.statusClass">
+        <b-card-body>
+          <div class="d-flex align-items-center mb-2">
+            <i class="step-icon fas" :class="step3.icon"></i>
+            <h3 class="step-title mb-0 ml-2">{{ step3.title }}</h3>
           </div>
+          <div v-if="step3.message" class="verify-step__msg">{{ step3.message }}</div>
+          <div v-if="step3.snippet" class="verify-snippet">
+            <span class="verify-snippet__label">Excerpt around the match</span>
+            <pre><span>{{ step3.snippet.before }}</span><mark>{{ step3.snippet.match }}</mark><span>{{ step3.snippet.after }}</span></pre>
+          </div>
+          <details v-if="payload" class="verify-payload">
+            <summary>Show full IPFS payload ({{ payloadSize }})</summary>
+            <vue-json-pretty :data="payload" :deep="1" highlightMouseoverNode />
+          </details>
         </b-card-body>
       </b-card>
 
@@ -82,15 +109,65 @@
 <script>
 import axios from 'axios'
 import { mapState } from 'vuex'
+import VueJsonPretty from 'vue-json-pretty'
+import 'vue-json-pretty/lib/styles.css'
+
+const ETH_RPC = 'https://ethereum-rpc.publicnode.com'
+const IPFS_GATEWAY = 'https://ipfs.aleph.cloud/ipfs/'
+const SNIPPET_CONTEXT = 80
+
+// Decode a hex byte string as UTF-8 (handles multi-byte chars correctly).
+function hexToUtf8Bytes(hex, length) {
+  const bytes = new Uint8Array(length)
+  for (let i = 0; i < length; i++) {
+    bytes[i] = parseInt(hex.substr(i * 2, 2), 16)
+  }
+  return new TextDecoder('utf-8').decode(bytes)
+}
+
+// Aleph anchor txs call a contract method with a single ABI-encoded
+// string parameter (the JSON payload). Layout (skip leading 0x):
+//   bytes 0..3   : 4-byte function selector
+//   bytes 4..35  : ABI offset to the string data (typically 0x20)
+//   bytes (offset)..(offset+31) : string length (uint256 big-endian)
+//   bytes (offset+32)..        : UTF-8 string bytes, right-padded to 32
+function decodeAnchorString(inputHex) {
+  const hex = inputHex.startsWith('0x') ? inputHex.slice(2) : inputHex
+  if (hex.length < 8 + 64 + 64) {
+    throw new Error('Input too short to contain an ABI-encoded string')
+  }
+  const data = hex.slice(8) // strip selector
+  const offset = parseInt(data.slice(0, 64), 16) // typically 32
+  const lenStart = offset * 2
+  const length = parseInt(data.slice(lenStart, lenStart + 64), 16)
+  if (!Number.isFinite(length) || length <= 0) {
+    throw new Error('Could not read the string length from the ABI envelope')
+  }
+  const stringHex = data.slice(lenStart + 64, lenStart + 64 + length * 2)
+  return hexToUtf8Bytes(stringHex, length)
+}
 
 export default {
   name: 'verify',
+  components: { VueJsonPretty },
+  props: {
+    hash: { type: String, default: null }
+  },
   data() {
     return {
       query: '',
       loading: false,
       result: null,
-      error: null
+      error: null,
+      chainLoading: false,
+      chainError: null,
+      txInput: null,
+      cid: null,
+      payloadLoading: false,
+      payloadError: null,
+      payload: null,
+      payloadSerialized: '',
+      payloadContainsHash: null
     }
   },
   computed: {
@@ -121,6 +198,7 @@ export default {
       ]
 
       if (ethConf) {
+        const txHash = ethConf.hash.startsWith('0x') ? ethConf.hash : '0x' + ethConf.hash
         return {
           title: 'Found in Aleph and anchored on Ethereum',
           icon: 'fa-check-circle',
@@ -130,8 +208,8 @@ export default {
             ...baseFields,
             { label: 'ETH block', value: '#' + ethConf.height,
               href: 'https://etherscan.io/block/' + ethConf.height },
-            { label: 'anchor tx', value: ethConf.hash,
-              href: 'https://etherscan.io/tx/' + ethConf.hash }
+            { label: 'anchor tx', value: txHash,
+              href: 'https://etherscan.io/tx/' + txHash }
           ],
           canChain: true
         }
@@ -156,15 +234,112 @@ export default {
         fields: baseFields,
         canChain: false
       }
+    },
+    step2() {
+      if (this.chainLoading) {
+        return {
+          title: 'Decoding the anchor transaction…',
+          icon: 'fa-spinner fa-spin',
+          statusClass: 'verify-step--pending'
+        }
+      }
+      if (this.chainError) {
+        return {
+          title: 'Could not decode the anchor transaction',
+          icon: 'fa-exclamation-triangle',
+          statusClass: 'verify-step--error',
+          message: this.chainError
+        }
+      }
+      if (!this.cid) return null
+      return {
+        title: 'IPFS payload identified',
+        icon: 'fa-link',
+        statusClass: 'verify-step--ok',
+        fields: [
+          { label: 'IPFS CID', value: this.cid },
+          { label: 'IPFS link', value: IPFS_GATEWAY + this.cid,
+            href: IPFS_GATEWAY + this.cid }
+        ]
+      }
+    },
+    step3() {
+      if (this.payloadLoading) {
+        return {
+          title: 'Fetching the IPFS payload…',
+          icon: 'fa-spinner fa-spin',
+          statusClass: 'verify-step--pending'
+        }
+      }
+      if (this.payloadError) {
+        return {
+          title: 'Could not fetch the IPFS payload',
+          icon: 'fa-exclamation-triangle',
+          statusClass: 'verify-step--error',
+          message: this.payloadError
+        }
+      }
+      if (this.payloadContainsHash === null) return null
+      const target = (this.result && this.result.item_hash) || (this.query || '').trim()
+      if (this.payloadContainsHash) {
+        return {
+          title: 'Verified: hash is present in the on-chain payload',
+          icon: 'fa-check-circle',
+          statusClass: 'verify-step--ok',
+          snippet: this.buildSnippet(target)
+        }
+      }
+      return {
+        title: 'WARNING: hash NOT present in the on-chain payload',
+        icon: 'fa-exclamation-triangle',
+        statusClass: 'verify-step--error',
+        message:
+          'The IPFS payload was fetched but does not contain this item_hash. ' +
+          'That contradicts what the Aleph API reported and should be investigated.'
+      }
+    },
+    payloadSize() {
+      if (!this.payloadSerialized) return ''
+      const bytes = this.payloadSerialized.length
+      if (bytes < 1024) return bytes + ' B'
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' kB'
+      return (bytes / 1024 / 1024).toFixed(2) + ' MB'
+    }
+  },
+  watch: {
+    hash: {
+      immediate: true,
+      handler(newHash) {
+        if (newHash) {
+          this.query = newHash
+          this.run()
+        }
+      }
     }
   },
   methods: {
+    submit() {
+      const hash = (this.query || '').trim()
+      if (!hash) return
+      if (this.$route.params.hash !== hash) {
+        // Sync the URL so the verification result is shareable.
+        // The hash-prop watcher above will pick it up and re-run.
+        this.$router.replace({ name: 'verify', params: { hash } })
+      } else {
+        // Same hash already in the URL; re-run explicitly.
+        this.run()
+      }
+    },
     async run() {
       const hash = (this.query || '').trim()
       if (!hash) return
       this.loading = true
       this.result = null
       this.error = null
+      this.chainLoading = false
+      this.chainError = null
+      this.txInput = null
+      this.cid = null
       try {
         const url = `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages/${hash}`
         const { data } = await axios.get(url)
@@ -179,8 +354,92 @@ export default {
         } else {
           this.error = 'Could not reach the Aleph API. ' + (err.message || '')
         }
+        return
       } finally {
         this.loading = false
+      }
+
+      const ethConf = this.result.confirmations
+        && this.result.confirmations.find(c => c.chain === 'ETH')
+      if (ethConf && ethConf.hash) {
+        this.resolveAnchor(ethConf.hash)
+      }
+    },
+    async resolveAnchor(txHash) {
+      this.chainLoading = true
+      this.chainError = null
+      // Aleph confirmations report the tx hash without the 0x prefix;
+      // ethereum-rpc.publicnode.com rejects unprefixed hashes.
+      const normalizedHash = txHash.startsWith('0x') ? txHash : '0x' + txHash
+      try {
+        const { data } = await axios.post(ETH_RPC, {
+          jsonrpc: '2.0',
+          method: 'eth_getTransactionByHash',
+          params: [normalizedHash],
+          id: 1
+        })
+        if (data.error) {
+          this.chainError = 'RPC error: ' + (data.error.message || JSON.stringify(data.error))
+          return
+        }
+        const tx = data.result
+        if (!tx || !tx.input) {
+          this.chainError = 'Transaction not found or has no input data.'
+          return
+        }
+        this.txInput = tx.input
+        let payload
+        try {
+          payload = JSON.parse(decodeAnchorString(tx.input))
+        } catch (e) {
+          this.chainError = 'Anchor tx input is not a valid ABI-encoded JSON payload: '
+            + (e.message || e)
+          return
+        }
+        if (!payload || !payload.content) {
+          this.chainError = 'Anchor payload has no "content" field (expected the IPFS CID).'
+          return
+        }
+        this.cid = payload.content
+      } catch (err) {
+        this.chainError = 'Could not reach the Ethereum RPC. ' + (err.message || '')
+        return
+      } finally {
+        this.chainLoading = false
+      }
+
+      if (this.cid && this.result && this.result.item_hash) {
+        this.resolvePayload(this.cid, this.result.item_hash)
+      }
+    },
+    async resolvePayload(cid, targetHash) {
+      this.payloadLoading = true
+      this.payloadError = null
+      this.payload = null
+      this.payloadSerialized = ''
+      this.payloadContainsHash = null
+      try {
+        const { data } = await axios.get(IPFS_GATEWAY + cid, { responseType: 'json' })
+        this.payload = data
+        this.payloadSerialized = typeof data === 'string' ? data : JSON.stringify(data)
+        this.payloadContainsHash = this.payloadSerialized.includes(targetHash)
+      } catch (err) {
+        this.payloadError = 'Could not fetch the IPFS payload. ' + (err.message || '')
+      } finally {
+        this.payloadLoading = false
+      }
+    },
+    buildSnippet(target) {
+      if (!this.payloadSerialized || !target) return null
+      const idx = this.payloadSerialized.indexOf(target)
+      if (idx === -1) return null
+      const start = Math.max(0, idx - SNIPPET_CONTEXT)
+      const end = Math.min(this.payloadSerialized.length, idx + target.length + SNIPPET_CONTEXT)
+      return {
+        before: (start > 0 ? '…' : '') + this.payloadSerialized.slice(start, idx),
+        match: target,
+        after: this.payloadSerialized.slice(idx + target.length, end) +
+          (end < this.payloadSerialized.length ? '…' : '')
       }
     }
   }
@@ -274,5 +533,56 @@ export default {
   color: #2b1865;
   padding: 0.1em 0.35em;
   border-radius: 0.25em;
+}
+
+.verify-snippet {
+  margin-top: 0.75rem;
+}
+
+.verify-snippet__label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.verify-snippet pre {
+  background: #f7f5fb;
+  border: 1px solid rgba(81, 0, 205, 0.1);
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  color: #2b1865;
+}
+
+.verify-snippet mark {
+  background: #d4ff00;
+  color: #2b1865;
+  padding: 0 0.15em;
+  font-weight: 700;
+  border-radius: 0.15em;
+}
+
+.verify-payload {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.verify-payload summary {
+  cursor: pointer;
+  color: #5100cd;
+  font-weight: 500;
+  padding: 0.25rem 0;
+  user-select: none;
+}
+
+.verify-payload summary:hover {
+  text-decoration: underline;
 }
 </style>
