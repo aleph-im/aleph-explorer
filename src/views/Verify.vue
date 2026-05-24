@@ -106,6 +106,9 @@
             <h3 class="step-title mb-0 ml-2">{{ step3.title }}</h3>
           </div>
           <div v-if="step3.message" class="verify-step__msg">{{ step3.message }}</div>
+          <div v-if="step3.gateway" class="verify-gateway">
+            served by <code>{{ step3.gateway }}</code>
+          </div>
           <div v-if="step3.snippet" class="verify-snippet">
             <span class="verify-snippet__label">Excerpt around the match</span>
             <pre><span>{{ step3.snippet.before }}</span><mark>{{ step3.snippet.match }}</mark><span>{{ step3.snippet.after }}</span></pre>
@@ -138,7 +141,19 @@ import 'vue-json-pretty/lib/styles.css'
 import { verifyMessageSignature } from '@/lib/signature.js'
 
 const ETH_RPC = 'https://ethereum-rpc.publicnode.com'
+
+// IPFS gateways tried in parallel for the verification fetch (Promise.any).
+// First successful response wins; the display link in step 2 always points
+// at the Aleph-branded gateway for share-ability.
 const IPFS_GATEWAY = 'https://ipfs.aleph.cloud/ipfs/'
+const IPFS_FALLBACK_GATEWAYS = [
+  'https://ipfs.aleph.cloud/ipfs/',
+  'https://ipfs.io/ipfs/',
+  'https://dweb.link/ipfs/',
+  'https://gateway.pinata.cloud/ipfs/'
+]
+const IPFS_TIMEOUT_MS = 15000
+
 const SNIPPET_CONTEXT = 80
 
 // Decode a hex byte string as UTF-8 (handles multi-byte chars correctly).
@@ -193,6 +208,7 @@ export default {
       payload: null,
       payloadSerialized: '',
       payloadContainsHash: null,
+      payloadGateway: null,
       sigStatus: null,    // 'valid' | 'invalid' | 'missing' | 'error' | null
       sigChain: null,
       sigError: null,
@@ -322,7 +338,8 @@ export default {
           title: 'Verified: hash is present in the on-chain payload',
           icon: 'fa-check-circle',
           statusClass: 'verify-step--ok',
-          snippet: this.buildSnippet(target)
+          snippet: this.buildSnippet(target),
+          gateway: this.payloadGateway
         }
       }
       return {
@@ -538,13 +555,28 @@ export default {
       this.payload = null
       this.payloadSerialized = ''
       this.payloadContainsHash = null
+      this.payloadGateway = null
       try {
-        const { data } = await axios.get(IPFS_GATEWAY + cid, { responseType: 'json' })
+        const attempts = IPFS_FALLBACK_GATEWAYS.map(gateway =>
+          axios.get(gateway + cid, {
+            responseType: 'json',
+            timeout: IPFS_TIMEOUT_MS
+          }).then(response => ({ data: response.data, gateway }))
+        )
+        // Promise.any resolves with the first fulfilled attempt and
+        // throws AggregateError when every gateway fails.
+        const { data, gateway } = await Promise.any(attempts)
         this.payload = data
+        this.payloadGateway = gateway
         this.payloadSerialized = typeof data === 'string' ? data : JSON.stringify(data)
         this.payloadContainsHash = this.payloadSerialized.includes(targetHash)
       } catch (err) {
-        this.payloadError = 'Could not fetch the IPFS payload. ' + (err.message || '')
+        if (err && err.name === 'AggregateError') {
+          this.payloadError = 'All IPFS gateways failed: '
+            + IPFS_FALLBACK_GATEWAYS.length + ' tried, none responded in time.'
+        } else {
+          this.payloadError = 'Could not fetch the IPFS payload. ' + (err.message || '')
+        }
       } finally {
         this.payloadLoading = false
       }
@@ -666,6 +698,19 @@ export default {
   color: #2b1865;
   padding: 0.1em 0.35em;
   border-radius: 0.25em;
+}
+
+.verify-gateway {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.verify-gateway code {
+  background: rgba(81, 0, 205, 0.06);
+  color: #2b1865;
+  padding: 0.05em 0.3em;
+  border-radius: 0.2em;
 }
 
 .verify-snippet {
