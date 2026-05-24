@@ -29,30 +29,48 @@
             <b-tabs pills card>
               <b-tab title="Message Content" v-if="message.content">
                 <b-card-body>
-                  <vue-json-pretty
-                    :data="message.content" highlightMouseoverNode>
-                  </vue-json-pretty>
+                  <template v-if="isHeavy(message.content) && !isExpanded(message, 'content')">
+                    <div class="json-heavy-gate">
+                      <p class="text-muted mb-2">
+                        Content is {{ formatBytes(sizeOf(message.content)) }}. Rendering is
+                        deferred to keep the page responsive.
+                      </p>
+                      <b-button variant="primary" size="sm"
+                        @click="expand(message, 'content')">
+                        Show content
+                      </b-button>
+                    </div>
+                  </template>
+                  <vue-json-pretty v-else :data="message.content" :deep="1"
+                    highlightMouseoverNode />
                 </b-card-body>
               </b-tab>
               <b-tab title="Signature" v-if="message.signature">
                 <b-card-body>
-                  <vue-json-pretty
-                    :data="{signature: message.signature}" highlightMouseoverNode>
-                  </vue-json-pretty>
+                  <vue-json-pretty :data="{signature: message.signature}" :deep="1"
+                    highlightMouseoverNode />
                 </b-card-body>
               </b-tab>
               <b-tab title="Confirmations" v-if="message.confirmations">
                 <b-card-body>
-                  <vue-json-pretty
-                    :data="message.confirmations" highlightMouseoverNode>
-                  </vue-json-pretty>
+                  <vue-json-pretty :data="message.confirmations" :deep="1"
+                    highlightMouseoverNode />
                 </b-card-body>
               </b-tab>
               <b-tab title="Raw stored">
                 <b-card-body>
-                  <vue-json-pretty
-                    :data="message" highlightMouseoverNode>
-                  </vue-json-pretty>
+                  <template v-if="isHeavy(message) && !isExpanded(message, 'raw')">
+                    <div class="json-heavy-gate">
+                      <p class="text-muted mb-2">
+                        Raw message is {{ formatBytes(sizeOf(message)) }}. Rendering is
+                        deferred to keep the page responsive.
+                      </p>
+                      <b-button variant="primary" size="sm" @click="expand(message, 'raw')">
+                        Show raw
+                      </b-button>
+                    </div>
+                  </template>
+                  <vue-json-pretty v-else :data="message" :deep="1" highlightMouseoverNode />
                 </b-card-body>
               </b-tab>
             </b-tabs>
@@ -188,6 +206,10 @@ function base64toHEX (base64) {
   return buffer.toString('hex')
 }
 
+// Above this serialized size (~100 KB), default to a deferred render so a
+// huge aggregate (e.g. corechannel state) doesn't freeze the tab switch.
+const HEAVY_JSON_THRESHOLD = 100 * 1024
+
 export default {
   name: 'message-detail',
   components: {
@@ -204,7 +226,9 @@ export default {
       messages: [],
       programSource: null,
       isProgramSourceLoading: false,
-      programSourceError: false
+      programSourceError: false,
+      // { '<item_hash>:content' | '<item_hash>:raw' : true }
+      expandedJson: {}
     }
   },
   props: {
@@ -222,6 +246,23 @@ export default {
     },
     getHash (hash) {
       if (hash.$binary !== undefined) { return base64toHEX(hash.$binary) } else { return hash }
+    },
+    sizeOf (value) {
+      try { return JSON.stringify(value).length } catch (e) { return 0 }
+    },
+    isHeavy (value) {
+      return this.sizeOf(value) > HEAVY_JSON_THRESHOLD
+    },
+    isExpanded (message, slot) {
+      return Boolean(this.expandedJson[message.item_hash + ':' + slot])
+    },
+    expand (message, slot) {
+      this.$set(this.expandedJson, message.item_hash + ':' + slot, true)
+    },
+    formatBytes (n) {
+      if (n < 1024) return n + ' B'
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB'
+      return (n / 1024 / 1024).toFixed(2) + ' MB'
     },
     async update () {
       await this.getMessages()
@@ -291,5 +332,13 @@ export default {
 .verify-cta {
   flex: 0 0 auto;
   white-space: nowrap;
+}
+
+.json-heavy-gate {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  background: rgba(81, 0, 205, 0.04);
+  border: 1px dashed rgba(81, 0, 205, 0.2);
+  border-radius: 0.5rem;
 }
 </style>
