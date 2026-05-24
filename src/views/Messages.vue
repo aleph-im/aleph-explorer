@@ -155,7 +155,7 @@
 
       <b-table responsive table-class="compact mb-0 messages-table"
         :class="{ 'is-loading-data': query_status.is_loading }"
-        :items="messages" :fields="message_fields" stacked="sm">
+        :items="messages" :fields="message_fields">
         <template v-slot:cell(item_hash)="data">
           <div class="d-flex align-items-center">
             <MessageIcon :messageType="data.item.type" />
@@ -200,8 +200,10 @@
 
       <b-card-footer class="d-flex justify-content-between bg-whitesmoke">
         Total: {{ total_msg }}
-        <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="9" class="mb-0" size="sm"
-          v-if="!hasPageLoaded"></b-pagination>
+        <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="9"
+          class="mb-0 d-none d-md-inline-flex" size="sm" v-if="!hasPageLoaded"></b-pagination>
+        <b-pagination v-model="page" :total-rows="total_msg" :per-page="per_page" limit="3"
+          class="mb-0 d-md-none" size="sm" v-if="!hasPageLoaded"></b-pagination>
       </b-card-footer>
     </b-card>
   </div>

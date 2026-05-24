@@ -270,4 +270,12 @@ export default {
 ::v-deep .home-addresses-table tbody tr:last-child td {
   border-bottom: none;
 }
+
+/* Keep the table within its card on all viewports — the b-table-stacked
+   layout otherwise reports natural content width via min-content. */
+::v-deep .home-addresses-table,
+::v-deep .home-addresses-table .table-responsive {
+  width: 100%;
+  max-width: 100%;
+}
 </style>

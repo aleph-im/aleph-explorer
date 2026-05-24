@@ -1,6 +1,6 @@
 <template>
   <b-row class="dashboard-stats">
-    <b-col cols="12" md="4">
+    <b-col cols="6" md="4" class="mb-3">
       <div class="stat-card">
         <div class="stat-label">Total messages</div>
         <div class="stat-value">{{ totalMessages }}</div>
@@ -11,7 +11,7 @@
       </div>
     </b-col>
 
-    <b-col cols="12" md="4">
+    <b-col cols="6" md="4" class="mb-3">
       <div class="stat-card">
         <div class="stat-label">Pending messages</div>
         <div class="stat-value" :class="{ 'stat-warn': pendingCount > 100 }">{{ pendingCount }}</div>
@@ -22,7 +22,7 @@
       </div>
     </b-col>
 
-    <b-col cols="12" md="4">
+    <b-col cols="6" md="4" class="mb-3">
       <div class="stat-card">
         <div class="stat-label">Last on-chain commit</div>
         <div class="stat-value">
@@ -37,7 +37,7 @@
       </div>
     </b-col>
 
-    <b-col cols="12" md="4">
+    <b-col cols="6" md="4" class="mb-3">
       <div class="stat-card">
         <div class="stat-label">Users on Aleph</div>
         <div class="stat-value">{{ totalAccounts }}</div>
@@ -48,7 +48,7 @@
       </div>
     </b-col>
 
-    <b-col cols="12" md="4">
+    <b-col cols="6" md="4" class="mb-3">
       <div class="stat-card">
         <div class="stat-label">Message rate</div>
         <div class="stat-value">{{ rateH1 }}<span class="stat-unit">/h</span></div>
@@ -56,7 +56,7 @@
       </div>
     </b-col>
 
-    <b-col cols="12" md="4">
+    <b-col cols="6" md="4" class="mb-3">
       <div class="stat-card">
         <div class="stat-label">Next on-chain commit in</div>
         <div class="stat-value">{{ countdownText }}</div>
@@ -145,7 +145,9 @@ export default {
     }
   },
   mounted() {
-    this.tickTimer = setInterval(() => { this.now = Date.now() }, 200)
+    // 1-second tick is sufficient for the MM:SS countdown display
+    // and avoids unnecessary redraws on mobile.
+    this.tickTimer = setInterval(() => { this.now = Date.now() }, 1000)
   },
   beforeDestroy() {
     if (this.tickTimer) clearInterval(this.tickTimer)
@@ -162,7 +164,6 @@ export default {
   background: #fff;
   border-radius: 0.5rem;
   padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   height: 100%;
 }
@@ -179,6 +180,22 @@ export default {
   font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.1;
+  word-break: break-word;
+}
+
+@media (max-width: 575px) {
+  .stat-card {
+    padding: 0.75rem 0.9rem;
+  }
+  .stat-value {
+    font-size: 1.05rem;
+  }
+  .stat-sub-highlight {
+    font-size: 0.78rem !important;
+  }
+  .stat-label {
+    font-size: 0.65rem;
+  }
 }
 
 .stat-unit {

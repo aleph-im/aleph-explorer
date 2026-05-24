@@ -18,7 +18,8 @@
             <SearchBar />
           </div>
           <b-navbar-brand to="/" class="ml-auto pl-3"
-            ><h1 class="h3-size">Aleph Cloud<br />explorer</h1></b-navbar-brand
+            ><h1 class="h3-size">Aleph Cloud<br class="d-none d-sm-inline" /><span
+              class="d-none d-sm-inline">explorer</span></h1></b-navbar-brand
           >
         </nav>
 
@@ -246,6 +247,13 @@ or your build process might be broken! `);
   font-size: 1.25rem;
   font-weight: 500;
   margin: 0;
+}
+
+@media (max-width: 575px) {
+  .navbar-brand .h3-size {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
 }
 
 .main-navbar {

@@ -19,7 +19,7 @@
       <!-- Table implementation for addresses -->
       <b-table responsive table-class="compact mb-0 addresses-table"
         :class="{ 'is-loading-data': is_loading }"
-        :items="items" :fields="addresses_fields" stacked="sm"
+        :items="items" :fields="addresses_fields"
         :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" @sort-changed="loadAddresses">
         <template v-slot:cell(address)="data">
           <AddressLink :address="data.value" class="address" />
@@ -28,8 +28,11 @@
 
       <b-card-footer class="d-flex justify-content-between align-items-center bg-whitesmoke">
         <span>Total: {{ total }}</span>
-        <b-pagination v-model="page" :total-rows="total" :per-page="per_page" limit="9" class="mb-0"
-          size="sm" @change="changePage">
+        <b-pagination v-model="page" :total-rows="total" :per-page="per_page" limit="9"
+          class="mb-0 d-none d-md-inline-flex" size="sm" @change="changePage">
+        </b-pagination>
+        <b-pagination v-model="page" :total-rows="total" :per-page="per_page" limit="3"
+          class="mb-0 d-md-none" size="sm" @change="changePage">
         </b-pagination>
       </b-card-footer>
       <!--

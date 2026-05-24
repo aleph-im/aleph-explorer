@@ -3,6 +3,42 @@
 // App styles
 .main-content {
   padding: $spacing-sm $spacing-lg $spacing-lg $spacing-lg;
+  // Clip horizontal overflow so wide tables/cards don't blow out the
+  // viewport on phones — their own `table-responsive` wrappers still
+  // scroll horizontally inside the card.
+  overflow-x: hidden;
+}
+
+@media (max-width: 575px) {
+  .main-content {
+    padding-left: $spacing-base;
+    padding-right: $spacing-base;
+  }
+}
+
+// Cards must not let descendant tables / JSON viewers blow past the
+// viewport width. Tables keep their own .table-responsive horizontal
+// scroll; everything else is clipped or wraps.
+.card {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+// On phones, let MessageList row children wrap to a new line instead
+// of forcing the parent wider than the screen.
+@media (max-width: 575px) {
+  .card .list-group-item > .d-flex {
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+  }
+}
+
+// Make vue-json-pretty content scroll inside its tab pane instead of
+// pushing the surrounding card wider on phones.
+.vjs-tree,
+.vjs-tree-list {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .main-wrapper {
