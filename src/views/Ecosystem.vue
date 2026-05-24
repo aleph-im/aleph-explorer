@@ -1,12 +1,13 @@
 <template>
   <div>
     <div class="section-header">
-      <h1>The Aleph Cloud ecosystem</h1>
+      <h1>The Aleph&nbsp;Cloud ecosystem</h1>
     </div>
     <div class="section-body">
       <p class="ecosystem-lead">
         The explorer you're looking at is one slice of a much bigger network.
-        Below is the rest of what the Aleph Cloud teams ship; pick a card to jump in.
+        <br />
+        Below is the rest of what the Aleph&nbsp;Cloud teams ship; pick a card to jump in.
       </p>
 
       <div v-for="group in groups" :key="group.key" class="ecosystem-group">
@@ -64,10 +65,12 @@ export default {
 
 <style scoped>
 .ecosystem-lead {
-  font-size: 0.95rem;
-  color: #6c757d;
-  margin-bottom: 1.5rem;
-  max-width: 60em;
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #2b1865;
+  margin-bottom: 2rem;
+  max-width: 50em;
 }
 
 .ecosystem-group {
