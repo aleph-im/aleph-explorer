@@ -8,7 +8,14 @@
       <h1>Message detail</h1>
     </div>
     <div class="section-body">
-      <h2 class="section-title">{{hash}}</h2>
+      <div class="d-flex align-items-center flex-wrap section-title-row">
+        <h2 class="section-title mb-0 mr-3">{{hash}}</h2>
+        <router-link :to="{ name: 'verify', params: { hash } }"
+          class="btn btn-sm btn-outline-primary verify-cta"
+          v-b-tooltip.hover title="Prove this message is signed and anchored on-chain">
+          <i class="fas fa-shield-alt"></i> Verify
+        </router-link>
+      </div>
       <p class="section-lead" v-if="chain&&address&&type">
         Looking for this {{type}} message on {{chain}}, sent by <address-link :address="address" :chain="chain" />
         <span v-if="messages.length"> {{reldateformat(messages[0].time)}}</span>.
@@ -274,5 +281,15 @@ export default {
 .vjs-tree {
   font-size: 10px !important;
   line-height: 1.5em;
+}
+
+.section-title-row {
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.verify-cta {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 </style>

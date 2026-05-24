@@ -12,16 +12,23 @@
 
       <b-card no-body class="verify-form-card mb-4">
         <b-card-body>
-          <b-input-group>
-            <b-form-input v-model="query" placeholder="Aleph item_hash (64 hex chars)"
-              @keyup.enter="submit" :disabled="loading" trim />
-            <b-input-group-append>
-              <b-button variant="primary" :disabled="!query || loading" @click="submit">
-                <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-shield-alt'"></i>
-                Verify
-              </b-button>
-            </b-input-group-append>
-          </b-input-group>
+          <div class="d-flex flex-wrap align-items-center verify-form-row">
+            <b-input-group class="verify-form-input">
+              <b-form-input v-model="query" placeholder="Aleph item_hash (64 hex chars)"
+                @keyup.enter="submit" :disabled="loading" trim />
+              <b-input-group-append>
+                <b-button variant="primary" :disabled="!query || loading" @click="submit">
+                  <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-shield-alt'"></i>
+                  Verify
+                </b-button>
+              </b-input-group-append>
+            </b-input-group>
+            <b-button v-if="result" variant="outline-secondary" @click="copyLink"
+              class="verify-copy-btn" v-b-tooltip.hover :title="copyTooltip">
+              <i class="fas" :class="copied ? 'fa-check' : 'fa-link'"></i>
+              <span class="ml-1">{{ copied ? 'Copied' : 'Copy link' }}</span>
+            </b-button>
+          </div>
           <p class="text-muted small mt-2 mb-0" v-if="!result && !error">
             The lookup happens entirely in your browser against the public Aleph API,
             a public Ethereum RPC, and a public IPFS gateway. No backend in between.
@@ -188,7 +195,14 @@ export default {
       payloadContainsHash: null,
       sigStatus: null,    // 'valid' | 'invalid' | 'missing' | 'error' | null
       sigChain: null,
-      sigError: null
+      sigError: null,
+      copied: false,
+      copyResetTimer: null
+    }
+  },
+  computed: {
+    copyTooltip() {
+      return this.copied ? 'Copied to clipboard' : 'Copy permalink to this verification'
     }
   },
   computed: {
@@ -376,6 +390,9 @@ export default {
       }
     }
   },
+  beforeDestroy() {
+    if (this.copyResetTimer) clearTimeout(this.copyResetTimer)
+  },
   methods: {
     submit() {
       const hash = (this.query || '').trim()
@@ -387,6 +404,18 @@ export default {
       } else {
         // Same hash already in the URL; re-run explicitly.
         this.run()
+      }
+    },
+    async copyLink() {
+      try {
+        await navigator.clipboard.writeText(window.location.href)
+        this.copied = true
+        if (this.copyResetTimer) clearTimeout(this.copyResetTimer)
+        this.copyResetTimer = setTimeout(() => { this.copied = false }, 2000)
+      } catch (e) {
+        // Fallback for browsers without Clipboard API; users can still
+        // copy from the URL bar.
+        this.copied = false
       }
     },
     async run() {
@@ -547,6 +576,19 @@ export default {
 
 .verify-form-card {
   border: 1px solid rgba(81, 0, 205, 0.15);
+}
+
+.verify-form-row {
+  gap: 0.75rem;
+}
+
+.verify-form-input {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.verify-copy-btn {
+  flex: 0 0 auto;
 }
 
 .verify-step {
