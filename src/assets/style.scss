@@ -1,5 +1,12 @@
 @use "sass:map";
 
+// Drop the document-level font size from the browser default (16px) to
+// 14px so the explorer reads at a denser, etherscan-style scale.
+// Everything sized in rem scales proportionally.
+html {
+  font-size: 14px;
+}
+
 // App styles
 .main-content {
   padding: $spacing-sm $spacing-lg $spacing-lg $spacing-lg;
