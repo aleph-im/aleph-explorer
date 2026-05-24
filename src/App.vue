@@ -79,14 +79,51 @@
                 <i class="fas fa-address-book"></i><span>Addresses</span>
               </b-nav-item>
             </ul>
-            <div class="p-3 mt-4 mb-4 hide-sidebar-mini">
+            <div class="px-3 pt-4 pb-2 hide-sidebar-mini">
               <b-link
                 to="/about"
-                class="btn btn-primary btn-lg btn-icon-split btn-block"
+                class="btn btn-primary btn-lg btn-icon-split btn-block mb-2"
               >
                 <i class="far fa-question-circle"></i>
                 <div>About</div>
               </b-link>
+              <b-link
+                href="https://docs.aleph.cloud/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-primary btn-lg btn-icon-split btn-block mb-0"
+              >
+                <i class="fas fa-book"></i>
+                <div>Documentation</div>
+              </b-link>
+            </div>
+            <div class="sidebar-socials hide-sidebar-mini">
+              <a
+                href="https://t.me/alephim/119590"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Telegram"
+              >
+                <i class="fab fa-telegram"></i>
+              </a>
+              <a
+                href="https://x.com/aleph_im"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="X (Twitter)"
+              >
+                <svg viewBox="0 0 384 512" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+                  <path d="M306.2 32l77.5 0-1.4 2L230.7 256 382.3 478l1.4 2-77.5 0L192 312.8 77.8 480 .3 480l1.4-2L153.3 256 1.7 34 .3 32l77.5 0L192 199.2 306.2 32z"/>
+                </svg>
+              </a>
+              <a
+                href="https://www.aleph.cloud/blog"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Blog"
+              >
+                <i class="fas fa-globe"></i>
+              </a>
             </div>
           </aside>
         </div>
@@ -254,6 +291,34 @@ or your build process might be broken! `);
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
   }
+}
+
+.sidebar-socials {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1rem 1rem;
+}
+
+.sidebar-socials a {
+  color: #fff !important;
+  opacity: 0.7;
+  font-size: 1.25rem;
+  line-height: 1;
+  height: auto !important;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity 0.15s;
+}
+
+.sidebar-socials a:hover {
+  opacity: 1;
+  background: transparent !important;
+}
+
+.sidebar-socials svg {
+  width: 0.85em;
+  height: 0.85em;
 }
 
 .main-navbar {

@@ -48,6 +48,9 @@
 
   .main-zone {
     flex-grow: 1;
+    // Make room for both fixed left bars on desktop: the navigator
+    // icon strip and the main sidebar.
+    margin-left: calc(#{$navigator-width} + #{$sidebar-min-width});
   }
 }
 
@@ -62,6 +65,12 @@ nav.navbar {
 }
 
 .navigator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 101;
+  overflow-y: auto;
   background: $navigator-bg;
   width: $navigator-width;
 
@@ -120,9 +129,14 @@ nav.navbar {
 }
 
 .main-sidebar {
-  position: inherit !important;
+  position: fixed !important;
+  top: 0;
+  left: $navigator-width;
   min-width: $sidebar-min-width;
-  height: auto;
+  width: $sidebar-min-width;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
   background: $sidebar-bg;
   color: color(white);
   font-family: $font-family-title;
@@ -186,6 +200,8 @@ nav.navbar {
     .sidebar-menu {
       /*min-height: calc(100vh - 75.6px - 42.5px - 5rem);*/
       flex-grow: 1;
+      overflow-y: auto;
+      min-height: 0;
     }
   }
 
@@ -212,8 +228,16 @@ nav.navbar {
   .main-wrapper {
     flex-direction: column-reverse;
 
+    .main-zone {
+      // Mobile sidebar is an overlay (position: absolute) — main-zone
+      // shouldn't reserve room for it.
+      margin-left: 0;
+    }
+
     .main-sidebar {
       width: 100%;
+      left: 0;
+      height: auto;
       position: absolute !important;
 
       #sidebar-wrapper {
