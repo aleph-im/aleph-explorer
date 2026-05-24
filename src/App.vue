@@ -49,6 +49,10 @@
               <b-nav-item to="/addresses">
                 <i class="fas fa-address-book"></i><span>Addresses</span>
               </b-nav-item>
+              <li class="menu-header">Trust</li>
+              <b-nav-item to="/verify">
+                <i class="fas fa-shield-alt"></i><span>Verify</span>
+              </b-nav-item>
               <li class="menu-header">Discover</li>
               <b-nav-item to="/ecosystem">
                 <i class="fas fa-th-large"></i><span>Ecosystem</span>

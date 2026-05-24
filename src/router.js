@@ -48,6 +48,11 @@ export default new Router({
       path: '/ecosystem',
       name: 'ecosystem',
       component: () => import('./views/Ecosystem.vue')
+    },
+    {
+      path: '/verify',
+      name: 'verify',
+      component: () => import('./views/Verify.vue')
     }
   ]
 })
