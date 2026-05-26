@@ -35,6 +35,14 @@ export default new Vuex.Store({
     },
     api_version: 'v1',
     last_broadcast: null,
+    channels: [],
+    channels_loaded_for: null,
+    metrics: null,
+    metrics_observed_at: null,
+    eth_block_observed_at: null,
+    eth_block_committed_at: null,
+    message_rates: { h1: null, h24: null },
+    network: { ccn_count: null, observed_at: null },
     api_server: {
       host: 'api2.aleph.im',
       protocol: 'https:',
@@ -108,9 +116,120 @@ export default new Vuex.Store({
     },
     set_address_posts_pagination (state, pagination) {
       state.address_detail.posts_pagination = pagination
+    },
+    set_channels (state, payload) {
+      state.channels = payload.channels
+      state.channels_loaded_for = payload.host
+    },
+    set_metrics (state, payload) {
+      const previousHeight = state.metrics
+        && state.metrics.pyaleph_status_chain_eth_last_committed_height
+      const newHeight = payload && payload.pyaleph_status_chain_eth_last_committed_height
+      // Wall-clock fallback used by the countdown if the RPC lookup fails.
+      // Reset only when the height actually advances so the countdown survives
+      // intermediate metrics polls.
+      if (newHeight !== undefined && newHeight !== previousHeight) {
+        state.eth_block_observed_at = Date.now()
+      }
+      state.metrics = payload
+      state.metrics_observed_at = Date.now()
+    },
+    set_eth_block_committed_at (state, timestamp) {
+      state.eth_block_committed_at = timestamp
+    },
+    set_message_rates (state, payload) {
+      state.message_rates = payload
+    },
+    set_network_size (state, payload) {
+      state.network = { ...payload, observed_at: Date.now() }
     }
   },
   actions: {
+    async load_metrics({commit, dispatch, state}) {
+      try {
+        const previousHeight = state.metrics
+          && state.metrics.pyaleph_status_chain_eth_last_committed_height
+        const { data } = await axios.get(
+          `${state.api_server.protocol}//${state.api_server.host}/metrics.json`
+        )
+        commit('set_metrics', data)
+        const newHeight = data && data.pyaleph_status_chain_eth_last_committed_height
+        if (newHeight !== undefined && newHeight !== previousHeight) {
+          dispatch('load_eth_block_timestamp', newHeight)
+        }
+      } catch (error) {
+        console.error('Failed to fetch metrics:', error)
+      }
+    },
+    async load_network_size({commit, state}) {
+      // The canonical corechannel aggregate is published by the Aleph
+      // foundation address. Other addresses also have corechannel entries,
+      // so we filter explicitly to avoid picking the wrong one.
+      try {
+        const { data } = await axios.get(
+          `${state.api_server.protocol}//${state.api_server.host}/api/v0/aggregates`,
+          {
+            params: {
+              keys: 'corechannel',
+              addresses: '0xa1B3bb7d2332383D96b7796B908fB7f7F3c2Be10',
+              pagination: 1
+            }
+          }
+        )
+        const agg = data && data.aggregates && data.aggregates[0]
+        const nodes = agg && agg.content && agg.content.nodes
+        if (Array.isArray(nodes)) {
+          commit('set_network_size', { ccn_count: nodes.length })
+        }
+      } catch (error) {
+        console.error('Failed to fetch network size:', error)
+      }
+    },
+    async load_eth_block_timestamp({commit}, height) {
+      try {
+        const hex = '0x' + height.toString(16)
+        const { data } = await axios.post('https://ethereum-rpc.publicnode.com', {
+          jsonrpc: '2.0',
+          method: 'eth_getBlockByNumber',
+          params: [hex, false],
+          id: 1
+        })
+        const tsHex = data && data.result && data.result.timestamp
+        if (!tsHex) return
+        commit('set_eth_block_committed_at', parseInt(tsHex, 16) * 1000)
+      } catch (error) {
+        console.error('Failed to fetch ETH block timestamp:', error)
+      }
+    },
+    async load_message_rates({commit, state}) {
+      const now = Math.floor(Date.now() / 1000)
+      const baseUrl = `${state.api_server.protocol}//${state.api_server.host}/api/v0/messages.json`
+      try {
+        const [h1, h24] = await Promise.all([
+          axios.get(baseUrl, { params: { startDate: now - 3600, pagination: 1, page: 1 } }),
+          axios.get(baseUrl, { params: { startDate: now - 86400, pagination: 1, page: 1 } })
+        ])
+        commit('set_message_rates', {
+          h1: h1.data.pagination_total ?? null,
+          h24: h24.data.pagination_total ?? null
+        })
+      } catch (error) {
+        console.error('Failed to fetch message rates:', error)
+      }
+    },
+    async load_channels({commit, state}) {
+      if (state.channels_loaded_for === state.api_server.host) return
+      try {
+        const response = await axios.get(
+          `${state.api_server.protocol}//${state.api_server.host}/api/v0/channels/list.json`
+        )
+        const channels = (response.data.channels || []).filter(c => c != null)
+        commit('set_channels', { channels, host: state.api_server.host })
+      } catch (error) {
+        console.error('Failed to fetch channels:', error)
+        commit('set_channels', { channels: [], host: state.api_server.host })
+      }
+    },
     async load_addresses({commit, state}, payload = {}) {
       try {
         const {
@@ -142,22 +261,14 @@ export default new Vuex.Store({
     },
     async load_address_stats({commit, state}, address) {
       try {
-        // Use our helper function to get address stats with exact address matching
+        // A full-length address as the substring filter matches at most itself,
+        // so a single-row page is enough to find it (or confirm it's absent).
         const result = await fetchAddresses(state.api_server, {
           addressContains: address,
-          perPage: 20  // Get enough addresses to ensure we find the one we're looking for
+          perPage: 1
         });
-
-        // Find the exact match for this address
-        const addressItem = Object.values(result.addressesObject)
-          .find(item => item.address === address);
-
-        if (addressItem) {
-          commit("set_address_stats", addressItem);
-        } else {
-          // If no exact match found, set empty stats
-          commit("set_address_stats", {});
-        }
+        const [addressItem] = Object.values(result.addressesObject);
+        commit("set_address_stats", addressItem || {});
       } catch (error) {
         console.error("Failed to get address stats:", error);
         commit("set_address_stats", {});
@@ -235,7 +346,6 @@ export default new Vuex.Store({
             `${state.api_server.protocol}//${state.api_server.host}/api/v1/posts.json`,
             {
               params: {
-                'types': 'blog_pers,comment,social',
                 'addresses': address,
                 'pagination': perPage,
                 'page': page

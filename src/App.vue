@@ -4,7 +4,7 @@
       <div class="main-zone">
         <div class="navbar-bg"></div>
         <nav class="navbar navbar-expand-lg main-navbar">
-          <ul class="navbar-nav mr-auto mr-3">
+          <ul class="navbar-nav mr-3">
             <li v-if="window.width < 1024">
               <b-link
                 @click="display_menu = !display_menu"
@@ -14,8 +14,12 @@
               ></b-link>
             </li>
           </ul>
-          <b-navbar-brand to="/"
-            ><h1 class="h3-size">Aleph Cloud<br />explorer</h1></b-navbar-brand
+          <div class="header-search">
+            <SearchBar />
+          </div>
+          <b-navbar-brand to="/" class="ml-auto pl-3"
+            ><h1 class="h3-size">Aleph Cloud<br class="d-none d-sm-inline" /><span
+              class="d-none d-sm-inline">explorer</span></h1></b-navbar-brand
           >
         </nav>
 
@@ -25,36 +29,7 @@
             <router-view />
           </section>
         </div>
-        <footer class="main-footer px-5">
-          <div class="footer-left">
-            Copyright © 2018-present
-            <a href="https://aleph.cloud">Aleph Cloud</a>
-          </div>
-          <div class="footer-right">
-            <template v-if="app_version">
-              <template v-if="last_release_is_a_tag()">
-                <a
-                  :href="
-                    'https://github.com/aleph-im/aleph-explorer/tree/' +
-                    app_version
-                  "
-                  >{{ app_version }}</a
-                >
-              </template>
-              <template v-else>
-                {{ app_version }}
-              </template>
-            </template>
-            <a
-              href="https://github.com/aleph-im/aleph-explorer"
-              class="card-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <i class="fab fa-github"></i>
-            </a>
-          </div>
-        </footer>
+        <EcosystemFooter />
       </div>
       <transition name="fade">
         <div class="main-sidebar" v-if="(window.width >= 1024) | display_menu">
@@ -74,15 +49,60 @@
               <b-nav-item to="/addresses">
                 <i class="fas fa-address-book"></i><span>Addresses</span>
               </b-nav-item>
+              <li class="menu-header">Trust</li>
+              <b-nav-item to="/verify">
+                <i class="fas fa-shield-alt"></i><span>Verifier</span>
+              </b-nav-item>
+              <li class="menu-header">Discover</li>
+              <b-nav-item to="/ecosystem">
+                <i class="fas fa-th-large"></i><span>Ecosystem</span>
+              </b-nav-item>
             </ul>
-            <div class="p-3 mt-4 mb-4 hide-sidebar-mini">
+            <div class="px-3 pt-4 pb-2 hide-sidebar-mini">
               <b-link
                 to="/about"
-                class="btn btn-primary btn-lg btn-icon-split btn-block"
+                class="btn btn-primary btn-lg btn-icon-split btn-block mb-2"
               >
                 <i class="far fa-question-circle"></i>
                 <div>About</div>
               </b-link>
+              <b-link
+                href="https://docs.aleph.cloud/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-primary btn-lg btn-icon-split btn-block mb-0"
+              >
+                <i class="fas fa-book"></i>
+                <div>Documentation</div>
+              </b-link>
+            </div>
+            <div class="sidebar-socials hide-sidebar-mini">
+              <a
+                href="https://t.me/alephim/119590"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Telegram"
+              >
+                <i class="fab fa-telegram"></i>
+              </a>
+              <a
+                href="https://x.com/aleph_im"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="X (Twitter)"
+              >
+                <svg viewBox="0 0 384 512" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+                  <path d="M306.2 32l77.5 0-1.4 2L230.7 256 382.3 478l1.4 2-77.5 0L192 312.8 77.8 480 .3 480l1.4-2L153.3 256 1.7 34 .3 32l77.5 0L192 199.2 306.2 32z"/>
+                </svg>
+              </a>
+              <a
+                href="https://www.aleph.cloud/blog"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Blog"
+              >
+                <i class="fas fa-globe"></i>
+              </a>
             </div>
           </aside>
         </div>
@@ -163,8 +183,11 @@
 
 <script>
 import { mapState } from "vuex";
+import SearchBar from "@/components/SearchBar.vue";
+import EcosystemFooter from "@/components/EcosystemFooter.vue";
 export default {
   name: "app",
+  components: { SearchBar, EcosystemFooter },
   data() {
     return {
       window: {
@@ -172,7 +195,6 @@ export default {
         height: 0,
       },
       display_menu: false,
-      app_version: GIT_DESCRIBE_TAGS || "unknown build",
     };
   },
   computed: mapState({
@@ -199,9 +221,6 @@ or your build process might be broken! `);
     handleResize() {
       this.window.width = window.innerWidth;
       this.window.height = window.innerHeight;
-    },
-    last_release_is_a_tag() {
-      return /\d+-.[0-9A-F]{7}$/i.test(this.app_version);
     },
   },
   watch: {
@@ -241,5 +260,61 @@ or your build process might be broken! `);
   font-size: 1.25rem;
   font-weight: 500;
   margin: 0;
+}
+
+@media (max-width: 575px) {
+  .navbar-brand .h3-size {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.sidebar-socials {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1rem 1rem;
+}
+
+.sidebar-socials a {
+  color: #fff !important;
+  opacity: 0.7;
+  font-size: 1.25rem;
+  line-height: 1;
+  height: auto !important;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity 0.15s;
+}
+
+.sidebar-socials a:hover {
+  opacity: 1;
+  background: transparent !important;
+}
+
+.sidebar-socials svg {
+  width: 0.85em;
+  height: 0.85em;
+}
+
+.main-navbar {
+  align-items: center;
+}
+
+.main-navbar .header-search {
+  flex: 1 1 auto;
+  max-width: 720px;
+  min-width: 220px;
+}
+
+.main-navbar .header-search .dashboard-search {
+  margin-bottom: 0;
+}
+
+@media (max-width: 575px) {
+  .main-navbar .header-search {
+    max-width: none;
+    min-width: 140px;
+  }
 }
 </style>

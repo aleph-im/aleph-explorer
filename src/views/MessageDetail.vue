@@ -8,7 +8,14 @@
       <h1>Message detail</h1>
     </div>
     <div class="section-body">
-      <h2 class="section-title">{{hash}}</h2>
+      <div class="d-flex align-items-center flex-wrap section-title-row">
+        <h2 class="section-title mb-0 mr-3">{{hash}}</h2>
+        <router-link :to="{ name: 'verify', params: { hash } }"
+          class="btn btn-sm btn-outline-primary verify-cta"
+          v-b-tooltip.hover title="Prove this message is signed and anchored on-chain">
+          <i class="fas fa-shield-alt"></i> Verify
+        </router-link>
+      </div>
       <p class="section-lead" v-if="chain&&address&&type">
         Looking for this {{type}} message on {{chain}}, sent by <address-link :address="address" :chain="chain" />
         <span v-if="messages.length"> {{reldateformat(messages[0].time)}}</span>.
@@ -22,30 +29,48 @@
             <b-tabs pills card>
               <b-tab title="Message Content" v-if="message.content">
                 <b-card-body>
-                  <vue-json-pretty
-                    :data="message.content" highlightMouseoverNode>
-                  </vue-json-pretty>
+                  <template v-if="isHeavy(message.content) && !isExpanded(message, 'content')">
+                    <div class="json-heavy-gate">
+                      <p class="text-muted mb-2">
+                        Content is {{ formatBytes(sizeOf(message.content)) }}. Rendering is
+                        deferred to keep the page responsive.
+                      </p>
+                      <b-button variant="primary" size="sm"
+                        @click="expand(message, 'content')">
+                        Show content
+                      </b-button>
+                    </div>
+                  </template>
+                  <vue-json-pretty v-else :data="message.content" :deep="1"
+                    highlightMouseoverNode />
                 </b-card-body>
               </b-tab>
               <b-tab title="Signature" v-if="message.signature">
                 <b-card-body>
-                  <vue-json-pretty
-                    :data="{signature: message.signature}" highlightMouseoverNode>
-                  </vue-json-pretty>
+                  <vue-json-pretty :data="{signature: message.signature}" :deep="1"
+                    highlightMouseoverNode />
                 </b-card-body>
               </b-tab>
               <b-tab title="Confirmations" v-if="message.confirmations">
                 <b-card-body>
-                  <vue-json-pretty
-                    :data="message.confirmations" highlightMouseoverNode>
-                  </vue-json-pretty>
+                  <vue-json-pretty :data="message.confirmations" :deep="1"
+                    highlightMouseoverNode />
                 </b-card-body>
               </b-tab>
               <b-tab title="Raw stored">
                 <b-card-body>
-                  <vue-json-pretty
-                    :data="message" highlightMouseoverNode>
-                  </vue-json-pretty>
+                  <template v-if="isHeavy(message) && !isExpanded(message, 'raw')">
+                    <div class="json-heavy-gate">
+                      <p class="text-muted mb-2">
+                        Raw message is {{ formatBytes(sizeOf(message)) }}. Rendering is
+                        deferred to keep the page responsive.
+                      </p>
+                      <b-button variant="primary" size="sm" @click="expand(message, 'raw')">
+                        Show raw
+                      </b-button>
+                    </div>
+                  </template>
+                  <vue-json-pretty v-else :data="message" :deep="1" highlightMouseoverNode />
                 </b-card-body>
               </b-tab>
             </b-tabs>
@@ -171,7 +196,7 @@
 <script>
 import { mapState } from 'vuex'
 import axios from 'axios'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import AddressLink from '@/components/AddressLink'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
@@ -181,6 +206,10 @@ function base64toHEX (base64) {
   return buffer.toString('hex')
 }
 
+// Above this serialized size (~100 KB), default to a deferred render so a
+// huge aggregate (e.g. corechannel state) doesn't freeze the tab switch.
+const HEAVY_JSON_THRESHOLD = 100 * 1024
+
 export default {
   name: 'message-detail',
   components: {
@@ -189,14 +218,17 @@ export default {
   computed: mapState({
     account: state => state.account,
     api_server: state => state.api_server,
-    profiles: state => state.profiles
+    profiles: state => state.profiles,
+    ipfs_gateway: state => state.ipfs_gateway
   }),
   data () {
     return {
       messages: [],
       programSource: null,
       isProgramSourceLoading: false,
-      programSourceError: false
+      programSourceError: false,
+      // { '<item_hash>:content' | '<item_hash>:raw' : true }
+      expandedJson: {}
     }
   },
   props: {
@@ -207,13 +239,30 @@ export default {
   },
   methods: {
     dateformat (dt) {
-      return moment.unix(dt).format('lll')
+      return dayjs.unix(dt).format('lll')
     },
     reldateformat (dt) {
-      return moment.unix(dt).fromNow()
+      return dayjs.unix(dt).fromNow()
     },
     getHash (hash) {
       if (hash.$binary !== undefined) { return base64toHEX(hash.$binary) } else { return hash }
+    },
+    sizeOf (value) {
+      try { return JSON.stringify(value).length } catch (e) { return 0 }
+    },
+    isHeavy (value) {
+      return this.sizeOf(value) > HEAVY_JSON_THRESHOLD
+    },
+    isExpanded (message, slot) {
+      return Boolean(this.expandedJson[message.item_hash + ':' + slot])
+    },
+    expand (message, slot) {
+      this.$set(this.expandedJson, message.item_hash + ':' + slot, true)
+    },
+    formatBytes (n) {
+      if (n < 1024) return n + ' B'
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB'
+      return (n / 1024 / 1024).toFixed(2) + ' MB'
     },
     async update () {
       await this.getMessages()
@@ -221,42 +270,33 @@ export default {
       this.$forceUpdate()
     },
     async getMessages () {
-      let args = {
-        hashes: this.hash
-      }
-
-      console.log(this.hash)
-
-      if (this.address) { args['addresses'] = this.address }
-
-      if (this.type) { args['msgType'] = this.type }
-
-      let response = await axios.get(
-        `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages.json`,
-        { params: args }
+      const response = await axios.get(
+        `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages/${this.hash}`
       )
-      this.messages = response.data.messages
+      this.messages = response.data.message ? [response.data.message] : []
     },
     async getProgramSource () {
       try {
         const ref = this.messages[0].content.code.ref
-  
+        const apiBase = `${this.api_server.protocol}//${this.api_server.host}`
+
         if(ref || !this.isProgramSourceLoading || !this.programSource){
           this.isProgramSourceLoading = true
-          
-          const srcQuery = await axios.get(`https://api2.aleph.im/api/v0/messages.json?hashes=${ref}`)
-  
+
+          const srcQuery = await axios.get(`${apiBase}/api/v0/messages.json?hashes=${ref}`)
+
           if(!srcQuery.data.messages[0].content.item_hash){
             throw new Error('No source code found')
           }
 
           const rawSrc = srcQuery.data.messages[0].content.item_hash
 
-          // Shady hack to retrieve the source code from the IPFS gateway instead of the Aleph API
+          // IPFS-style hashes go through the configured IPFS gateway,
+          // anything else is served by the active Aleph node.
           if(rawSrc.startsWith('Q') || rawSrc.startsWith('bafy'))
-            this.programSource = 'https://ipfs.io/ipfs/' + rawSrc
+            this.programSource = this.ipfs_gateway + rawSrc
           else
-            this.programSource = 'https://api2.aleph.im/api/v0/storage/raw/' + rawSrc
+            this.programSource = `${apiBase}/api/v0/storage/raw/${rawSrc}`
         }
 
         this.isProgramSourceLoading = false
@@ -268,12 +308,12 @@ export default {
     }
   },
   watch: {
-    async hash () {
-      await this.update()
+    hash: {
+      immediate: true,
+      async handler () {
+        await this.update()
+      }
     }
-  },
-  async mounted () {
-    await this.update()
   }
 }
 </script>
@@ -282,5 +322,23 @@ export default {
 .vjs-tree {
   font-size: 10px !important;
   line-height: 1.5em;
+}
+
+.section-title-row {
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.verify-cta {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.json-heavy-gate {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  background: rgba(81, 0, 205, 0.04);
+  border: 1px dashed rgba(81, 0, 205, 0.2);
+  border-radius: 0.5rem;
 }
 </style>

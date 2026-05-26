@@ -40,11 +40,11 @@
               </div>
               <div class="profile-widget-item">
                 <div class="profile-widget-item-label">Posts</div>
-                <div class="profile-widget-item-value">{{stats.posts || 0}}</div>
+                <div class="profile-widget-item-value">{{stats.post || 0}}</div>
               </div>
               <div class="profile-widget-item">
                 <div class="profile-widget-item-label">Aggregates</div>
-                <div class="profile-widget-item-value">{{stats.aggregates || 0}}</div>
+                <div class="profile-widget-item-value">{{stats.aggregate || 0}}</div>
               </div>
             </div>
           </div>
@@ -149,6 +149,23 @@ export default {
     onMessagesPageChange(newPage) {
       this.current_msg_page = newPage
       this.refreshMessages()
+    },
+    startPolling() {
+      if (this.polling) return
+      this.polling = setInterval(this.partialRefresh, 10000)
+    },
+    stopPolling() {
+      if (!this.polling) return
+      clearInterval(this.polling)
+      this.polling = null
+    },
+    onVisibilityChange() {
+      if (document.hidden) {
+        this.stopPolling()
+      } else {
+        this.partialRefresh()
+        this.startPolling()
+      }
     }
   },
   watch: {
@@ -160,11 +177,12 @@ export default {
     this.loadAllData()
   },
   mounted() {
-    // Set up polling to refresh messages and posts data
-    this.polling = setInterval(this.partialRefresh.bind(this), 10000)
+    this.startPolling()
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
   },
   beforeDestroy () {
-  	clearInterval(this.polling)
+    this.stopPolling()
+    document.removeEventListener('visibilitychange', this.onVisibilityChange)
   }
 }
 </script>

@@ -32,8 +32,9 @@
               {{message.content.size/1000000}} MB</b-badge> -->
           </div>
           <div class="ml-auto">
-            <b-badge v-b-tooltip.hover :title="confirm_text(message)"
-            variant="light" v-if="message.confirmations">{{message.confirmations.length}}</b-badge>
+            <b-badge v-if="message.confirmed" variant="light" v-b-tooltip.hover
+              :title="confirm_text(message)">confirmed</b-badge>
+            <b-badge v-else variant="light">pending</b-badge>
           </div>
         </div>
       </b-list-group-item>
@@ -42,7 +43,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import dayjs from 'dayjs'
 import MessageLink from './MessageLink'
 import AddressLink from './AddressLink'
 import MessageIcon from './MessageIcon.vue'
@@ -60,10 +61,10 @@ export default {
 },
   methods: {
     dateformat (dt) {
-      return moment.unix(dt).format('lll')
+      return dayjs.unix(dt).format('lll')
     },
     reldateformat (dt) {
-      return moment.unix(dt).fromNow()
+      return dayjs.unix(dt).fromNow()
     },
     confirm_text (message) {
       let chains = [...new Set(message.confirmations.map(c => c.chain))]
@@ -95,5 +96,16 @@ export default {
 .dynamic-list-leave-active {
   position: absolute;
   width: 100%;
+}
+
+// Brief brand-purple background flash on newly-arrived rows so the eye
+// catches the live update.
+.dynamic-list-enter-active {
+  animation: row-flash 1.5s ease-out;
+}
+
+@keyframes row-flash {
+  0%   { background-color: rgba(81, 0, 205, 0.18); }
+  100% { background-color: transparent; }
 }
 </style>

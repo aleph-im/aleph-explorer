@@ -43,6 +43,17 @@ export default new Router({
       path: '/addresses',
       name: 'addresses',
       component: () => import('./views/Addresses.vue')
+    },
+    {
+      path: '/ecosystem',
+      name: 'ecosystem',
+      component: () => import('./views/Ecosystem.vue')
+    },
+    {
+      path: '/verify/:hash?',
+      name: 'verify',
+      component: () => import('./views/Verify.vue'),
+      props: true
     }
   ]
 })

@@ -1,9 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'path';
 import vuePlugin from '@vitejs/plugin-vue2';
-import envCompatible from 'vite-plugin-env-compatible';
-import { createHtmlPlugin } from 'vite-plugin-html';
-import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
 import { execSync } from 'child_process';
 
 const getGitDescription = () => {
@@ -39,16 +36,21 @@ export default defineConfig({
   },
   plugins: [
     vuePlugin({ jsx: true }),
-    viteCommonjs(),
-    envCompatible(),
-    createHtmlPlugin({
-      inject: {
-        data: {
-          title: 'aleph-explorer'
-        }
-      }
-    }),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Silence deprecation warnings emitted by stisla-theme's own SCSS
+        // (third-party, can't be fixed from here).
+        quietDeps: true,
+        // stisla-theme still uses @import internally and propagates that
+        // syntax across our entry SCSS. The migration to @use changes
+        // variable scoping and breaks stisla-theme's global expectations,
+        // so silence the @import deprecation until stisla-theme migrates.
+        silenceDeprecations: ['import']
+      }
+    }
+  },
   define: {
     GIT_DESCRIBE_TAGS: JSON.stringify(getGitDescription())
   },

@@ -1,6 +1,54 @@
+@use "sass:map";
+
+// Drop the document-level font size from the browser default (16px) to
+// 14px so the explorer reads at a denser, etherscan-style scale.
+// Everything sized in rem scales proportionally.
+html {
+  font-size: 14px;
+}
+
 // App styles
 .main-content {
   padding: $spacing-sm $spacing-lg $spacing-lg $spacing-lg;
+  // Grow to fill the main-zone so the footer below us sticks to the
+  // bottom of the viewport when the page content is short.
+  flex-grow: 1;
+  // Clip horizontal overflow so wide tables/cards don't blow out the
+  // viewport on phones; their own `table-responsive` wrappers still
+  // scroll horizontally inside the card.
+  overflow-x: hidden;
+}
+
+@media (max-width: 575px) {
+  .main-content {
+    padding-left: $spacing-base;
+    padding-right: $spacing-base;
+  }
+}
+
+// Cards must not let descendant tables / JSON viewers blow past the
+// viewport width. Tables keep their own .table-responsive horizontal
+// scroll; everything else is clipped or wraps.
+.card {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+// On phones, let MessageList row children wrap to a new line instead
+// of forcing the parent wider than the screen.
+@media (max-width: 575px) {
+  .card .list-group-item > .d-flex {
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+  }
+}
+
+// Make vue-json-pretty content scroll inside its tab pane instead of
+// pushing the surrounding card wider on phones.
+.vjs-tree,
+.vjs-tree-list {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .main-wrapper {
@@ -9,7 +57,13 @@
   min-height: 100vh;
 
   .main-zone {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
+    min-height: 100vh;
+    // Make room for both fixed left bars on desktop: the navigator
+    // icon strip and the main sidebar.
+    margin-left: calc(#{$navigator-width} + #{$sidebar-min-width});
   }
 }
 
@@ -24,6 +78,12 @@ nav.navbar {
 }
 
 .navigator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 101;
+  overflow-y: auto;
   background: $navigator-bg;
   width: $navigator-width;
 
@@ -82,9 +142,14 @@ nav.navbar {
 }
 
 .main-sidebar {
-  position: inherit !important;
+  position: fixed !important;
+  top: 0;
+  left: $navigator-width;
   min-width: $sidebar-min-width;
-  height: auto;
+  width: $sidebar-min-width;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
   background: $sidebar-bg;
   color: color(white);
   font-family: $font-family-title;
@@ -148,6 +213,8 @@ nav.navbar {
     .sidebar-menu {
       /*min-height: calc(100vh - 75.6px - 42.5px - 5rem);*/
       flex-grow: 1;
+      overflow-y: auto;
+      min-height: 0;
     }
   }
 
@@ -170,12 +237,20 @@ nav.navbar {
   }
 }
 
-@media only screen and (max-width: map-get($grid-breakpoints, lg)) {
+@media only screen and (max-width: map.get($grid-breakpoints, lg)) {
   .main-wrapper {
     flex-direction: column-reverse;
 
+    .main-zone {
+      // Mobile sidebar is an overlay (position: absolute); main-zone
+      // shouldn't reserve room for it.
+      margin-left: 0;
+    }
+
     .main-sidebar {
       width: 100%;
+      left: 0;
+      height: auto;
       position: absolute !important;
 
       #sidebar-wrapper {
