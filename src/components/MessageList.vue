@@ -97,4 +97,15 @@ export default {
   position: absolute;
   width: 100%;
 }
+
+// Brief brand-purple background flash on newly-arrived rows so the eye
+// catches the live update.
+.dynamic-list-enter-active {
+  animation: row-flash 1.5s ease-out;
+}
+
+@keyframes row-flash {
+  0%   { background-color: rgba(81, 0, 205, 0.18); }
+  100% { background-color: transparent; }
+}
 </style>

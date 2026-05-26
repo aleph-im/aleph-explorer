@@ -1,30 +1,7 @@
 <template>
   <div class="ecosystem-footer">
     <b-container fluid>
-      <b-row>
-        <b-col v-for="group in groups" :key="group.key" cols="6" md="3" class="mb-3">
-          <h6 class="ecosystem-footer__heading">{{ group.title }}</h6>
-          <ul class="ecosystem-footer__list">
-            <li v-for="item in group.items" :key="item.name">
-              <a :href="item.url" target="_blank" rel="noopener noreferrer">
-                <i :class="item.icon"></i> {{ item.name }}
-              </a>
-            </li>
-          </ul>
-        </b-col>
-      </b-row>
-      <b-row class="mt-2 pt-3 ecosystem-footer__resources">
-        <b-col cols="12" class="d-flex flex-wrap">
-          <a v-for="link in resources" :key="link.name" :href="link.url" target="_blank"
-            rel="noopener noreferrer" class="ecosystem-footer__resource" :title="link.name">
-            <i :class="link.icon"></i> {{ link.name }}
-          </a>
-          <b-link to="/ecosystem" class="ecosystem-footer__resource ml-auto">
-            See full ecosystem <i class="fas fa-chevron-right fa-xs"></i>
-          </b-link>
-        </b-col>
-      </b-row>
-      <b-row class="mt-2 pt-3 ecosystem-footer__legal">
+      <b-row class="ecosystem-footer__legal">
         <b-col cols="12" md="8" class="ecosystem-footer__copy">
           Copyright © 2018-present
           <a href="https://aleph.cloud" target="_blank" rel="noopener noreferrer">Aleph Cloud</a>
@@ -45,18 +22,28 @@
           </a>
         </b-col>
       </b-row>
+      <b-row class="mt-2 pt-3 ecosystem-footer__resources">
+        <b-col cols="12" class="d-flex flex-wrap">
+          <a v-for="link in resources" :key="link.name" :href="link.url" target="_blank"
+            rel="noopener noreferrer" class="ecosystem-footer__resource" :title="link.name">
+            <i :class="link.icon"></i> {{ link.name }}
+          </a>
+          <b-link to="/ecosystem" class="ecosystem-footer__resource ml-auto">
+            See full ecosystem <i class="fas fa-chevron-right fa-xs"></i>
+          </b-link>
+        </b-col>
+      </b-row>
     </b-container>
   </div>
 </template>
 
 <script>
-import { ECOSYSTEM_GROUPS, RESOURCE_LINKS } from '@/lib/ecosystem.js'
+import { RESOURCE_LINKS } from '@/lib/ecosystem.js'
 
 export default {
   name: 'EcosystemFooter',
   data() {
     return {
-      groups: ECOSYSTEM_GROUPS,
       resources: RESOURCE_LINKS,
       app_version: GIT_DESCRIBE_TAGS || 'unknown build'
     }
@@ -71,52 +58,9 @@ export default {
 
 <style scoped>
 .ecosystem-footer {
-  padding: 2rem 0 1.25rem;
+  padding: 1.25rem 0;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   background: #fafafd;
-}
-
-.ecosystem-footer__heading {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #6c757d;
-  margin-bottom: 0.6rem;
-  font-weight: 700;
-}
-
-.ecosystem-footer__list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ecosystem-footer__list li {
-  margin-bottom: 0.4rem;
-}
-
-.ecosystem-footer__list a {
-  color: #2b1865;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.ecosystem-footer__list a:hover {
-  color: #5100cd;
-  text-decoration: underline;
-}
-
-.ecosystem-footer__list .fas,
-.ecosystem-footer__list .fab {
-  margin-right: 0.35rem;
-  width: 1em;
-  text-align: center;
-  opacity: 0.7;
-}
-
-.ecosystem-footer__resources {
-  border-top: 1px dashed rgba(0, 0, 0, 0.08);
 }
 
 .ecosystem-footer__resource {
@@ -133,8 +77,11 @@ export default {
   color: #5100cd;
 }
 
-.ecosystem-footer__legal {
+.ecosystem-footer__resources {
   border-top: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+.ecosystem-footer__legal {
   font-size: 0.8rem;
   color: #6c757d;
 }

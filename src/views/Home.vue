@@ -9,8 +9,20 @@
         <b-col cols="12" md="6">
           <b-card no-body>
             <b-card-header>
-              <h4>Last messages <b-spinner small class="ml-3" label="Loading messages"
-                v-if="query_status.is_loading" /></h4>
+              <h4 class="d-flex align-items-center flex-wrap mb-0">
+                <span class="mr-2">Last messages</span>
+                <span class="ws-status" :class="wsStatusClass"
+                  v-b-tooltip.hover :title="wsStatusTitle">
+                  <span class="ws-status__dot"></span>
+                </span>
+                <b-badge v-if="!query_status.has_error" variant="light"
+                  class="ws-rate ml-2" v-b-tooltip.hover
+                  title="Messages received in this tab over the last 5 minutes">
+                  +{{ recentTimes.length }} /5min
+                </b-badge>
+                <b-spinner small class="ml-3" label="Loading messages"
+                  v-if="query_status.is_loading" />
+              </h4>
               <div class="card-header-action">
                 <b-link class="btn btn-primary" to="/messages">View all <i class="fas fa-chevron-right"></i></b-link>
               </div>
@@ -69,6 +81,8 @@ export default {
       metricsTimer: null,
       ratesTimer: null,
       addresses_loading: false,
+      recentTimes: [],
+      rateTickTimer: null,
       messages_fields: [
         { key: 'item_hash', label: 'Item Hash', class: 'hash' },
         { key: 'type', label: 'Type' },
@@ -91,6 +105,16 @@ export default {
       return Object.entries(this.addresses_stats)
         .map(([address, stats]) => ({ address, ...stats }))
         .sort((a, b) => b.messages - a.messages).slice(0, 25)
+    },
+    wsStatusClass() {
+      if (this.query_status.has_error) return 'ws-status--error'
+      if (this.query_status.is_loading) return 'ws-status--connecting'
+      return 'ws-status--live'
+    },
+    wsStatusTitle() {
+      if (this.query_status.has_error) return 'Live stream disconnected'
+      if (this.query_status.is_loading) return 'Connecting to live stream…'
+      return 'Live stream connected'
     },
     ...mapState({
       account: 'account',
@@ -120,6 +144,18 @@ export default {
       this.last_messages.unshift(data)
       this.last_messages.pop()
     },
+    recordMessageTick() {
+      this.recentTimes.push(Date.now())
+      this.pruneRecentTimes()
+    },
+    pruneRecentTimes() {
+      // Sliding 5-minute window; pruned every 5s so the badge ticks down
+      // visibly when no new messages arrive.
+      const cutoff = Date.now() - 5 * 60 * 1000
+      if (this.recentTimes.length && this.recentTimes[0] <= cutoff) {
+        this.recentTimes = this.recentTimes.filter(t => t > cutoff)
+      }
+    },
     openWS() {
       const socket = new WebSocket(`${this.api_server.ws_protocol}//${this.api_server.host}/api/ws0/messages?history=${QUEUE_SIZE}`)
       socket._intentionallyClosed = false
@@ -145,6 +181,7 @@ export default {
           return
         }
 
+        this.recordMessageTick()
         if (this.last_messages.length === QUEUE_SIZE)
           return this.pushToMessageQueue(data)
 
@@ -212,6 +249,9 @@ export default {
     }).finally(() => { this.addresses_loading = false })
     this.startDashboardPolling()
     document.addEventListener('visibilitychange', this.onVisibilityChange)
+    // Tick every 5s to keep the "/60s" chip in sync even when no new
+    // messages arrive (so the count decreases visibly as time passes).
+    this.rateTickTimer = setInterval(this.pruneRecentTimes, 5000)
   },
   watch: {
     'api_server.host'() {
@@ -224,12 +264,56 @@ export default {
   beforeDestroy() {
     this.closeWS()
     this.stopDashboardPolling()
+    if (this.rateTickTimer) { clearInterval(this.rateTickTimer); this.rateTickTimer = null }
     document.removeEventListener('visibilitychange', this.onVisibilityChange)
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.ws-status {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.ws-status__dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 currentColor;
+}
+
+.ws-status--live { color: #1e9c2e; }
+.ws-status--live .ws-status__dot {
+  animation: ws-pulse 1.6s ease-out infinite;
+}
+
+.ws-status--connecting { color: #c69200; }
+.ws-status--connecting .ws-status__dot {
+  animation: ws-pulse 2.4s ease-out infinite;
+  opacity: 0.7;
+}
+
+.ws-status--error { color: #d9245a; }
+.ws-status--error .ws-status__dot {
+  animation: none;
+}
+
+@keyframes ws-pulse {
+  0%   { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+  70%  { box-shadow: 0 0 0 0.4rem rgba(0, 0, 0, 0); opacity: 0.8; }
+  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); opacity: 1; }
+}
+
+.ws-rate {
+  font-weight: 500;
+  font-size: 0.72rem;
+  vertical-align: middle;
+}
+
 .messages-list-header {
   display: flex;
   align-items: center;

@@ -49,32 +49,19 @@
           </b-col>
         </b-row>
       </div>
-
-      <b-card no-body class="ecosystem-resources">
-        <b-card-body>
-          <h3 class="mb-3">Resources & community</h3>
-          <div class="d-flex flex-wrap">
-            <a v-for="link in resources" :key="link.name" :href="link.url" target="_blank"
-              rel="noopener noreferrer" class="ecosystem-resource">
-              <i :class="link.icon"></i> {{ link.name }}
-            </a>
-          </div>
-        </b-card-body>
-      </b-card>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import { ECOSYSTEM_GROUPS, RESOURCE_LINKS } from '@/lib/ecosystem.js'
+import { ECOSYSTEM_GROUPS } from '@/lib/ecosystem.js'
 
 export default {
   name: 'ecosystem',
   data() {
     return {
-      groups: ECOSYSTEM_GROUPS,
-      resources: RESOURCE_LINKS
+      groups: ECOSYSTEM_GROUPS
     }
   },
   computed: {
@@ -192,21 +179,5 @@ export default {
   flex-grow: 1;
 }
 
-.ecosystem-resources {
-  margin-top: 1rem;
-}
 
-.ecosystem-resource {
-  color: #495057;
-  text-decoration: none;
-  font-size: 0.9rem;
-  margin: 0 1.25rem 0.5rem 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.ecosystem-resource:hover {
-  color: #5100cd;
-}
 </style>

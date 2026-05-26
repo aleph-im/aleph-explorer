@@ -59,7 +59,14 @@
     <b-col cols="6" md="4" class="mb-3">
       <div class="stat-card">
         <div class="stat-label">Next on-chain commit in</div>
-        <div class="stat-value">{{ countdownText }}</div>
+        <div class="stat-value">
+          <div v-if="isAnchoring" class="progress-anchoring"
+            v-b-tooltip.hover title="A new commit is being assembled and broadcast">
+            <div class="progress-anchoring__bar"></div>
+            <span class="progress-anchoring__label">anchoring</span>
+          </div>
+          <template v-else>{{ countdownText }}</template>
+        </div>
         <div class="stat-sub">≈1h commit cadence</div>
       </div>
     </b-col>
@@ -141,7 +148,12 @@ export default {
       if (!this.commitAnchor) return '-'
       const target = this.commitAnchor + COMMIT_CADENCE_MS
       const remaining = target - this.now
-      return remaining > 0 ? fmtDuration(remaining) : 'overdue'
+      return remaining > 0 ? fmtDuration(remaining) : 'anchoring…'
+    },
+    isAnchoring() {
+      if (!this.commitAnchor) return false
+      const target = this.commitAnchor + COMMIT_CADENCE_MS
+      return target - this.now <= 0
     }
   },
   mounted() {
@@ -234,5 +246,58 @@ export default {
 
 .stat-warn {
   color: #d9245a;
+}
+
+/* Indeterminate "anchoring in progress" bar shown when the 1h commit
+   cadence has elapsed but the new committed height hasn't surfaced
+   in the metrics poll yet. A purple shimmer slides across a tinted
+   track, with the word "anchoring" centered on top. */
+.progress-anchoring {
+  position: relative;
+  width: 100%;
+  height: 1.5rem;
+  background: rgba(81, 0, 205, 0.08);
+  border-radius: 0.3rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-anchoring__bar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg,
+    rgba(81, 0, 205, 0),
+    rgba(81, 0, 205, 0.45) 50%,
+    rgba(81, 0, 205, 0));
+  animation: anchoring-slide 1.8s linear infinite;
+  will-change: left;
+}
+
+.progress-anchoring__label {
+  position: relative;
+  z-index: 1;
+  font-size: 0.78rem;
+  color: #5100cd;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+}
+
+@keyframes anchoring-slide {
+  0%   { left: -40%; }
+  100% { left: 100%; }
+}
+
+@media (max-width: 575px) {
+  .progress-anchoring {
+    height: 1.05rem;
+  }
+  .progress-anchoring__label {
+    font-size: 0.65rem;
+  }
 }
 </style>
