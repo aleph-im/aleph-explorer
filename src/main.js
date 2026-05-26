@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import vSelect from 'vue-select'
+import VueMeta from 'vue-meta'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -26,6 +27,8 @@ import {
 
 dayjs.extend(localizedFormat)
 dayjs.extend(relativeTime)
+
+Vue.use(VueMeta)
 
 // Register only the bootstrap-vue components actually used in templates.
 // Adding a new <b-*> tag requires adding it to this list.

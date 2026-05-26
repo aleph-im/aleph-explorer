@@ -69,7 +69,7 @@
               <b-link
                 href="https://docs.aleph.cloud/"
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
                 class="btn btn-primary btn-lg btn-icon-split btn-block mb-0"
               >
                 <i class="fas fa-book"></i>
@@ -98,7 +98,7 @@
               <a
                 href="https://www.aleph.cloud/blog"
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
                 aria-label="Blog"
               >
                 <i class="fas fa-globe"></i>
@@ -188,6 +188,14 @@ import EcosystemFooter from "@/components/EcosystemFooter.vue";
 export default {
   name: "app",
   components: { SearchBar, EcosystemFooter },
+  metaInfo: {
+    // Fallback title used when a route view doesn't override it.
+    // Other views set title: 'Messages' / 'Verify' / etc. and the
+    // template appends "| Aleph Cloud Explorer" automatically.
+    title: null,
+    titleTemplate: (chunk) =>
+      chunk ? `${chunk} | Aleph Cloud Explorer` : 'Aleph Cloud Explorer'
+  },
   data() {
     return {
       window: {

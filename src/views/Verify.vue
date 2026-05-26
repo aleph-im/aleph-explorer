@@ -49,7 +49,7 @@
               <dt :key="field.label + '-l'">{{ field.label }}</dt>
               <dd :key="field.label + '-v'">
                 <router-link v-if="field.to" :to="field.to">{{ field.value }}</router-link>
-                <a v-else-if="field.href" :href="field.href" target="_blank" rel="noopener noreferrer">
+                <a v-else-if="field.href" :href="field.href" target="_blank" :rel="relFor(field.href)">
                   <code>{{ field.value }}</code> <i class="fas fa-external-link-alt fa-xs"></i>
                 </a>
                 <code v-else>{{ field.value }}</code>
@@ -88,7 +88,7 @@
             <template v-for="field in step2.fields">
               <dt :key="field.label + '-l'">{{ field.label }}</dt>
               <dd :key="field.label + '-v'">
-                <a v-if="field.href" :href="field.href" target="_blank" rel="noopener noreferrer">
+                <a v-if="field.href" :href="field.href" target="_blank" :rel="relFor(field.href)">
                   <code>{{ field.value }}</code> <i class="fas fa-external-link-alt fa-xs"></i>
                 </a>
                 <code v-else>{{ field.value }}</code>
@@ -139,6 +139,7 @@ import { mapState } from 'vuex'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
 import { verifyMessageSignature } from '@/lib/signature.js'
+import { relFor } from '@/lib/links.js'
 
 const ETH_RPC = 'https://ethereum-rpc.publicnode.com'
 
@@ -192,6 +193,16 @@ export default {
   components: { VueJsonPretty },
   props: {
     hash: { type: String, default: null }
+  },
+  metaInfo() {
+    const short = this.hash ? this.hash.slice(0, 12) + '…' : null
+    return {
+      title: short ? 'Verify ' + short : 'Verifier',
+      meta: [
+        { vmid: 'description', name: 'description',
+          content: 'Cryptographically prove an Aleph message: signature recovery, Ethereum anchor decode and IPFS-payload presence check, all client-side.' }
+      ]
+    }
   },
   data() {
     return {
@@ -411,6 +422,7 @@ export default {
     if (this.copyResetTimer) clearTimeout(this.copyResetTimer)
   },
   methods: {
+    relFor,
     submit() {
       const hash = (this.query || '').trim()
       if (!hash) return

@@ -222,6 +222,13 @@ import { toUnixTimestamp } from '../helpers.js'
 
 export default {
   name: 'messages',
+  metaInfo: {
+    title: 'Messages',
+    meta: [
+      { vmid: 'description', name: 'description',
+        content: 'Browse and filter every signed message on Aleph: posts, aggregates, files, programs, instances, with chain, channel, status and block-range filters.' }
+    ]
+  },
   data() {
     return {
       messages: [],

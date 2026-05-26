@@ -72,6 +72,13 @@ const QUEUE_SIZE = 15
 
 export default {
   name: 'home',
+  metaInfo: {
+    title: null, // keep the bare brand title on the dashboard
+    meta: [
+      { vmid: 'description', name: 'description',
+        content: 'Live dashboard for the Aleph Cloud network: total messages, pending queue, last on-chain commit, message rate, anchoring countdown.' }
+    ]
+  },
   data() {
     return {
       last_messages: [],

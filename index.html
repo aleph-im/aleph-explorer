@@ -46,14 +46,59 @@
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileColor" content="#5100cd" />
     <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#5100cd" />
     <title>Decentralized cloud explorer | Aleph Cloud</title>
     <meta
       name="description"
-      content="Explore real-time blockchain and cloud activity with the Aleph Cloud Explorer. Track nodes, transactions, confidential VMs, and decentralized infrastructure data in a secure, transparent environment."
+      content="Block explorer for Aleph Cloud. Browse signed messages, addresses and aggregates, and cryptographically verify that any message is signed, batched and anchored on Ethereum."
     />
+    <link rel="canonical" href="https://explorer.aleph.cloud/" />
+
+    <!-- Open Graph (Facebook, LinkedIn, Discord, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Aleph Cloud Explorer" />
+    <meta property="og:title" content="Aleph Cloud Explorer" />
+    <meta
+      property="og:description"
+      content="Block explorer for Aleph Cloud. Browse signed messages, addresses and aggregates, and cryptographically verify that any message is signed, batched and anchored on Ethereum."
+    />
+    <meta property="og:url" content="https://explorer.aleph.cloud/" />
+    <meta property="og:image" content="https://explorer.aleph.cloud/apple-icon-180x180.png" />
+    <meta property="og:image:alt" content="Aleph Cloud" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@aleph_im" />
+    <meta name="twitter:title" content="Aleph Cloud Explorer" />
+    <meta
+      name="twitter:description"
+      content="Block explorer for Aleph Cloud. Browse signed messages, addresses and aggregates, and cryptographically verify that any message is signed, batched and anchored on Ethereum."
+    />
+    <meta name="twitter:image" content="https://explorer.aleph.cloud/apple-icon-180x180.png" />
+
+    <!-- Structured data: WebSite schema with SearchAction for sitelinks search box -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Aleph Cloud Explorer",
+      "url": "https://explorer.aleph.cloud/",
+      "description": "Block explorer for Aleph Cloud. Browse signed messages, addresses and aggregates, and cryptographically verify that any message is signed, batched and anchored on Ethereum.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Aleph Cloud",
+        "url": "https://aleph.cloud"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://explorer.aleph.cloud/addresses?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
     <link
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"

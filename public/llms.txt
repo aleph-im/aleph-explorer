@@ -1,0 +1,36 @@
+# Aleph Cloud Explorer
+
+> Block explorer and verifier for the Aleph Cloud decentralized network. Browse signed messages, addresses, and aggregates; cryptographically verify that a message exists, was signed by its sender, and is anchored on Ethereum via an IPFS-pinned batch.
+
+Aleph Cloud is a decentralized cloud platform where anyone can sign and publish messages (posts, aggregates, files, programs, instances) with any chain wallet (Ethereum, Solana, Avalanche, Tezos, BSC, Base, Cosmos, Polkadot). Messages are batched and anchored on Ethereum every ~1 hour. Every Core Channel Node pins every file. Publishing is free for users.
+
+## Pages
+
+- [Dashboard](https://explorer.aleph.cloud/): live network stats from /metrics.json, total messages and pinned files, last on-chain commit, message rate, anchoring countdown
+- [Messages](https://explorer.aleph.cloud/messages): browse signed messages with filters by channel, sender, type (POST, AGGREGATE, STORE, PROGRAM, INSTANCE, FORGET), tags, content types, chains, message status, block range
+- [Addresses](https://explorer.aleph.cloud/addresses): paginated list of addresses with message, post, and aggregate counts
+- [Verifier](https://explorer.aleph.cloud/verify): cryptographic proof tool that checks signature validity, decodes the Ethereum anchor transaction, and confirms the message is present in the IPFS-pinned batch
+- [Ecosystem](https://explorer.aleph.cloud/ecosystem): index of Aleph Cloud products (Cloud Console, Network overview, Bridge, LibertAI, LiberClaw) and storage redundancy stats
+- [About](https://explorer.aleph.cloud/about): project background
+
+## API
+
+- [Aleph node REST API](https://api2.aleph.im/): the public Aleph node that the explorer reads from
+- [Live WebSocket stream](wss://api2.aleph.im/api/ws0/messages): real-time message feed used by the dashboard
+- [On-chain anchor contract](https://etherscan.io/address/0x166fd4299364b21c7567e163d85d78d2fb2f8ad5): Ethereum contract where batched message hashes are committed every ~1 hour
+
+## Resources
+
+- [Aleph Cloud homepage](https://aleph.cloud)
+- [Documentation](https://docs.aleph.cloud/)
+- [Blog](https://www.aleph.cloud/blog)
+- [GitHub organization](https://github.com/aleph-im)
+
+## Optional
+
+- [Cloud Console](https://app.aleph.cloud/console/): deploy VMs, GPU, websites, storage, serverless functions
+- [Network overview](https://network.aleph.cloud): live node map and metrics
+- [Account & staking](https://app.aleph.cloud/account/): validators and staking rewards
+- [Bridge](https://swap.aleph.cloud): $ALEPH cross-chain bridge
+- [LibertAI](https://libertai.io): private AI inference on Aleph compute
+- [LiberClaw](https://liberclaw.ai): autonomous AI agents on Aleph compute

@@ -4,7 +4,7 @@
       <b-row class="ecosystem-footer__legal">
         <b-col cols="12" md="8" class="ecosystem-footer__copy">
           Copyright © 2018-present
-          <a href="https://aleph.cloud" target="_blank" rel="noopener noreferrer">Aleph Cloud</a>
+          <a href="https://aleph.cloud" target="_blank" rel="noopener">Aleph Cloud</a>
           <template v-if="app_version">
             <span class="ecosystem-footer__version">
               <template v-if="last_release_is_a_tag()">
@@ -25,7 +25,7 @@
       <b-row class="mt-2 pt-3 ecosystem-footer__resources">
         <b-col cols="12" class="d-flex flex-wrap">
           <a v-for="link in resources" :key="link.name" :href="link.url" target="_blank"
-            rel="noopener noreferrer" class="ecosystem-footer__resource" :title="link.name">
+            :rel="relFor(link.url)" class="ecosystem-footer__resource" :title="link.name">
             <i :class="link.icon"></i> {{ link.name }}
           </a>
           <b-link to="/ecosystem" class="ecosystem-footer__resource ml-auto">
@@ -39,6 +39,7 @@
 
 <script>
 import { RESOURCE_LINKS } from '@/lib/ecosystem.js'
+import { relFor } from '@/lib/links.js'
 
 export default {
   name: 'EcosystemFooter',
@@ -49,6 +50,7 @@ export default {
     }
   },
   methods: {
+    relFor,
     last_release_is_a_tag() {
       return /\d+-.[0-9A-F]{7}$/i.test(this.app_version)
     }

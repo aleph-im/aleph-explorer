@@ -18,8 +18,13 @@
               <div class="ecosystem-redundancy__label">Storage redundancy</div>
               <p class="ecosystem-redundancy__text mb-0">
                 Every file pinned on Aleph is replicated across
-                <strong>{{ ccnCount }} Core&nbsp;Channel Nodes</strong> worldwide. No single
-                node, region or operator can take your data offline.
+                <a href="https://app.aleph.cloud/account/earn/ccn/" target="_blank"
+                  rel="noopener" class="ecosystem-redundancy__link"
+                  title="See the live list of Core Channel Nodes">
+                  <strong>{{ ccnCount }} Core&nbsp;Channel Nodes</strong>
+                  <i class="fas fa-external-link-alt fa-xs"></i>
+                </a>
+                worldwide. No single node, region or operator can take your data offline.
               </p>
             </div>
           </div>
@@ -40,7 +45,7 @@
                   </div>
                 </div>
                 <p class="ecosystem-card__description">{{ item.description }}</p>
-                <a :href="item.url" target="_blank" rel="noopener noreferrer"
+                <a :href="item.url" target="_blank" :rel="relFor(item.url)"
                   class="btn btn-primary btn-sm mt-auto align-self-start">
                   Open <i class="fas fa-external-link-alt fa-xs ml-1"></i>
                 </a>
@@ -56,13 +61,24 @@
 <script>
 import { mapState } from 'vuex'
 import { ECOSYSTEM_GROUPS } from '@/lib/ecosystem.js'
+import { relFor } from '@/lib/links.js'
 
 export default {
   name: 'ecosystem',
+  metaInfo: {
+    title: 'Ecosystem',
+    meta: [
+      { vmid: 'description', name: 'description',
+        content: 'The Aleph Cloud ecosystem: Cloud Console, Network overview, ALEPH bridge, LibertAI and LiberClaw, plus storage-redundancy stats from the corechannel aggregate.' }
+    ]
+  },
   data() {
     return {
       groups: ECOSYSTEM_GROUPS
     }
+  },
+  methods: {
+    relFor
   },
   computed: {
     ...mapState({
@@ -122,6 +138,21 @@ export default {
 .ecosystem-redundancy__text strong {
   color: #5100cd;
   font-weight: 700;
+}
+
+.ecosystem-redundancy__link {
+  color: #5100cd;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ecosystem-redundancy__link:hover {
+  text-decoration: underline;
+}
+
+.ecosystem-redundancy__link .fa-external-link-alt {
+  margin-left: 0.2em;
+  opacity: 0.6;
 }
 
 .ecosystem-group {
