@@ -107,7 +107,7 @@
                       <b-spinner small class="ml-3" label="Loading messages" />
                     </template>
                     <template v-else-if="programSource">
-                      <span><a :href="programSource" target="_blank" rel="noopener noreferrer">
+                      <span><a :href="programSource" target="_blank" :rel="relFor(programSource)">
                         <i class="fas fa-download" />&nbsp;
                         Download
                         <template v-if="message.content.code.encoding === 'plain'">
@@ -200,6 +200,7 @@ import dayjs from 'dayjs'
 import AddressLink from '@/components/AddressLink'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
+import { relFor } from '@/lib/links.js'
 
 function base64toHEX (base64) {
   const buffer = Buffer.from(base64, 'base64')
@@ -214,6 +215,17 @@ export default {
   name: 'message-detail',
   components: {
     VueJsonPretty, AddressLink
+  },
+  metaInfo() {
+    const short = this.hash ? this.hash.slice(0, 12) + '…' : 'Message'
+    return {
+      title: 'Message ' + short,
+      meta: [
+        { vmid: 'description', name: 'description',
+          content: 'Signed Aleph message ' + (this.hash || '') +
+            ' — content, signature, confirmations and raw payload, ready to verify.' }
+      ]
+    }
   },
   computed: mapState({
     account: state => state.account,
@@ -244,6 +256,7 @@ export default {
     reldateformat (dt) {
       return dayjs.unix(dt).fromNow()
     },
+    relFor,
     getHash (hash) {
       if (hash.$binary !== undefined) { return base64toHEX(hash.$binary) } else { return hash }
     },

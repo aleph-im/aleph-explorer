@@ -4,7 +4,7 @@
       <b-card-header>
         <h4>
           What is
-          <a href="https:/cloud" target="_blank" rel="noopener noreferrer"
+          <a href="https://aleph.cloud" target="_blank" rel="noopener"
             >Aleph Cloud</a
           >?
         </h4>
@@ -22,7 +22,7 @@
           href="https://aleph.cloud"
           class="card-link"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener"
         >
           <i class="fas fa-home"></i> Website</a
         >
@@ -43,5 +43,12 @@
 export default {
   name: "about",
   components: {},
+  metaInfo: {
+    title: 'About',
+    meta: [
+      { vmid: 'description', name: 'description',
+        content: 'About Aleph Cloud: a cross-blockchain layer-2 network and decentralized cloud computing platform.' }
+    ]
+  }
 };
 </script>

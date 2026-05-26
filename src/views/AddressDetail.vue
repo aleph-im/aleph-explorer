@@ -85,6 +85,19 @@ import 'vue-json-pretty/lib/styles.css'
 
 export default {
   name: 'address-detail',
+  metaInfo() {
+    const short = this.address
+      ? this.address.slice(0, 6) + '…' + this.address.slice(-4)
+      : 'Address'
+    return {
+      title: 'Address ' + short,
+      meta: [
+        { vmid: 'description', name: 'description',
+          content: 'Aleph activity for ' + (this.address || 'this address') +
+            ' — published messages, aggregates and posts.' }
+      ]
+    }
+  },
   data() {
     return {
       current_msg_page: 1,

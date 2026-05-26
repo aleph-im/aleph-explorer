@@ -49,6 +49,13 @@ import AddressLink from '@/components/AddressLink'
 
 export default {
   name: 'about',
+  metaInfo: {
+    title: 'Addresses',
+    meta: [
+      { vmid: 'description', name: 'description',
+        content: 'Paginated index of every address that has published a message on Aleph, with message, post and aggregate counts.' }
+    ]
+  },
   data() {
     return {
       per_page: 20,
