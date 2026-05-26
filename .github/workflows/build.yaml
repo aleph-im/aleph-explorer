@@ -15,9 +15,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Get git context
-        run: git fetch --prune --unshallow
+        with:
+          # Full history + tags so `git describe --tags` in vite.config.js
+          # produces a real version string (e.g. v0.1.9b-51-g35a6cb6)
+          # instead of falling back to "unknown build".
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup node
         uses: actions/setup-node@v4
