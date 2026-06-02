@@ -136,7 +136,13 @@
       <b-card-header class="d-flex align-items-center flex-wrap messages-header">
         <h4 class="mb-0 mr-3">
           Messages
-          <b-spinner small class="ml-2" label="Loading" v-if="query_status.is_loading" />
+          <span class="messages-status-slot ml-2">
+            <b-spinner small label="Loading" v-if="query_status.is_loading" />
+            <a v-else href="#" class="messages-refresh" @click.prevent="getMessages"
+              v-b-tooltip.hover title="Refresh messages" aria-label="Refresh">
+              <i class="fas fa-sync-alt"></i>
+            </a>
+          </span>
         </h4>
 
         <template v-if="!showAdvancedFilters">
@@ -313,6 +319,9 @@ export default {
         params: {
           pagination: this.per_page,
           page: this.page,
+          // Headers-only response: we only render content.type / content.key
+          // / content.address in the table, never the full content JSONB.
+          contentFormat: 'headers',
           channels: this.filters.channels ? this.filters.channels.join(',') : undefined,
           addresses: this.filters.sender || undefined,
           msgType: this.filters.type !== 'ALL' ? this.filters.type : undefined,
@@ -459,6 +468,33 @@ export default {
   color: inherit;
   font-size: 0.9em;
   white-space: nowrap;
+}
+
+/* Fixed-size slot that holds the spinner or the refresh icon at the
+   exact same X / Y, regardless of which element type is inside it. */
+.messages-header .messages-status-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: -0.125em; /* matches the default .spinner-border alignment */
+}
+
+.messages-header .messages-refresh {
+  color: inherit;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.messages-header .messages-refresh:hover,
+.messages-header .messages-refresh:focus {
+  color: #5100cd;
+  text-decoration: none;
+}
+
+.messages-header .messages-refresh .fas {
+  font-size: 0.85em;
 }
 
 .messages-header .header-channel-filter {
