@@ -205,9 +205,12 @@ export default new Vuex.Store({
       const now = Math.floor(Date.now() / 1000)
       const baseUrl = `${state.api_server.protocol}//${state.api_server.host}/api/v0/messages.json`
       try {
+        // We only read pagination_total here, never the rows themselves.
+        // contentFormat=none drops the content JSONB entirely from the
+        // response body, which is much smaller and faster on the server.
         const [h1, h24] = await Promise.all([
-          axios.get(baseUrl, { params: { startDate: now - 3600, pagination: 1, page: 1 } }),
-          axios.get(baseUrl, { params: { startDate: now - 86400, pagination: 1, page: 1 } })
+          axios.get(baseUrl, { params: { startDate: now - 3600, pagination: 1, page: 1, contentFormat: 'none' } }),
+          axios.get(baseUrl, { params: { startDate: now - 86400, pagination: 1, page: 1, contentFormat: 'none' } })
         ])
         commit('set_message_rates', {
           h1: h1.data.pagination_total ?? null,
@@ -313,7 +316,10 @@ export default new Vuex.Store({
               params: {
                 'addresses': address,
                 'pagination': perPage,
-                'page': page
+                'page': page,
+                // Headers-only; the address messages list never renders
+                // the full content JSONB.
+                'contentFormat': 'headers'
               }
             }
           );
