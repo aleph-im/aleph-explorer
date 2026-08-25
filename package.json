@@ -14,7 +14,7 @@
     "dayjs": "^1.11.20",
     "ethers": "^6.16.0",
     "stisla-theme": "^1.0.5",
-    "vue": "^2.7.0",
+    "vue": "^3.0.0",
     "vue-json-pretty": "1.9.5",
     "vue-meta": "^2.4.0",
     "vue-router": "^3.0.3",
