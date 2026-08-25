@@ -48,6 +48,7 @@ export const fetchAddresses = async (api_server, options = {}) => {
         store: stats.store || 0,
         program: stats.program || 0,
         instance: stats.instance || 0,
+        v_program: stats.v_program || 0,
         forget: stats.forget || 0
       };
 
