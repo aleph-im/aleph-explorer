@@ -132,6 +132,76 @@
             </b-list-group>
           </b-card>
 
+          <b-card no-body v-if="message.type === 'V-PROGRAM'">
+            <b-card-header>
+              <h4>V-Program details</h4>
+            </b-card-header>
+            <b-list-group flush>
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Runtime</span>
+                    <span><a :href="`/message/${message.content.runtime.ref}`">
+                      <template v-if="message.content.runtime.comment">
+                        {{ message.content.runtime.comment }}
+                      </template>
+                      <template v-else>
+                        {{ message.content.runtime.ref.slice(0, 12) }}&hellip;
+                      </template>
+                      </a></span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Workload</span>
+                    <span><a :href="`/message/${message.content.workload.ref}`">
+                      {{ message.content.workload.ref.slice(0, 12) }}&hellip;
+                    </a></span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Workload root hash</span>
+                    <span class="text-monospace" :title="message.content.workload.roothash">
+                      {{ message.content.workload.roothash.slice(0, 16) }}&hellip;
+                    </span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>TEE</span>
+                    <span>{{ message.content.verification.backend }}
+                      (policy 0x{{ message.content.verification.policy.toString(16) }})</span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Launch measurements</span>
+                    <span>
+                      <template v-for="(m, i) in message.content.verification.measurements">
+                        <span :key="i" class="text-monospace" :title="measurementDigest(m)">
+                          {{ m.vcpu_type || m.platform }}: {{ measurementDigest(m).slice(0, 12) }}&hellip;
+                        </span><br :key="'br' + i" />
+                      </template>
+                    </span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Verified volumes</span>
+                    <span>{{ (message.content.volumes || []).length }}</span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>Internet</span>
+                    <span>{{ message.content.environment.internet ? 'yes' : 'no' }}</span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>vCPUs</span>
+                    <span>{{  message.content.resources.vcpus }}</span>
+                  </b-list-group-item>
+
+                  <b-list-group-item class="d-flex w-100 font-small justify-content-between">
+                    <span>RAM</span>
+                    <span>{{ Number(message.content.resources.memory / 1024).toFixed(2) }}&nbsp;Gb</span>
+                  </b-list-group-item>
+            </b-list-group>
+          </b-card>
+
           <b-card no-body>
             <b-card-header>
               <h4>Message details</h4>
@@ -287,6 +357,11 @@ export default {
         `${this.api_server.protocol}//${this.api_server.host}/api/v0/messages/${this.hash}`
       )
       this.messages = response.data.message ? [response.data.message] : []
+    },
+    measurementDigest (measurement) {
+      // Current schema carries registers.launch; older messages carried a scalar digest.
+      if (measurement.registers && measurement.registers.launch) return measurement.registers.launch
+      return measurement.digest || ''
     },
     async getProgramSource () {
       try {

@@ -37,6 +37,7 @@
                   <b-form-radio value="POST">Post</b-form-radio>
                   <b-form-radio value="PROGRAM">Program</b-form-radio>
                   <b-form-radio value="INSTANCE">Instance</b-form-radio>
+                  <b-form-radio value="V-PROGRAM">V-Program</b-form-radio>
                   <b-form-radio value="STORE">Store</b-form-radio>
                 </b-form-radio-group>
               </b-form-group>

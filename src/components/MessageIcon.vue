@@ -25,6 +25,10 @@ const iconStyles = {
     background: 'bg-dark',
     text: 'VM'
   },
+  'V-PROGRAM': {
+    background: 'bg-success',
+    text: 'VP'
+  },
   FORGET: {
     background: 'bg-secondary',
     text: 'F'

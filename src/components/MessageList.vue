@@ -27,6 +27,9 @@
             <b-badge variant="light"  v-b-tooltip.hover :title="preview_format(message)"
             v-if="message.content && message.type==='AGGREGATE'" class="text-truncate break-word" style="max-width: 15em">
               {{message.content.key}}</b-badge>
+            <b-badge variant="light" v-b-tooltip.hover :title="message.content.runtime && message.content.runtime.ref"
+            v-if="message.content && message.type==='V-PROGRAM' && message.content.runtime" class="text-truncate break-word" style="max-width: 15em">
+              {{message.content.runtime.comment || 'V-Program'}}</b-badge>
             <!-- <b-badge variant="light"
             v-if="message.type==='STORE'" class="text-truncate break-word">
               {{message.content.size/1000000}} MB</b-badge> -->
